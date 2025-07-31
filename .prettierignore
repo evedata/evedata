@@ -1,0 +1,10 @@
+CHANGELOG.md
+
+*-lock.*
+*.lock
+*.log
+
+**/*.hbs
+.turbo/**
+
+.github/PULL_REQUEST_TEMPLATE.md

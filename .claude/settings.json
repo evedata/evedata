@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm run build:*)",
+      "Bash(pnpm run check:*)",
+      "Bash(pnpm run fix:*)",
+      "Bash(pnpm run prettify:*)",
+      "Bash(pnpm run test:*)",
+      "Bash(pnpm run view-report:*)",
+      "Bash(turbo run build:*)",
+      "Bash(turbo run check:*)",
+      "Bash(turbo run test:*)",
+      "Bash(uv run pyright:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(uv run ruff:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(rg:*)"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | { read file_path; if echo \"$file_path\" | grep -q '\\.py$'; then uv run ruff check --fix-only \"$file_path\"; uv run ruff format \"$file_path\"; fi; }"
+          }
+        ]
+      }
+    ]
+  }
+}

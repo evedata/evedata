@@ -1,0 +1,176 @@
+site_name: EVEData Documentation
+site_url: https://docs.evedata.io
+site_author: Corvin Vale
+site_description: "EVEData is a data platform for EVE Online"
+
+repo_name: evedata/evedata
+repo_url: https://github.com/evedata/evedata
+
+copyright: '&copy; 2024 Corvin Vale. All rights reserved. "EVE", "EVE Online", "CCP", and all related logos and images are trademarks or registered trademarks of CCP hf.'
+
+docs_dir: content
+
+theme:
+  name: material
+  features:
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - content.tooltips
+    - navigation.footer
+    - navigation.indexes
+    - navigation.prune
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+  font:
+    text: Inter
+    code: JetBrains Mono
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/link
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep orange
+      accent: deep orange
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: orange
+      toggle:
+        icon: material/toggle-switch-off
+        name: Switch to system preference
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/evedata
+    - icon: fontawesome/brands/bluesky
+      link: https://bsky.app/profile/valeant.space
+    - icon: fontawesome/brands/x-twitter
+      link: https://x.com/corvinvale
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/AjXHGwey
+
+plugins:
+  - blog
+  - glightbox
+  # - mkdocstrings:
+  #     default_handler: python
+  #     handlers:
+  #       python:
+  #         inventories:
+  #           - https://docs.python.org/3/objects.inv
+  #         paths: []
+  #         options:
+  #           heading_level: 2
+  #           docstring_options:
+  #             ignore_init_summary: true
+  #           docstring_section_style: list
+  #           merge_init_into_class: true
+  - privacy:
+      enabled: !ENV [CI, false]
+  - search:
+      lang: en
+  - social
+  - tags
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.blocks.caption
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      normalize_issue_symbols: true
+      repo_url_shorthand: true
+      user: evedata
+      repo: evedata
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+  - tables
+  - toc:
+      permalink: true
+      permalink_title: Anchor link to this section for reference
+      title: On this page
+      toc_depth: 3
+
+extra_javascript:
+  - javascripts/mathjax.js
+
+nav:
+  - Home:
+      - index.md
+      - Why?: why.md
+      - Quick start: quick-start.md
+      - Project:
+          - Vision: vision.md
+          - Roadmap: roadmap.md
+          - Alternatives: alternatives.md
+          - License: license.md
+          - Acknowledgements: acknowledgements.md
+          - Generative AI: genai.md
+  - Tutorials:
+      - Overview: tutorials/overview.md
+  - Guides:
+      - Overview: guides/overview.md
+  - Concepts:
+      - Overview: concepts/overview.md
+      - Architecture: concepts/architecture.md
+  - Reference:
+      - Overview: reference/overview.md
+      - Glossary: reference/glossary.md
+  - Contributing:
+      - Overview: contributing/overview.md
+      - Reporting issues: contributing/reporting-issues.md
+      - Contributing code: contributing/code.md
+      - Contributing documentation: contributing/documentation.md
+  - Community:
+      - Overview: community/overview.md
+      - Code of conduct: community/code-of-conduct.md
+  - Blog:
+      - blog/index.md

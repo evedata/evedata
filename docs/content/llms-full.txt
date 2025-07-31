@@ -1,0 +1,3 @@
+# EVEData
+
+> EVEData is a data platform for EVE Online.

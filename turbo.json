@@ -1,0 +1,43 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "ui": "tui",
+  "globalEnv": ["NODE_VERSION"],
+  "globalPassThroughEnv": ["NODE_EXTRA_CA_CERTS", "CI", "VSCODE_INSPECTOR_OPTIONS"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "deploy": {
+      "cache": false,
+      "dependsOn": ["^deploy"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "format": {
+      "dependsOn": ["^format"]
+    },
+    "test": {
+      "dependsOn": ["build"]
+    },
+    "test:ci": {
+      "dependsOn": ["build"]
+    },
+    "test:e2e": {
+      "dependsOn": ["^test:e2e"]
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true
+    },
+    "types": {
+      "dependsOn": ["build"]
+    }
+  }
+}

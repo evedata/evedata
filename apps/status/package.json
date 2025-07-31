@@ -1,0 +1,43 @@
+{
+  "name": "status",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "check:types": "tsc --noEmit",
+    "deploy": "rm -fr .open-next && opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "start": "next start",
+    "lint": "next lint",
+    "preview": "rm -fr .open-next && opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "upload": "rm -fr .open-next &&opennextjs-cloudflare build && opennextjs-cloudflare upload"
+  },
+  "dependencies": {
+    "@opennextjs/cloudflare": "^1.6.2",
+    "next": "~15.3.5",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@playwright/test": "^1.54.1",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/vitest-config": "workspace:*",
+    "@tailwindcss/postcss": "^4.1.11",
+    "@testing-library/react": "^16.3.0",
+    "@types/node": "catalog:default",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitest/coverage-istanbul": "catalog:default",
+    "eslint": "^9.31.0",
+    "tailwindcss": "^4.1.11",
+    "typescript": "catalog:default",
+    "vitest": "catalog:default",
+    "wrangler": "^4.26.1"
+  }
+}

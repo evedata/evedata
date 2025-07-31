@@ -1,0 +1,45 @@
+{
+  "name": "evedata-io",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Monorepo for EVEData",
+  "author": "Corvin Vale <corvin.vale@example.com>",
+  "scripts": {
+    "build": "dotenv -- turbo build",
+    "check": "dotenv -- turbo lint types format",
+    "lint": "dotenv -- turbo lint",
+    "dev": "dotenv -- turbo dev",
+    "fix": "dotenv -- turbo lint -- --fix && pnpm run prettify",
+    "format": "prettier --write . --ignore-unknown",
+    "test": "dotenv -- turbo run test",
+    "test:ci": "dotenv -- turbo test:ci",
+    "test:e2e": "dotenv -- turbo test:e2e",
+    "test:watch": "turbo test:watch",
+    "types": "dotenv -- turbo types",
+    "view-report": "turbo run view-report"
+  },
+  "dependencies": {
+    "@repo/vitest-config": "workspace:*",
+    "@types/node": "catalog:default",
+    "cross-env": "^7.0.3",
+    "dotenv-cli": "^8.0.0",
+    "esbuild": "catalog:default",
+    "jsonc-parser": "^3.3.1",
+    "markdownlint-cli2": "^0.18.1",
+    "prettier": "^3.6.2",
+    "prettier-plugin-packagejson": "^2.5.19",
+    "prettier-plugin-toml": "^2.0.6",
+    "turbo": "^2.5.5",
+    "typescript": "catalog:default",
+    "vitest": "catalog:default"
+  },
+  "packageManager": "pnpm@10.13.1",
+  "engines": {
+    "node": ">=22.14.0",
+    "pnpm": "^10.13.1"
+  },
+  "volta": {
+    "node": ">=22.14.0",
+    "pnpm": "^10.13.1"
+  }
+}

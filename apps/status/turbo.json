@@ -1,0 +1,21 @@
+{
+  "extends": [
+    "//"
+  ],
+  "tasks": {
+    "build": {
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
+    },
+    "preview": {
+      "cache": false,
+      "env": ["NODE_ENV"],
+      "persistent": true
+    },
+    "test:e2e": {
+      "env": ["PORT"]
+    }
+  }
+}

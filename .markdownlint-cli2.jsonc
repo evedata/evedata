@@ -1,0 +1,13 @@
+{
+  "config": {
+    "line-length": false,
+    "first-line-h1": false,
+    "no-emphasis-as-heading": false
+  },
+  "customRules": [],
+  "gitignore": true,
+  "noBanner": true,
+  "noInlineConfig": true,
+  "noProgress": true,
+  "showFound": true
+}
