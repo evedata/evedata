@@ -1,0 +1,147 @@
+[build-system]
+requires = ["uv_build>=0.8.0,<0.9"]
+build-backend = "uv_build"
+
+[project]
+name = "evedata-monorepo"
+version = "0.0.0"
+description = "EVEData monorepo"
+readme = "README.md"
+authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
+classifiers = ["Private :: Do Not Upload"]
+requires-python = ">=3.13"
+dependencies = ["evedata-docs"]
+
+[dependency-groups]
+dev = [
+  "codespell[toml]>=2.4.1",
+  "commitizen>=4.8.3",
+  "cz-path>=0.0.1",
+  "pre-commit>=4.2.0",
+  "pyright>=1.1.403",
+  "ruff>=0.12.4",
+  "workers-py>=1.1.3",
+  "yamllint>=1.37.1",
+]
+
+[tool.codespell]
+check-filenames = true
+check-hidden = true
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "v$version"
+version_scheme = "semver"
+version_provider = "uv"
+update_changelog_on_bump = true
+major_version_zero = true
+gpg_sign = true
+annotated_tags = true
+changelog_merge_prerelease = true
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+exclude = ["**/.*", "**/__pycache__", "**/node_modules", "**/experiments"]
+
+[tool.pytest.ini_options]
+addopts = ["--tb", "short", "-n", "auto"]
+asyncio_mode = "auto"
+consider_namespace_packages = true
+env = { "EVEDATA_ENV" = "test" }
+filterwarnings = ["error"]
+testpaths = ["tests"]
+xfail_strict = true
+
+[tool.ruff]
+target-version = "py313"
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = [
+  "A",     # flake8-builtins
+  "ARG",   # flake8-unused-arguments
+  "ASYNC", # flake8-async
+  "B",     # bugbear
+  "BLE",   # flake8-blind-except
+  "C4",    # flake8-comprehensions
+  "D",     # pydocstyle
+  "DTZ",   # flake8-datetimez
+  "E",     # pycodestyle (error)
+  "EM",    # flake8-errmsg
+  "EXE",   # flake8-executable
+  "F",     # pyflakes
+  "FAST",  # FastAPI
+  "FBT",   # flake8-boolean-trap
+  "FURB",  # refurb
+  "G",     # flake8-logging-format
+  "I",     # isort
+  "ICN",   # flake8-import-conventions
+  "ISC",   # flake8-implicit-str-concat
+  "LOG",   # flake8-logging
+  "N",     # pep8-naming
+  "PERF",  # Perflint
+  "PGH",   # pygrep-hooks
+  "PIE",   # flake8-pie
+  "PL",    # pylint
+  "PT",    # flake8-pytest-style
+  "PTH",   # flake8-use-pathlib
+  "PYI",   # flake8-pyi
+  "RET",   # flake8-return
+  "RUF",   # Ruff-specific rules
+  "S",     # flake8-bandit
+  "SIM",   # flake8-simplify
+  "SLF",   # flake8-self
+  "SLOT",  # flake8-slots
+  "TC",    # flake8-type-checking
+  "TD",    # flake8-todos
+  "TID",   # flake8-tidy-imports
+  "T10",   # flake8-debugger
+  "T20",   # flake8-print
+  "TRY",   # tryceratops
+  "UP",    # pyupgrade
+]
+pydocstyle = { convention = "google" }
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+extra-standard-library = ["typing_extensions"]
+forced-separate = ["tests"]
+known-first-party = ["evedata"]
+
+[tool.ruff.lint.flake8-type-checking]
+quote-annotations = true
+runtime-evaluated-base-classes = [
+  "pydantic.BaseModel",
+  "sqlalchemy.orm.DeclarativeBase",
+]
+runtime-evaluated-decorators = ["pydantic.validate_call", "attrs.define"]
+
+[tool.ruff.lint.flake8-unused-arguments]
+ignore-variadic-names = true
+
+[tool.ruff.lint.pep8-naming]
+classmethod-decorators = [
+  # Allow Pydantic's `@validator` decorator to trigger class method treatment.
+  "pydantic.validator",
+  # Allow SQLAlchemy's dynamic decorators, like `@field.expression`, to trigger class method treatment.
+  "declared_attr",
+  "expression",
+  "comparator",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["T20"]
+
+[tool.uv]
+default-groups = ["dev"]
+package = false
+required-version = ">=0.8.0,<0.9"
+
+[tool.uv.sources]
+evedata-docs = { workspace = true }
+
+[tool.uv.workspace]
+members = ["docs", "packages/*"]

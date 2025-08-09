@@ -1,0 +1,7 @@
+brew "cairo"
+brew "freetype"
+brew "libffi"
+brew "libjpeg"
+brew "libpng"
+brew "zlib"
+brew "pngquant"

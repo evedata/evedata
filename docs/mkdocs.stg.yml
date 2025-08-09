@@ -1,0 +1,3 @@
+INHERIT: ./mkdocs.yml
+site_name: EVEData Documentation (STAGING)
+site_url: https://docs-stg.evedata.dev

@@ -1,0 +1,4 @@
+ignore:
+  - "*lock.yaml"
+  - "**/node_modules"
+  - ".venv"

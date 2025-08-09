@@ -1,0 +1,32 @@
+{
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "fix": "markdownlint-cli2 \"**/*.md\" --fix",
+    "fix:markdown": "markdownlint-cli2 \"**/*.md\" --fix",
+    "format": "prettier --write . --ignore-unknown",
+    "format:prettier": "prettier --write . --ignore-unknown",
+    "lint": "markdownlint-cli2 \"**/*.md\"",
+    "lint:markdown": "markdownlint-cli2 \"**/*.md\""
+  },
+  "dependencies": {
+    "markdownlint-cli2": "^0.18.1",
+    "prettier": "^3.6.2",
+    "prettier-plugin-packagejson": "^2.5.19",
+    "prettier-plugin-toml": "^2.0.6"
+  },
+  "packageManager": "pnpm@10.14.0",
+  "engines": {
+    "node": ">=22.14.0",
+    "pnpm": "^10.13.1"
+  },
+  "volta": {
+    "node": ">=22.14.0",
+    "pnpm": "^10.13.1"
+  },
+  "devDependencies": {
+    "wrangler": "^4.28.1"
+  }
+}
