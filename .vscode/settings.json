@@ -62,6 +62,7 @@
     "onupdate",
     "opennextjs",
     "otelcol",
+    "packagejson",
     "pathlib",
     "patito",
     "Perflint",
