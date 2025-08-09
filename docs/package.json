@@ -1,0 +1,26 @@
+{
+  "private": true,
+  "scripts": {
+    "deploy:pr": "wrangler versions upload --env dev --preview-alias pr-$PR_NUMBER",
+    "deploy:prd": "wrangler deploy --env prd",
+    "deploy:stg": "wrangler deploy --env stg",
+    "fix": "markdownlint-cli2 \"**/*.md\" --fix",
+    "fix:markdown": "markdownlint-cli2 \"**/*.md\" --fix",
+    "lint": "markdownlint-cli2 \"**/*.md\"",
+    "lint:markdown": "markdownlint-cli2 \"**/*.md\""
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "markdownlint-cli2": "^0.18.1",
+    "wrangler": "^4.28.0"
+  },
+  "packageManager": "pnpm@10.14.0",
+  "engines": {
+    "node": ">=22.14.0",
+    "pnpm": "^10.14.0"
+  },
+  "volta": {
+    "node": ">=22.14.0",
+    "pnpm": "^10.14.0"
+  }
+}

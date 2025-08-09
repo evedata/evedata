@@ -1,0 +1,53 @@
+repos:
+  - hooks:
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-json
+      - id: check-toml
+      - args:
+          - --unsafe
+        id: check-yaml
+      - id: debug-statements
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+    repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+
+  - hooks:
+      - args:
+          - --exit-non-zero-on-fix
+          - --fix
+        id: ruff-check
+      - id: ruff-format
+    repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.4
+
+  - hooks:
+      - id: pyright
+    repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.403
+
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.29.0
+    hooks:
+      - id: yamllint
+        args: [--strict]
+
+  - hooks:
+      - additional_dependencies:
+          - tomli
+        exclude: .*uv.lock|.*pnpm-lock.yaml|.*.d.ts
+        id: codespell
+    repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+
+  - hooks:
+      - id: commitizen
+      - id: commitizen-branch
+        stages:
+          - pre-push
+    repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.8.3

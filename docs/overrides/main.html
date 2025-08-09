@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block announce %}
+  {% if config.extra.env != "prd" %}
+    <div class="admonition danger">
+      <p>
+        <strong>You are viewing a development version of EVEData's documentation.</strong>
+        For the latest stable documentation, visit <a href="https://docs.evedata.io">here</a>.
+      </p>
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block scripts %}
+  <!-- Add scripts that need to run before here -->
+  {{ super() }}
+  <!-- Add scripts that need to run afterwards here -->
+{% endblock %}

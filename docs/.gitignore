@@ -1,0 +1,6 @@
+mkdocs.pr.yml
+requirements.txt
+site/
+
+# Hack to find libcairo
+*.dylib

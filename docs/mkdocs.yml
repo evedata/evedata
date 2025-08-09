@@ -1,0 +1,168 @@
+site_name: EVEData Documentation
+site_url: https://docs.evedata.io
+site_author: Corvin Vale
+site_description: Documentation for the EVEData platform.
+
+repo_name: evedata/evedata
+repo_url: https://github.com/evedata/evedata
+edit_uri: https://github.com/evedata/evedata/edit/main/docs/content/
+
+copyright:
+  '&copy; 2024 Corvin Vale. All rights reserved. "EVE", "EVE Online", "CCP", and all
+  related logos and images are trademarks or registered trademarks of CCP hf.'
+
+docs_dir: content
+watch:
+  - includes
+
+theme:
+  name: material
+  custom_dir: overrides
+  features:
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - content.tooltips
+    - navigation.footer
+    - navigation.indexes
+    - navigation.prune
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+  font:
+    text: Inter
+    code: JetBrains Mono
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/link
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep orange
+      accent: deep orange
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/toggle-switch-off
+        name: Switch to system preference
+extra:
+  env: !ENV [EVEDATA_DOCS_ENV, "dev"]
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/evedata
+    - icon: fontawesome/brands/bluesky
+      link: https://bsky.app/profile/evedata.io
+    - icon: fontawesome/brands/discord
+      link: https://dsc.gg/evedata
+
+plugins:
+  - blog
+  - git-authors:
+      exclude:
+        - blog/**/*.md
+        - index.md
+  - git-revision-date-localized:
+      fallback_to_build_date: true
+  - glightbox
+  - privacy:
+      enabled: !ENV [CI, false]
+  - rss:
+      use_git: false
+  - search:
+      lang: en
+  - social
+  - tags
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.blocks.caption
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      normalize_issue_symbols: true
+      repo_url_shorthand: true
+      user: corvinvale
+      repo: evedata-guides
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
+        - includes/links.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+  - tables
+  - toc:
+      permalink: true
+      permalink_title: Anchor link to this section for reference
+      title: On this page
+      toc_depth: 3
+
+nav:
+  - Home:
+      - index.md
+      - Vision: vision.md
+      - FAQ: faq.md
+      - Changelog: changelog.md
+      - Tutorials:
+          - tutorials/index.md
+      - Guides:
+          - guides/index.md
+      - Explanation:
+          - explanation/index.md
+      - Reference:
+          - reference/index.md
+          - Glossary: reference/glossary.md
+  - REST API:
+      - rest/index.md
+  - WebSocket API:
+      - websocket/index.md
+  - Webhooks:
+      - webhooks/index.md
+  - Datasets:
+      - datasets/index.md
+  - SDKs:
+      - sdks/index.md
+  - Blog:
+      - blog/index.md
