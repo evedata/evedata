@@ -95,12 +95,14 @@
     "streamlit",
     "taskiq",
     "testpypi",
+    "tflint",
     "tiangolo",
     "tryceratops",
     "ttok",
     "unrs",
     "vegafusion",
-    "viewonly"
+    "viewonly",
+    "weur"
   ],
 
   "eslint.workingDirectories": [
@@ -173,6 +175,16 @@
 
   "[xml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+
+  "[terraform]": {
+    "editor.defaultFormatter": "hashicorp.terraform",
+    "editor.formatOnSave": true
+  },
+
+  "[terraform-vars]": {
+    "editor.defaultFormatter": "hashicorp.terraform",
     "editor.formatOnSave": true
   },
 

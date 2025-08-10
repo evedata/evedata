@@ -1,0 +1,5 @@
+ignore:
+  - "*lock.yaml"
+  - "**/node_modules"
+  - "**/.terraform"
+  - ".venv"
