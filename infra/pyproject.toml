@@ -1,43 +1,11 @@
-[build-system]
-requires = ["uv_build>=0.8.0,<0.9"]
-build-backend = "uv_build"
-
 [project]
-name = "evedata-monorepo"
-version = "0.0.0"
-description = "EVEData monorepo"
-readme = "README.md"
-authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
-classifiers = ["Private :: Do Not Upload"]
+name = "evedata-infra"
 requires-python = ">=3.13"
-dependencies = ["evedata-docs", "evedata-infra"]
+version = "0.0.0"
+dependencies = []
 
 [dependency-groups]
-dev = [
-  "codespell[toml]>=2.4.1",
-  "commitizen>=4.8.3",
-  "cz-path>=0.0.1",
-  "pre-commit>=4.2.0",
-  "pyright>=1.1.403",
-  "ruff>=0.12.4",
-  "workers-py>=1.1.3",
-  "yamllint>=1.37.1",
-]
-
-[tool.codespell]
-check-filenames = true
-check-hidden = true
-
-[tool.commitizen]
-name = "cz_conventional_commits"
-tag_format = "v$version"
-version_scheme = "semver"
-version_provider = "uv"
-update_changelog_on_bump = true
-major_version_zero = true
-gpg_sign = true
-annotated_tags = true
-changelog_merge_prerelease = true
+dev = ["pyright>=1.1.403", "ruff>=0.12.4", "yamllint>=1.37.1"]
 
 [tool.pyright]
 venvPath = "."
@@ -139,10 +107,3 @@ classmethod-decorators = [
 default-groups = ["dev"]
 package = false
 required-version = ">=0.8.0,<0.9"
-
-[tool.uv.sources]
-evedata-docs = { workspace = true }
-evedata-infra = { workspace = true }
-
-[tool.uv.workspace]
-members = ["docs", "infra", "packages/*"]

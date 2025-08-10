@@ -1,10 +1,16 @@
 version = 1
 revision = 2
 requires-python = ">=3.13"
+resolution-markers = [
+    "sys_platform == 'linux'",
+    "sys_platform == 'linux2'",
+    "sys_platform != 'linux' and sys_platform != 'linux2'",
+]
 
 [manifest]
 members = [
     "evedata-docs",
+    "evedata-infra",
     "evedata-monorepo",
 ]
 
@@ -278,11 +284,33 @@ requires-dist = [
 ]
 
 [[package]]
+name = "evedata-infra"
+version = "0.0.0"
+source = { virtual = "infra" }
+
+[package.dev-dependencies]
+dev = [
+    { name = "pyright" },
+    { name = "ruff" },
+    { name = "yamllint" },
+]
+
+[package.metadata]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pyright", specifier = ">=1.1.403" },
+    { name = "ruff", specifier = ">=0.12.4" },
+    { name = "yamllint", specifier = ">=1.37.1" },
+]
+
+[[package]]
 name = "evedata-monorepo"
 version = "0.0.0"
 source = { virtual = "." }
 dependencies = [
     { name = "evedata-docs" },
+    { name = "evedata-infra" },
 ]
 
 [package.dev-dependencies]
@@ -298,7 +326,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "evedata-docs", virtual = "docs" }]
+requires-dist = [
+    { name = "evedata-docs", virtual = "docs" },
+    { name = "evedata-infra", virtual = "infra" },
+]
 
 [package.metadata.requires-dev]
 dev = [
