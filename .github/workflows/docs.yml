@@ -36,7 +36,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -67,7 +67,7 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           sparse-checkout: |
@@ -150,7 +150,7 @@ jobs:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (inputs.deploy_target == 'staging' || inputs.deploy_target == 'both'))
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           sparse-checkout: |
@@ -195,7 +195,7 @@ jobs:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (inputs.deploy_target == 'production' || inputs.deploy_target == 'both'))
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           sparse-checkout: |
