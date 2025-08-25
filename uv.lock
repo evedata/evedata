@@ -934,6 +934,9 @@ requires-dist = [
 name = "evedata-infra"
 version = "0.1.0"
 source = { editable = "infra" }
+dependencies = [
+    { name = "evedata-utils" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -943,6 +946,7 @@ dev = [
 ]
 
 [package.metadata]
+requires-dist = [{ name = "evedata-utils", editable = "platform/utils" }]
 
 [package.metadata.requires-dev]
 dev = [

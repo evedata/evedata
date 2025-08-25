@@ -10,7 +10,7 @@ readme = "README.md"
 authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = ["evedata-utils"]
 
 [dependency-groups]
 dev = ["pyright>=1.1.403", "ruff>=0.12.4", "yamllint>=1.37.1"]
@@ -107,3 +107,6 @@ classmethod-decorators = [
 "**/__main__.py" = ["D100"]
 "**/tests/**" = ["D", "PLR2004", "S101"]
 "*.ipynb" = ["T20"]
+
+[tool.uv.sources]
+evedata-utils = { workspace = true }
