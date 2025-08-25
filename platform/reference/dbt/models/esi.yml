@@ -1,0 +1,42 @@
+version: 2
+
+sources:
+  - name: esi
+    schema: esi_raw
+    tables:
+      - name: ancestries
+      - name: asteroid_belts
+      - name: bloodlines
+      - name: categories
+      - name: categories__groups
+      - name: constellations
+      - name: constellations__systems
+      - name: dogma_attributes
+      - name: dogma_effects
+      - name: dogma_effects__modifiers
+      - name: factions
+      - name: graphics
+      - name: groups
+      - name: groups__types
+      - name: market_groups
+      - name: market_groups__types
+      - name: moons
+      - name: npc_corporations
+      - name: npc_corporation_icons
+      - name: planets
+      - name: races
+      - name: regions
+      - name: regions__constellations
+      - name: solar_systems
+      - name: solar_systems__planets
+      - name: solar_systems__planets__asteroid_belts
+      - name: solar_systems__planets__moons
+      - name: solar_systems__stargates
+      - name: solar_systems__stations
+      - name: stargates
+      - name: stars
+      - name: stations
+      - name: stations__services
+      - name: types
+      - name: types__dogma_attributes
+      - name: types__dogma_effects

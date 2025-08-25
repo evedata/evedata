@@ -1,28 +1,32 @@
 [build-system]
-requires = ["uv_build>=0.8.0,<0.9"]
+requires = ["uv_build>=0.8.3,<0.9.0"]
 build-backend = "uv_build"
 
 [project]
-name = "evedata-monorepo"
-version = "0.0.0"
-description = "EVEData monorepo"
+name = "evedatactl"
+version = "0.1.0"
+description = ""
 readme = "README.md"
 authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
-classifiers = ["Private :: Do Not Upload"]
-requires-python = ">=3.13"
-dependencies = ["evedata-docs", "evedata-infra", "evedata-reference"]
+requires-python = ">=3.12"
+dependencies = ["rich>=14.1.0", "typer>=0.16.1"]
 
 [dependency-groups]
 dev = [
-  "codespell[toml]>=2.4.1",
-  "commitizen>=4.8.3",
-  "cz-path>=0.0.1",
-  "pre-commit>=4.2.0",
+  "codespell>=2.4.1",
+  "pre-commit>=4.3.0",
   "pyright>=1.1.403",
-  "ruff>=0.12.4",
-  "workers-py>=1.1.3",
-  "yamllint>=1.37.1",
+  "pytest>=8.4.1",
+  "pytest-cov>=6.2.1",
+  "pytest-env>=1.1.5",
+  "pytest-mock>=3.14.1",
+  "pytest-xdist>=3.8.0",
+  "ruff>=0.12.9",
+  "sqlfluff>=3.4.2",
 ]
+
+[project.scripts]
+evedatactl = "evedatactl.cli:main"
 
 [tool.codespell]
 check-filenames = true
@@ -40,21 +44,30 @@ annotated_tags = true
 changelog_merge_prerelease = true
 
 [tool.pyright]
+strict = ["src", "tests"]
 venvPath = "."
 venv = ".venv"
-exclude = ["**/.*", "**/__pycache__", "**/node_modules", "**/experiments"]
+exclude = ["**/.*", "**/__pycache__", "**/node_modules"]
 
 [tool.pytest.ini_options]
-addopts = ["--tb", "short", "-n", "auto"]
-asyncio_mode = "auto"
-consider_namespace_packages = true
-env = { "EVEDATA_ENV" = "test" }
+addopts = [
+  "--tb",
+  "short",
+  "--cov",
+  "evedata",
+  "--cov-branch",
+  "--cov-report",
+  "term-missing",
+]
+env = { "EVEKIT_ENV" = "test" }
 filterwarnings = ["error"]
 testpaths = ["tests"]
 xfail_strict = true
 
 [tool.ruff]
 target-version = "py313"
+extend-exclude = ["tmp"]
+line-length = 120
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -109,7 +122,6 @@ pydocstyle = { convention = "google" }
 combine-as-imports = true
 extra-standard-library = ["typing_extensions"]
 forced-separate = ["tests"]
-known-first-party = ["evedata"]
 
 [tool.ruff.lint.flake8-type-checking]
 quote-annotations = true
@@ -133,18 +145,6 @@ classmethod-decorators = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"**/__main__.py" = ["D100"]
+"**/tests/**" = ["D", "PLR2004", "S101"]
 "*.ipynb" = ["T20"]
-
-[tool.uv]
-default-groups = ["dev"]
-package = false
-required-version = ">=0.8.0,<0.9"
-
-[tool.uv.sources]
-evedatactl = { workspace = true }
-evedata-docs = { workspace = true }
-evedata-infra = { workspace = true }
-evedata-reference = { workspace = true }
-
-[tool.uv.workspace]
-members = ["docs", "infra", "platform/ctl", "platform/reference"]

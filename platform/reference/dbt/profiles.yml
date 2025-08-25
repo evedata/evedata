@@ -1,0 +1,10 @@
+evedata:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../data/evedata/evedata.duckdb
+      schema: evedata
+      extensions:
+        - httpfs
+        - parquet
