@@ -9,7 +9,7 @@ description = ""
 readme = "README.md"
 authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 requires-python = ">=3.12"
-dependencies = ["evedata-core", "rich>=14.1.0", "typer>=0.16.1"]
+dependencies = ["evedata-core", "evedata-utils", "rich>=14.1.0", "typer>=0.16.1"]
 
 [dependency-groups]
 dev = [
@@ -67,7 +67,7 @@ xfail_strict = true
 [tool.ruff]
 target-version = "py313"
 extend-exclude = ["tmp"]
-line-length = 120
+line-length = 88
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -151,3 +151,4 @@ classmethod-decorators = [
 
 [tool.uv.sources]
 evedata-core = { workspace = true }
+evedata-utils = { workspace = true }
