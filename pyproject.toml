@@ -10,7 +10,7 @@ readme = "README.md"
 authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.13"
-dependencies = ["evedata-docs", "evedata-infra", "evedata-reference"]
+dependencies = ["evedata-core", "evedata-docs", "evedata-infra", "evedata-reference"]
 
 [dependency-groups]
 dev = [
@@ -133,6 +133,8 @@ classmethod-decorators = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"**/__main__.py" = ["D100"]
+"**/tests/**" = ["D", "PLR2004", "S101"]
 "*.ipynb" = ["T20"]
 
 [tool.uv]
@@ -142,9 +144,10 @@ required-version = ">=0.8.0,<0.9"
 
 [tool.uv.sources]
 evedatactl = { workspace = true }
+evedata-core = { workspace = true }
 evedata-docs = { workspace = true }
 evedata-infra = { workspace = true }
 evedata-reference = { workspace = true }
 
 [tool.uv.workspace]
-members = ["docs", "infra", "platform/ctl", "platform/reference"]
+members = ["docs", "infra", "platform/core", "platform/ctl", "platform/reference"]
