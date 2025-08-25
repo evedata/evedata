@@ -4,22 +4,31 @@ from typing import Annotated
 import typer
 from typer import Typer
 
+from ._commands import (
+    download_cmd,
+    export_cmd,
+    extract_cmd,
+    load_cmd,
+    publish_cmd,
+    schemas_cmd,
+    tables_cmd,
+    transform_cmd,
+)
+
 cli = Typer(name="evedata-reference")
+cli.add_typer(download_cmd)
+cli.add_typer(export_cmd)
+cli.add_typer(extract_cmd)
+cli.add_typer(load_cmd)
+cli.add_typer(publish_cmd)
+cli.add_typer(schemas_cmd)
+cli.add_typer(tables_cmd)
+cli.add_typer(transform_cmd)
 
 
 @cli.callback()
 def callback() -> None:
     """Manage reference data."""
-
-
-@cli.command(name="download-hde")
-def download_hde_cmd() -> None:
-    """Download the latest HDE data."""
-
-
-@cli.command(name="download-sde")
-def download_sde_cmd() -> None:
-    """Download the latest SDE data."""
 
 
 @cli.command(name="load-esi-raw")
