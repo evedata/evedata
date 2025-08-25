@@ -1,8 +1,9 @@
 """Normalize dictionary keys used as IDs in EVE SDE data.
 
-This module provides functionality to transform EVE Online's Static Data Export (SDE) YAML structures and Hoboleaks Data
-Export (HDE) JSON structures into normalized formats, primarily converting dictionaries that use their keys as IDs into
-lists of dictionaries with explicit 'id' fields.
+This module provides functionality to transform EVE Online's Static Data Export (SDE)
+YAML structures and Hoboleaks Data Export (HDE) JSON structures into normalized formats,
+primarily converting dictionaries that use their keys as IDs into lists of dictionaries
+with explicit 'id' fields.
 """
 
 from functools import lru_cache
@@ -16,7 +17,9 @@ class NormalizationError(Exception):
     including unsupported data structures, mixed types, and recursion depth exceeded.
     """
 
-    def __init__(self, message: str, *, data: Any = None, cause: Exception | None = None) -> None:
+    def __init__(
+        self, message: str, *, data: Any = None, cause: Exception | None = None
+    ) -> None:
         """Initialize NormalizationError with context.
 
         Args:
@@ -166,8 +169,10 @@ def normalize_id_keys(  # noqa: PLR0911
         1. Scalars (bool, int, float, str) -> unchanged
         2. Lists of scalars -> unchanged
         3. Lists of dicts -> each dict normalized recursively
-        4. Dict with int-like keys and scalar values -> list of {"id": key, "value": val}
-        5. Dict with int-like keys and dict values -> list of {"id": key, **normalized_val}
+        4. Dict with int-like keys and scalar values
+            -> list of {"id": key, "value": val}
+        5. Dict with int-like keys and dict values
+            -> list of {"id": key, **normalized_val}
         6. Dict with string keys -> values normalized recursively
         7. Empty dict -> empty list
 
@@ -187,8 +192,9 @@ def normalize_id_keys(  # noqa: PLR0911
         - Lists return lists
 
     Raises:
-        NormalizationError: If data structure cannot be normalized (e.g., mixed list types, mixed dict key types,
-            unsupported data types, or maximum recursion depth exceeded)
+        NormalizationError: If data structure cannot be normalized (e.g., mixed list
+            types, mixed dict key types, unsupported data types, or maximum recursion
+            depth exceeded)
 
     Examples:
         Basic ID normalization:
@@ -215,11 +221,17 @@ def normalize_id_keys(  # noqa: PLR0911
             return data
 
         if _all_list_items_are_dicts(data):
-            return [normalize_id_keys(item, _depth=_depth + 1, _max_depth=_max_depth) for item in data]
+            return [
+                normalize_id_keys(item, _depth=_depth + 1, _max_depth=_max_depth)
+                for item in data
+            ]
 
         dict_count = sum(1 for item in data if isinstance(item, dict))
         non_dict_count = len(data) - dict_count
-        msg = f"Cannot normalize list with mixed types: {dict_count} dict(s) and {non_dict_count} non-dict item(s)"
+        msg = (
+            f"Cannot normalize list with mixed types: {dict_count} dict(s) and"
+            f" {non_dict_count} non-dict item(s)"
+        )
         raise NormalizationError(msg, data=data)
 
     if isinstance(data, dict):  # pyright: ignore[reportUnnecessaryIsInstance]
@@ -234,7 +246,12 @@ def normalize_id_keys(  # noqa: PLR0911
                 return [
                     {
                         "id": int(k),
-                        **cast("dict[str, Any]", normalize_id_keys(v, _depth=_depth + 1, _max_depth=_max_depth)),
+                        **cast(
+                            "dict[str, Any]",
+                            normalize_id_keys(
+                                v, _depth=_depth + 1, _max_depth=_max_depth
+                            ),
+                        ),
                     }
                     for k, v in data.items()
                 ]
@@ -244,12 +261,24 @@ def normalize_id_keys(  # noqa: PLR0911
 
         if _has_all_string_keys(data):
             try:
-                return {str(k): normalize_id_keys(v, _depth=_depth + 1, _max_depth=_max_depth) for k, v in data.items()}
+                return {
+                    str(k): normalize_id_keys(
+                        v, _depth=_depth + 1, _max_depth=_max_depth
+                    )
+                    for k, v in data.items()
+                }
             except (ValueError, TypeError) as e:
                 msg = f"Failed to normalize dict values: {e}"
                 raise NormalizationError(msg, data=data, cause=e) from e
 
     max_sample_len = 100
-    sample = str(data)[:max_sample_len] + "..." if len(str(data)) > max_sample_len else str(data)
-    msg = f"Cannot normalize data structure of type {type(data).__name__}. Sample: {sample}"
+    sample = (
+        str(data)[:max_sample_len] + "..."
+        if len(str(data)) > max_sample_len
+        else str(data)
+    )
+    msg = (
+        f"Cannot normalize data structure of type {type(data).__name__}."
+        f" Sample: {sample}"
+    )
     raise NormalizationError(msg, data=data)

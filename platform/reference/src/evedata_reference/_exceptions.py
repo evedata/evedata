@@ -37,7 +37,10 @@ class UnsupportedDestinationError(EVEDataException):
 
     def __init__(self, destination: str, supported: list[str] | None = None):
         if supported:
-            message = f"Unsupported destination: '{destination}'. Supported formats: {', '.join(supported)}"
+            message = (
+                f"Unsupported destination: '{destination}'."
+                f" Supported formats: {', '.join(supported)}"
+            )
         else:
             message = f"Unsupported destination: '{destination}'"
         super().__init__(message)

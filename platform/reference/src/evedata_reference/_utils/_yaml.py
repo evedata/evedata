@@ -19,7 +19,9 @@ def load_yaml_file(file_path: str | Path) -> Any:
 def load_yaml_with_normalized_id_keys(
     path: str | Path,
 ) -> "Generator[dict[str, Any]]":
-    data: dict[int, dict[str, Any]] | dict[str, Any] | list[dict[str, Any]] = load_yaml_file(path)
+    data: dict[int, dict[str, Any]] | dict[str, Any] | list[dict[str, Any]] = (
+        load_yaml_file(path)
+    )
     if isinstance(data, list):
         for item in data:
             yield normalize_id_keys(item)

@@ -67,21 +67,51 @@ blueprints_config: "ResourceConfig" = {
     "hints": {
         "primary_key": "id",
         "nested_hints": {
-            ("activities", "copying", "materials"): make_nested_hints(primary_key=["blueprintID", "typeID"]),
-            ("activities", "copying", "skills"): make_nested_hints(primary_key=["blueprintID", "typeID"]),
-            ("activities", "invention", "materials"): make_nested_hints(primary_key=["blueprintID", "typeID"]),
-            ("activities", "invention", "products"): make_nested_hints(primary_key=["blueprintID", "typeID"]),
-            ("activities", "invention", "skills"): make_nested_hints(primary_key=["blueprintID", "typeID"]),
-            ("activities", "manufacturing", "materials"): make_nested_hints(primary_key=["blueprintID", "typeID"]),
-            ("activities", "manufacturing", "products"): make_nested_hints(primary_key=["blueprintID", "typeID"]),
-            ("activities", "manufacturing", "skills"): make_nested_hints(primary_key=["blueprintID", "typeID"]),
-            ("activities", "reaction", "materials"): make_nested_hints(primary_key=["blueprintID", "typeID"]),
-            ("activities", "reaction", "products"): make_nested_hints(primary_key=["blueprintID", "typeID"]),
-            ("activities", "reaction", "skills"): make_nested_hints(primary_key=["blueprintID", "typeID"]),
-            ("activities", "research_material", "materials"): make_nested_hints(primary_key=["blueprintID", "typeID"]),
-            ("activities", "research_material", "skills"): make_nested_hints(primary_key=["blueprintID", "typeID"]),
-            ("activities", "research_time", "materials"): make_nested_hints(primary_key=["blueprintID", "typeID"]),
-            ("activities", "research_time", "skills"): make_nested_hints(primary_key=["blueprintID", "typeID"]),
+            ("activities", "copying", "materials"): make_nested_hints(
+                primary_key=["blueprintID", "typeID"]
+            ),
+            ("activities", "copying", "skills"): make_nested_hints(
+                primary_key=["blueprintID", "typeID"]
+            ),
+            ("activities", "invention", "materials"): make_nested_hints(
+                primary_key=["blueprintID", "typeID"]
+            ),
+            ("activities", "invention", "products"): make_nested_hints(
+                primary_key=["blueprintID", "typeID"]
+            ),
+            ("activities", "invention", "skills"): make_nested_hints(
+                primary_key=["blueprintID", "typeID"]
+            ),
+            ("activities", "manufacturing", "materials"): make_nested_hints(
+                primary_key=["blueprintID", "typeID"]
+            ),
+            ("activities", "manufacturing", "products"): make_nested_hints(
+                primary_key=["blueprintID", "typeID"]
+            ),
+            ("activities", "manufacturing", "skills"): make_nested_hints(
+                primary_key=["blueprintID", "typeID"]
+            ),
+            ("activities", "reaction", "materials"): make_nested_hints(
+                primary_key=["blueprintID", "typeID"]
+            ),
+            ("activities", "reaction", "products"): make_nested_hints(
+                primary_key=["blueprintID", "typeID"]
+            ),
+            ("activities", "reaction", "skills"): make_nested_hints(
+                primary_key=["blueprintID", "typeID"]
+            ),
+            ("activities", "research_material", "materials"): make_nested_hints(
+                primary_key=["blueprintID", "typeID"]
+            ),
+            ("activities", "research_material", "skills"): make_nested_hints(
+                primary_key=["blueprintID", "typeID"]
+            ),
+            ("activities", "research_time", "materials"): make_nested_hints(
+                primary_key=["blueprintID", "typeID"]
+            ),
+            ("activities", "research_time", "skills"): make_nested_hints(
+                primary_key=["blueprintID", "typeID"]
+            ),
         },
     },
 }

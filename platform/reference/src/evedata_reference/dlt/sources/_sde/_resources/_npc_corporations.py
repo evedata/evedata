@@ -11,7 +11,8 @@ def _before_load_npc_corporation(record: dict[str, Any]) -> dict[str, Any]:
 
     if "allowedMemberRaces" in record:
         new_allowed_member_races = [
-            {"corporationID": id_, "raceID": race_id} for race_id in record["allowedMemberRaces"]
+            {"corporationID": id_, "raceID": race_id}
+            for race_id in record["allowedMemberRaces"]
         ]
         record["allowedMemberRaces"] = new_allowed_member_races
 
@@ -33,7 +34,9 @@ npc_corporations_config: "ResourceConfig" = {
             {"name": "lpOfferTables", "data_type": "json"},
         ],
         "nested_hints": {
-            "allowedMemberRaces": make_nested_hints(primary_key=["corporationID", "raceID"]),
+            "allowedMemberRaces": make_nested_hints(
+                primary_key=["corporationID", "raceID"]
+            ),
             "divisions": make_nested_hints(primary_key=["corporationID", "divisionID"]),
         },
     },

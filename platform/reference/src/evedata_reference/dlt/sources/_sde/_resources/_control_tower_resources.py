@@ -18,6 +18,8 @@ control_tower_resources_config: "ResourceConfig" = {
     "before_load": [_before_load_control_tower_resource],
     "hints": {
         "primary_key": "id",
-        "nested_hints": {"resources": {"primary_key": ["controlTowerTypeID", "resourceTypeID"]}},
+        "nested_hints": {
+            "resources": {"primary_key": ["controlTowerTypeID", "resourceTypeID"]}
+        },
     },
 }

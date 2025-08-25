@@ -38,7 +38,9 @@ def load_esi_raw_cmd(
         resource_names = [f"esi_{r.strip()}" for r in resources.split(",")]
         esi_source = esi_source.with_resources(*resource_names)
 
-    build_pipeline("esi", "esi_raw", destination_name=destination).run(esi_source, loader_file_format="parquet")
+    build_pipeline("esi", "esi_raw", destination_name=destination).run(
+        esi_source, loader_file_format="parquet"
+    )
 
 
 @app.command(name="load-hde-raw")
@@ -66,7 +68,9 @@ def load_hde_raw_cmd(
     ] = None,
 ):
     """Extract, normalize, and load HDE data from the specified path."""
-    from evedata_reference.dlt.naming import hde as hde_naming_convention  # noqa: PLC0415
+    from evedata_reference.dlt.naming import (  # noqa: PLC0415
+        hde as hde_naming_convention,
+    )
     from evedata_reference.dlt.pipelines import build_pipeline  # noqa: PLC0415
     from evedata_reference.dlt.sources import hde  # noqa: PLC0415
 
@@ -75,9 +79,12 @@ def load_hde_raw_cmd(
         resource_names = [f"hde_{r.strip()}" for r in resources.split(",")]
         hde_source = hde_source.with_resources(*resource_names)
 
-    build_pipeline("hde", "hde_raw", destination_name=destination, naming_convention_module=hde_naming_convention).run(
-        hde_source, loader_file_format="parquet"
-    )
+    build_pipeline(
+        "hde",
+        "hde_raw",
+        destination_name=destination,
+        naming_convention_module=hde_naming_convention,
+    ).run(hde_source, loader_file_format="parquet")
 
 
 @app.command(name="load-sde-raw")
@@ -113,4 +120,6 @@ def load_sde_raw_cmd(
         resource_names = [f"sde_{r.strip()}" for r in resources.split(",")]
         sde_source = sde_source.with_resources(*resource_names)
 
-    build_pipeline("sde", "sde_raw", destination_name=destination).run(sde_source, loader_file_format="parquet")
+    build_pipeline("sde", "sde_raw", destination_name=destination).run(
+        sde_source, loader_file_format="parquet"
+    )

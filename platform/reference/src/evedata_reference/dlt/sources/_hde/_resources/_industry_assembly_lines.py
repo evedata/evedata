@@ -30,9 +30,13 @@ industry_assembly_lines_config: "ResourceConfig" = {
     "hints": {
         "primary_key": "id",
         "nested_hints": {
-            "categories": make_nested_hints(primary_key=["assemblyLineID", "categoryID"]),
+            "categories": make_nested_hints(
+                primary_key=["assemblyLineID", "categoryID"]
+            ),
             "groups": make_nested_hints(primary_key=["assemblyLineID", "groupID"]),
-            "typeLists": make_nested_hints(primary_key=["assemblyLineID", "typeListID"]),
+            "typeLists": make_nested_hints(
+                primary_key=["assemblyLineID", "typeListID"]
+            ),
         },
     },
 }

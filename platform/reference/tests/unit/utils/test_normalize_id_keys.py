@@ -62,7 +62,9 @@ class TestListInputs:
 
     def test_mixed_list_with_dicts(self):
         # Lists with mixed types where some are dicts should trigger NormalizationError
-        with pytest.raises(NormalizationError, match="Cannot normalize list with mixed types"):
+        with pytest.raises(
+            NormalizationError, match="Cannot normalize list with mixed types"
+        ):
             normalize_id_keys([1, {"key": "value"}, "string"])
 
 
@@ -74,8 +76,12 @@ class TestIntKeyedDicts:
             {"id": 2, "value": "b"},
             {"id": 3, "value": "c"},
         ]
-        result = cast("list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data)))
-        assert sorted(result, key=lambda x: x["id"]) == sorted(expected, key=lambda x: x["id"])
+        result = cast(
+            "list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data))
+        )
+        assert sorted(result, key=lambda x: x["id"]) == sorted(
+            expected, key=lambda x: x["id"]
+        )
 
     def test_dict_string_int_keys_scalar_values(self):
         input_data = {"1": "a", "2": "b", "3": "c"}
@@ -85,7 +91,9 @@ class TestIntKeyedDicts:
             {"id": 3, "value": "c"},
         ]
         result = cast("list[dict[str, Any]]", normalize_id_keys(input_data))
-        assert sorted(result, key=lambda x: x["id"]) == sorted(expected, key=lambda x: x["id"])
+        assert sorted(result, key=lambda x: x["id"]) == sorted(
+            expected, key=lambda x: x["id"]
+        )
 
     def test_dict_mixed_int_string_keys_scalar_values(self):
         input_data: dict[int | str, str] = {1: "a", "2": "b", 3: "c"}
@@ -94,20 +102,30 @@ class TestIntKeyedDicts:
             {"id": 2, "value": "b"},
             {"id": 3, "value": "c"},
         ]
-        result = cast("list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data)))
-        assert sorted(result, key=lambda x: x["id"]) == sorted(expected, key=lambda x: x["id"])
+        result = cast(
+            "list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data))
+        )
+        assert sorted(result, key=lambda x: x["id"]) == sorted(
+            expected, key=lambda x: x["id"]
+        )
 
     def test_dict_int_keys_dict_values(self):
         input_data = {1: {"name": "test1"}, 2: {"name": "test2"}}
         expected = [{"id": 1, "name": "test1"}, {"id": 2, "name": "test2"}]
         result = cast("list[dict[str, Any]]", normalize_id_keys(input_data))
-        assert sorted(result, key=lambda x: x["id"]) == sorted(expected, key=lambda x: x["id"])
+        assert sorted(result, key=lambda x: x["id"]) == sorted(
+            expected, key=lambda x: x["id"]
+        )
 
     def test_dict_int_keys_list_values(self):
         input_data: dict[int, list[str]] = {1: ["a", "b"], 2: ["c", "d"]}
         expected = [{"id": 1, "value": ["a", "b"]}, {"id": 2, "value": ["c", "d"]}]
-        result = cast("list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data)))
-        assert sorted(result, key=lambda x: x["id"]) == sorted(expected, key=lambda x: x["id"])
+        result = cast(
+            "list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data))
+        )
+        assert sorted(result, key=lambda x: x["id"]) == sorted(
+            expected, key=lambda x: x["id"]
+        )
 
     def test_dict_int_keys_with_nested_dict(self):
         input_data = {
@@ -152,7 +170,9 @@ class TestStringKeyedDicts:
 
     def test_dict_string_keys_with_int_like_dict_values(self):
         input_data = {"parent": {1: "value1", 2: "value2"}}
-        expected = {"parent": [{"id": 1, "value": "value1"}, {"id": 2, "value": "value2"}]}
+        expected = {
+            "parent": [{"id": 1, "value": "value1"}, {"id": 2, "value": "value2"}]
+        }
         result = normalize_id_keys(input_data)
         assert isinstance(result, dict)
         if isinstance(result["parent"], list):
@@ -174,7 +194,9 @@ class TestNestedStructures:
             {"id": 1, "value": [{"name": "child1"}, {"name": "child2"}]},
             {"id": 2, "value": [{"name": "child3"}]},
         ]
-        result = cast("list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data)))
+        result = cast(
+            "list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data))
+        )
         # Sort by id for consistent comparison
         result_sorted = sorted(result, key=lambda x: x["id"])
         expected_sorted = sorted(expected, key=lambda x: x["id"])
@@ -199,7 +221,9 @@ class TestNestedStructures:
             },
             {"id": 2, "value": [{"type": "C", "data": {30: {"value": "z"}}}]},
         ]
-        result = cast("list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data)))
+        result = cast(
+            "list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data))
+        )
         # Sort for consistent comparison
         result_sorted = sorted(result, key=lambda x: x["id"])
         expected_sorted = sorted(expected, key=lambda x: x["id"])
@@ -228,7 +252,9 @@ class TestNestedStructures:
                 ],
             }
         ]
-        result = cast("list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data)))
+        result = cast(
+            "list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data))
+        )
         assert result == expected
 
 
@@ -239,7 +265,9 @@ class TestEdgeCases:
 
     def test_none_values_in_dict(self):
         # None values in string-keyed dicts trigger error during recursive normalization
-        with pytest.raises(NormalizationError, match="Cannot normalize data structure of type NoneType"):
+        with pytest.raises(
+            NormalizationError, match="Cannot normalize data structure of type NoneType"
+        ):
             normalize_id_keys({"key": None})
 
         # None values in int-keyed dicts are preserved as scalars
@@ -271,8 +299,12 @@ class TestEdgeCases:
             {"id": -1, "value": "negative"},
             {"id": -100, "value": "very negative"},
         ]
-        result = cast("list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data)))
-        assert sorted(result, key=lambda x: x["id"]) == sorted(expected, key=lambda x: x["id"])
+        result = cast(
+            "list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data))
+        )
+        assert sorted(result, key=lambda x: x["id"]) == sorted(
+            expected, key=lambda x: x["id"]
+        )
 
     def test_zero_as_key(self):
         input_data: dict[int, str] = {0: "zero value"}
@@ -286,7 +318,9 @@ class TestErrorConditions:
             normalize_id_keys(cast("Any", {1: "int", "str": "string"}))
 
     def test_mixed_list_types(self):
-        with pytest.raises(NormalizationError, match="Cannot normalize list with mixed types"):
+        with pytest.raises(
+            NormalizationError, match="Cannot normalize list with mixed types"
+        ):
             normalize_id_keys([{"key": "value"}, "string", 123])
 
 
@@ -343,7 +377,9 @@ class TestEVEDataIntegration:
 
         materials = blueprint["activities"]["manufacturing"]["materials"]
         expected_materials = [{"id": 34, "value": 11000}, {"id": 35, "value": 2200}]
-        assert sorted(materials, key=lambda x: x["id"]) == sorted(expected_materials, key=lambda x: x["id"])
+        assert sorted(materials, key=lambda x: x["id"]) == sorted(
+            expected_materials, key=lambda x: x["id"]
+        )
 
     def test_eve_market_groups_structure(self):
         input_data = {
@@ -502,7 +538,9 @@ class TestHelperFunctions:
 class TestNormalizationError:
     def test_normalization_error_with_cause(self):
         original_error = ValueError("Original error")
-        error = NormalizationError("Test error", data={"test": "data"}, cause=original_error)
+        error = NormalizationError(
+            "Test error", data={"test": "data"}, cause=original_error
+        )
 
         assert error.__cause__ is original_error
         assert error.data == {"test": "data"}
@@ -525,7 +563,9 @@ class TestRecursionAndMocking:
     def test_recursion_depth_exceeded(self):
         data = {"nested": {"deeper": {"deepest": "value"}}}
 
-        with pytest.raises(NormalizationError, match="Maximum recursion depth \\(2\\) exceeded") as exc_info:
+        with pytest.raises(
+            NormalizationError, match="Maximum recursion depth \\(2\\) exceeded"
+        ) as exc_info:
             normalize_id_keys(data, _max_depth=2)
 
         assert isinstance(exc_info.value.__cause__, RecursionError)
@@ -545,7 +585,9 @@ class TestRecursionAndMocking:
 
         mocker.patch.object(module, "normalize_id_keys", side_effect=mock_normalize)
 
-        with pytest.raises(module.NormalizationError, match="Failed to normalize dict values"):
+        with pytest.raises(
+            module.NormalizationError, match="Failed to normalize dict values"
+        ):
             module.normalize_id_keys(data)
 
     def test_string_keys_dict_values_error_handling(self, mocker: "MockerFixture"):
@@ -565,5 +607,8 @@ class TestRecursionAndMocking:
 
         mocker.patch.object(module, "normalize_id_keys", side_effect=mock_normalize)
 
-        with pytest.raises(module.NormalizationError, match="Failed to normalize dict values.*Mocked error"):
+        with pytest.raises(
+            module.NormalizationError,
+            match="Failed to normalize dict values.*Mocked error",
+        ):
             module.normalize_id_keys(data)

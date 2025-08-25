@@ -32,14 +32,28 @@ def build_pipeline(  # noqa: PLR0913
     destination_name = destination_name or "duckdb"
     naming_convention_module = naming_convention_module or snake_case
     import_schema_path = import_schema_path or str(
-        Path.cwd() / "data" / "dlt" / "schemas" / "import" / pipeline_name / destination_name
+        Path.cwd()
+        / "data"
+        / "dlt"
+        / "schemas"
+        / "import"
+        / pipeline_name
+        / destination_name
     )
     export_schema_path = export_schema_path or str(
-        Path.cwd() / "data" / "dlt" / "schemas" / "export" / pipeline_name / destination_name
+        Path.cwd()
+        / "data"
+        / "dlt"
+        / "schemas"
+        / "export"
+        / pipeline_name
+        / destination_name
     )
     progress = progress or "alive_progress"
 
-    destination_path = destination_path or (Path.cwd() / "data" / "evedata_reference.duckdb")
+    destination_path = destination_path or (
+        Path.cwd() / "data" / "evedata_reference.duckdb"
+    )
     destination_path.parent.mkdir(parents=True, exist_ok=True)
     data_dir = data_dir or (Path.cwd() / "data" / "dlt" / "data")
     data_dir.mkdir(parents=True, exist_ok=True)
@@ -52,9 +66,13 @@ def build_pipeline(  # noqa: PLR0913
 
     match destination_name:
         case "duckdb":
-            destination = dlt.destinations.duckdb(str(destination_path), naming_convention=naming_convention_module)
+            destination = dlt.destinations.duckdb(
+                str(destination_path), naming_convention=naming_convention_module
+            )
         case _:
-            raise UnsupportedDestinationError(destination_name, supported=SUPPORTED_DESTINATIONS)
+            raise UnsupportedDestinationError(
+                destination_name, supported=SUPPORTED_DESTINATIONS
+            )
 
     return dlt.pipeline(
         pipeline_name=pipeline_name,

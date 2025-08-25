@@ -6,7 +6,9 @@ if TYPE_CHECKING:
     from evedata_reference.dlt.sources._types import ResourceConfig
 
 
-def _before_load_station_standings_restriction(record: dict[str, Any]) -> dict[str, Any]:
+def _before_load_station_standings_restriction(
+    record: dict[str, Any],
+) -> dict[str, Any]:
     id_ = record["id"]
 
     for service in record.get("services", []):

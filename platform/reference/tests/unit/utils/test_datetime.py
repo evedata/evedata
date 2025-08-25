@@ -4,7 +4,10 @@ from datetime import UTC, datetime
 
 import pytest
 
-from evedata_reference._utils._datetime import http_date_to_datetime, http_date_to_iso8601
+from evedata_reference._utils._datetime import (
+    http_date_to_datetime,
+    http_date_to_iso8601,
+)
 
 
 class TestHttpDateToDatetime:

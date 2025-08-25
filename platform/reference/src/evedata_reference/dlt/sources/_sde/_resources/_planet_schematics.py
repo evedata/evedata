@@ -16,9 +16,21 @@ def _before_load_planet_schematic(record: dict[str, Any]) -> dict[str, Any]:
     outputs: list[dict[str, Any]] = []
     for type_ in types:
         if type_.get("isInput"):
-            inputs.append({"schematicID": id_, "typeID": type_["id"], "quantity": type_["quantity"]})
+            inputs.append(
+                {
+                    "schematicID": id_,
+                    "typeID": type_["id"],
+                    "quantity": type_["quantity"],
+                }
+            )
         else:
-            outputs.append({"schematicID": id_, "typeID": type_["id"], "quantity": type_["quantity"]})
+            outputs.append(
+                {
+                    "schematicID": id_,
+                    "typeID": type_["id"],
+                    "quantity": type_["quantity"],
+                }
+            )
     record["inputs"] = inputs
     record["outputs"] = outputs
     return record

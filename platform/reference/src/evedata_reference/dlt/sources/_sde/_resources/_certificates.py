@@ -9,7 +9,10 @@ if TYPE_CHECKING:
 def _before_load_certificate(record: dict[str, Any]) -> dict[str, Any]:
     certificate_id = record["id"]
     if "recommendedFor" in record:
-        new_recommended_for = [{"certificateID": certificate_id, "typeID": entry} for entry in record["recommendedFor"]]
+        new_recommended_for = [
+            {"certificateID": certificate_id, "typeID": entry}
+            for entry in record["recommendedFor"]
+        ]
         record["recommendedFor"] = new_recommended_for
     if "skillTypes" in record:
         new_skill_types = [
@@ -33,7 +36,9 @@ certificates_config: "ResourceConfig" = {
     "hints": {
         "primary_key": "id",
         "nested_hints": {
-            "recommendedFor": make_nested_hints(primary_key=["certificateID", "typeID"]),
+            "recommendedFor": make_nested_hints(
+                primary_key=["certificateID", "typeID"]
+            ),
             "skillTypes": make_nested_hints(primary_key=["certificateID", "typeID"]),
         },
     },

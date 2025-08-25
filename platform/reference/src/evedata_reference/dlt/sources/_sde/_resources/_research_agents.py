@@ -17,6 +17,8 @@ research_agents_config: "ResourceConfig" = {
     "before_load": [_before_load_research_agent],
     "hints": {
         "primary_key": "id",
-        "nested_hints": {"skills": make_nested_hints(primary_key=["researchAgentID", "typeID"])},
+        "nested_hints": {
+            "skills": make_nested_hints(primary_key=["researchAgentID", "typeID"])
+        },
     },
 }

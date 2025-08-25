@@ -14,7 +14,11 @@ def _before_load_type(record: dict[str, Any]) -> dict[str, Any]:
         for mastery in record["masteries"]:
             new_masteries.extend(
                 [
-                    {"typeID": id_, "certificateID": certificate_id, "level": mastery["id"]}
+                    {
+                        "typeID": id_,
+                        "certificateID": certificate_id,
+                        "level": mastery["id"],
+                    }
                     for certificate_id in mastery.get("value", [])
                 ]
             )
@@ -51,9 +55,15 @@ types_config: "ResourceConfig" = {
         "primary_key": "id",
         "nested_hints": {
             "masteries": make_nested_hints(primary_key=["typeID", "certificateID"]),
-            ("traits", "miscBonuses"): make_nested_hints(primary_key=["typeID", "traitIndex"]),
-            ("traits", "roleBonuses"): make_nested_hints(primary_key=["typeID", "traitIndex"]),
-            ("traits", "typeBonuses"): make_nested_hints(primary_key=["typeID", "traitTypeID", "traitIndex"]),
+            ("traits", "miscBonuses"): make_nested_hints(
+                primary_key=["typeID", "traitIndex"]
+            ),
+            ("traits", "roleBonuses"): make_nested_hints(
+                primary_key=["typeID", "traitIndex"]
+            ),
+            ("traits", "typeBonuses"): make_nested_hints(
+                primary_key=["typeID", "traitTypeID", "traitIndex"]
+            ),
         },
     },
 }

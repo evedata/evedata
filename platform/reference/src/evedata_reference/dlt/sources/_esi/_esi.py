@@ -23,7 +23,9 @@ _RESOURCE_CONFIGS: dict[str, "ESIResourceConfig"] = {
     "asteroid_belts": {
         "depends_on": "solar_systems",
         "path": "/universe/asteroid_belts/%s",
-        "ids_fn": lambda r, _: [id_ for p in r.get("planets", []) for id_ in p.get("asteroid_belts", [])],
+        "ids_fn": lambda r, _: [
+            id_ for p in r.get("planets", []) for id_ in p.get("asteroid_belts", [])
+        ],
         "include_id_in_record": True,
         "hints": {"primary_key": "id"},
     },
@@ -82,7 +84,9 @@ _RESOURCE_CONFIGS: dict[str, "ESIResourceConfig"] = {
     "moons": {
         "depends_on": "solar_systems",
         "path": "/universe/moons/%s",
-        "ids_fn": lambda r, _: [id_ for p in r.get("planets", []) for id_ in p.get("moons", [])],
+        "ids_fn": lambda r, _: [
+            id_ for p in r.get("planets", []) for id_ in p.get("moons", [])
+        ],
         "rename_columns": {"moon_id": "id"},
         "hints": {"primary_key": "id"},
     },
@@ -163,19 +167,25 @@ def esi() -> Any:
             for id_ in ids:
                 path = config["path"] % id_
                 data: dict[str, Any]
-                data, response_metadata = cast("tuple[dict[str, Any], dict[str, Any]]", client.get(path))
+                data, response_metadata = cast(
+                    "tuple[dict[str, Any], dict[str, Any]]", client.get(path)
+                )
                 data["_esi"] = response_metadata
                 if config.get("include_id_in_record"):
                     data["id"] = id_
                 yield process_data(data, config)
         else:
             path = config["path"]
-            all_data, response_metadata = cast("tuple[list[dict[str, Any]], dict[str, Any]]", client.get(path))
+            all_data, response_metadata = cast(
+                "tuple[list[dict[str, Any]], dict[str, Any]]", client.get(path)
+            )
             for data in all_data:
                 data["_esi"] = response_metadata
                 yield process_data(data, config)
 
-    def get_esi_transformer(name: str, config: "ESIResourceConfig") -> "Callable[[Any], Generator[dict[str, Any]]]":
+    def get_esi_transformer(
+        name: str, config: "ESIResourceConfig"
+    ) -> "Callable[[Any], Generator[dict[str, Any]]]":
         ids_fn = config.get("ids_fn")
         if not ids_fn:
             msg = f"Resource {name} depends on another resource but has no ids_fn"
@@ -185,7 +195,9 @@ def esi() -> Any:
             ids = ids_fn(record, config)
             for id_ in ids:
                 path = config["path"] % id_
-                data, response_metadata = cast("tuple[dict[str, Any], dict[str, Any]]", client.get(path))
+                data, response_metadata = cast(
+                    "tuple[dict[str, Any], dict[str, Any]]", client.get(path)
+                )
                 data["_esi"] = response_metadata
                 if config.get("include_id_in_record"):
                     data["id"] = id_
@@ -195,7 +207,9 @@ def esi() -> Any:
 
     resources: dict[str, DltResource] = {}
 
-    resource_configs = {k: v for k, v in _RESOURCE_CONFIGS.items() if "depends_on" not in v}
+    resource_configs = {
+        k: v for k, v in _RESOURCE_CONFIGS.items() if "depends_on" not in v
+    }
     for resource_name, resource_config in resource_configs.items():
         hints = resource_config.get("hints", {})
         resource = dlt.resource(
@@ -207,7 +221,9 @@ def esi() -> Any:
         resource = before_load(resource, resource_config)
         resources[resource_name] = resource
 
-    transform_configs = {k: v for k, v in _RESOURCE_CONFIGS.items() if "depends_on" in v}
+    transform_configs = {
+        k: v for k, v in _RESOURCE_CONFIGS.items() if "depends_on" in v
+    }
     for resource_name, resource_config in transform_configs.items():
         dependency = resources[resource_config["depends_on"]]
         hints = resource_config.get("hints", {})

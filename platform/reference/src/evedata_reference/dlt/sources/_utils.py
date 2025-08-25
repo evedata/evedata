@@ -17,14 +17,18 @@ if TYPE_CHECKING:
 
 
 def process_data(
-    data: dict[str, Any], config: "FileResourceConfig", names: dict[int, str] | None = None
+    data: dict[str, Any],
+    config: "FileResourceConfig",
+    names: dict[int, str] | None = None,
 ) -> dict[str, Any]:
     final_data = data
     if "before_extract" in config:
         for func in config["before_extract"]:
             final_data = func(final_data)
     if "rename_columns" in config:
-        final_data = {config["rename_columns"].get(k, k): v for k, v in final_data.items()}
+        final_data = {
+            config["rename_columns"].get(k, k): v for k, v in final_data.items()
+        }
     if names and config.get("name_from_inv_names"):
         final_data["name"] = names.get(final_data["id"], "Name Unknown")
     return final_data
@@ -47,7 +51,10 @@ def get_yaml_resource(
 
 
 def get_yaml_resource_glob(
-    path: "Path", glob: str, config: "FileResourceConfig", names: dict[int, str] | None = None
+    path: "Path",
+    glob: str,
+    config: "FileResourceConfig",
+    names: dict[int, str] | None = None,
 ) -> "Generator[dict[str, Any]]":
     names = names or {}
     for file_path in path.glob(glob):

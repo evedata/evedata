@@ -11,7 +11,8 @@ def _before_load_expert_system(record: dict[str, Any]) -> dict[str, Any]:
 
     if "associatedShipTypes" in record:
         record["associatedShipTypes"] = [
-            {"expertSystemID": id_, "typeID": type_id} for type_id in record["associatedShipTypes"]
+            {"expertSystemID": id_, "typeID": type_id}
+            for type_id in record["associatedShipTypes"]
         ]
         record["shipTypes"] = record.pop("associatedShipTypes")
 
@@ -29,7 +30,9 @@ expert_systems_config: "ResourceConfig" = {
         "primary_key": "id",
         "nested_hints": {
             "shipTypes": make_nested_hints(primary_key=["expertSystemID", "typeID"]),
-            "skillsGranted": make_nested_hints(primary_key=["expertSystemID", "typeID"]),
+            "skillsGranted": make_nested_hints(
+                primary_key=["expertSystemID", "typeID"]
+            ),
         },
     },
 }

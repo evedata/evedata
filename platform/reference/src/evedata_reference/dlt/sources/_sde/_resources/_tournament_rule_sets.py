@@ -11,11 +11,15 @@ def _before_load_tournament_rule_set(record: dict[str, Any]) -> dict[str, Any]:
 
     if "bannedGroups" in record:
         record["bannedGroups"] = [
-            {"ruleSetID": id_, "groupID": group_id} for group_id in record.get("bannedGroups", [])
+            {"ruleSetID": id_, "groupID": group_id}
+            for group_id in record.get("bannedGroups", [])
         ]
 
     if "bannedTypes" in record:
-        record["bannedTypes"] = [{"ruleSetID": id_, "typeID": type_id} for type_id in record.get("bannedTypes", [])]
+        record["bannedTypes"] = [
+            {"ruleSetID": id_, "typeID": type_id}
+            for type_id in record.get("bannedTypes", [])
+        ]
 
     if "points" in record:
         for group_points in record["points"].get("groups", []):

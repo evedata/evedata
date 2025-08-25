@@ -73,20 +73,48 @@ industry_modifier_sources_config: "ResourceConfig" = {
     "hints": {
         "primary_key": "id",
         "nested_hints": {
-            ("copying", "cost"): make_nested_hints(primary_key=["modifierSourceID", "dogmaAttributeID"]),
-            ("copying", "time"): make_nested_hints(primary_key=["modifierSourceID", "dogmaAttributeID"]),
-            ("invention", "cost"): make_nested_hints(primary_key=["modifierSourceID", "dogmaAttributeID"]),
-            ("invention", "time"): make_nested_hints(primary_key=["modifierSourceID", "dogmaAttributeID"]),
-            ("manufacturing", "cost"): make_nested_hints(primary_key=["modifierSourceID", "dogmaAttributeID"]),
-            ("manufacturing", "material"): make_nested_hints(primary_key=["modifierSourceID", "dogmaAttributeID"]),
-            ("manufacturing", "time"): make_nested_hints(primary_key=["modifierSourceID", "dogmaAttributeID"]),
-            ("reaction", "cost"): make_nested_hints(primary_key=["modifierSourceID", "dogmaAttributeID"]),
-            ("reaction", "material"): make_nested_hints(primary_key=["modifierSourceID", "dogmaAttributeID"]),
-            ("reaction", "time"): make_nested_hints(primary_key=["modifierSourceID", "dogmaAttributeID"]),
-            ("research_material", "cost"): make_nested_hints(primary_key=["modifierSourceID", "dogmaAttributeID"]),
-            ("research_material", "time"): make_nested_hints(primary_key=["modifierSourceID", "dogmaAttributeID"]),
-            ("research_time", "cost"): make_nested_hints(primary_key=["modifierSourceID", "dogmaAttributeID"]),
-            ("research_time", "time"): make_nested_hints(primary_key=["modifierSourceID", "dogmaAttributeID"]),
+            ("copying", "cost"): make_nested_hints(
+                primary_key=["modifierSourceID", "dogmaAttributeID"]
+            ),
+            ("copying", "time"): make_nested_hints(
+                primary_key=["modifierSourceID", "dogmaAttributeID"]
+            ),
+            ("invention", "cost"): make_nested_hints(
+                primary_key=["modifierSourceID", "dogmaAttributeID"]
+            ),
+            ("invention", "time"): make_nested_hints(
+                primary_key=["modifierSourceID", "dogmaAttributeID"]
+            ),
+            ("manufacturing", "cost"): make_nested_hints(
+                primary_key=["modifierSourceID", "dogmaAttributeID"]
+            ),
+            ("manufacturing", "material"): make_nested_hints(
+                primary_key=["modifierSourceID", "dogmaAttributeID"]
+            ),
+            ("manufacturing", "time"): make_nested_hints(
+                primary_key=["modifierSourceID", "dogmaAttributeID"]
+            ),
+            ("reaction", "cost"): make_nested_hints(
+                primary_key=["modifierSourceID", "dogmaAttributeID"]
+            ),
+            ("reaction", "material"): make_nested_hints(
+                primary_key=["modifierSourceID", "dogmaAttributeID"]
+            ),
+            ("reaction", "time"): make_nested_hints(
+                primary_key=["modifierSourceID", "dogmaAttributeID"]
+            ),
+            ("research_material", "cost"): make_nested_hints(
+                primary_key=["modifierSourceID", "dogmaAttributeID"]
+            ),
+            ("research_material", "time"): make_nested_hints(
+                primary_key=["modifierSourceID", "dogmaAttributeID"]
+            ),
+            ("research_time", "cost"): make_nested_hints(
+                primary_key=["modifierSourceID", "dogmaAttributeID"]
+            ),
+            ("research_time", "time"): make_nested_hints(
+                primary_key=["modifierSourceID", "dogmaAttributeID"]
+            ),
         },
     },
 }

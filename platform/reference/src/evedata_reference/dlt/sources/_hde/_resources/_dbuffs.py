@@ -29,8 +29,12 @@ dbuffs_config: "ResourceConfig" = {
         "nested_hints": {
             "itemModifiers": {"primary_key": ["dbuff_id", "dogmaAttributeID"]},
             "locationModifiers": {"primary_key": ["dbuff_id", "dogmaAttributeID"]},
-            "locationGroupModifiers": {"primary_key": ["dbuff_id", "dogmaAttributeID", "groupID"]},
-            "locationRequiredSkillModifiers": {"primary_key": ["dbuff_id", "dogmaAttributeID", "skillID"]},
+            "locationGroupModifiers": {
+                "primary_key": ["dbuff_id", "dogmaAttributeID", "groupID"]
+            },
+            "locationRequiredSkillModifiers": {
+                "primary_key": ["dbuff_id", "dogmaAttributeID", "skillID"]
+            },
         },
     },
 }

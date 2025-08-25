@@ -27,7 +27,9 @@ skill_plans_config: "ResourceConfig" = {
         "primary_key": "id",
         "nested_hints": {
             "milestones": make_nested_hints(primary_key=["skillPlanID", "typeID"]),
-            "skillRequirements": make_nested_hints(primary_key=["skillPlanID", "typeID"]),
+            "skillRequirements": make_nested_hints(
+                primary_key=["skillPlanID", "typeID"]
+            ),
         },
     },
 }

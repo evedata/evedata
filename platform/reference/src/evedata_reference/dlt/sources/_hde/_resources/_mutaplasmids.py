@@ -16,7 +16,11 @@ def _before_load_mutaplasmid(record: dict[str, Any]) -> dict[str, Any]:
     for mapping in record.get("inputOutputMapping", []):
         mappings.extend(
             [
-                {"mutaplasmidID": id_, "inputTypeID": type_, "outputTypeID": mapping["resultingType"]}
+                {
+                    "mutaplasmidID": id_,
+                    "inputTypeID": type_,
+                    "outputTypeID": mapping["resultingType"],
+                }
                 for type_ in mapping["applicableTypes"]
             ]
         )
@@ -32,7 +36,9 @@ mutaplasmids_config: "ResourceConfig" = {
         "primary_key": "id",
         "nested_hints": {
             "attributes": {"primary_key": ["mutaplasmidID", "dogmaAttributeID"]},
-            "mappings": {"primary_key": ["mutaplasmidID", "inputTypeID", "outputTypeID"]},
+            "mappings": {
+                "primary_key": ["mutaplasmidID", "inputTypeID", "outputTypeID"]
+            },
         },
     },
 }

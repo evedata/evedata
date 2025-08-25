@@ -21,7 +21,9 @@ industry_installation_types_config: "ResourceConfig" = {
     "hints": {
         "primary_key": "id",
         "nested_hints": {
-            "assembly_lines": make_nested_hints(primary_key=["installationTypeID", "assemblyLineID"]),
+            "assembly_lines": make_nested_hints(
+                primary_key=["installationTypeID", "assemblyLineID"]
+            ),
         },
     },
 }

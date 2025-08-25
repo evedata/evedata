@@ -18,6 +18,8 @@ def _before_load_contraband_type(record: dict[str, Any]) -> dict[str, Any]:
 contraband_types_config: "ResourceConfig" = {
     "before_load": [_before_load_contraband_type],
     "hints": {
-        "nested_hints": {"factions": make_nested_hints(primary_key=["factionID", "typeID"])},
+        "nested_hints": {
+            "factions": make_nested_hints(primary_key=["factionID", "typeID"])
+        },
     },
 }

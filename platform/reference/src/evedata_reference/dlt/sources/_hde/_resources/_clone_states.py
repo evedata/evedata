@@ -9,7 +9,8 @@ def _before_load_clone_state(record: dict[str, Any]) -> dict[str, Any]:
 
     if "skills" in record:
         record["skills"] = [
-            {"cloneStateID": id_, "typeID": skill["id"], "level": skill["value"]} for skill in record["skills"]
+            {"cloneStateID": id_, "typeID": skill["id"], "level": skill["value"]}
+            for skill in record["skills"]
         ]
 
     return record

@@ -5,8 +5,12 @@ from typing import TYPE_CHECKING, Any
 
 import dlt
 
-from evedata_reference.dlt.sources._sde._resources._blueprints import blueprints_config as sde_blueprints_config
-from evedata_reference.dlt.sources._sde._resources._skins import skins_config as sde_skins_config
+from evedata_reference.dlt.sources._sde._resources._blueprints import (
+    blueprints_config as sde_blueprints_config,
+)
+from evedata_reference.dlt.sources._sde._resources._skins import (
+    skins_config as sde_skins_config,
+)
 from evedata_reference.dlt.sources._sde._resources._type_materials import (
     type_materials_config as sde_type_materials_config,
 )
@@ -20,12 +24,21 @@ if TYPE_CHECKING:
 
 _RESOURCE_CONFIGS: dict[str, "FileResourceConfig"] = {
     "accounting_entry_types": {"hints": {"primary_key": "id"}},
-    "agent_types": {"rename_columns": {"value": "name"}, "hints": {"primary_key": "id"}},
+    "agent_types": {
+        "rename_columns": {"value": "name"},
+        "hints": {"primary_key": "id"},
+    },
     "blueprints": sde_blueprints_config,
     "clone_states": clone_states_config,  # noqa: F405
-    "compressible_types": {"rename_columns": {"value": "compressedTypeID"}, "hints": {"primary_key": "id"}},
+    "compressible_types": {
+        "rename_columns": {"value": "compressedTypeID"},
+        "hints": {"primary_key": "id"},
+    },
     "dbuffs": dbuffs_config,  # noqa: F405
-    "dogma_effect_categories": {"rename_columns": {"value": "name"}, "hints": {"primary_key": "id"}},
+    "dogma_effect_categories": {
+        "rename_columns": {"value": "name"},
+        "hints": {"primary_key": "id"},
+    },
     "dogma_units": {"hints": {"primary_key": "id"}},
     "expert_systems": expert_systems_config,  # noqa: F405
     "graphic_material_sets": {"hints": {"primary_key": "id"}},

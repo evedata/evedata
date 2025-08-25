@@ -16,10 +16,16 @@ if TYPE_CHECKING:
 
 
 def _before_load_solar_system(record: dict[str, Any]) -> dict[str, Any]:  # noqa: PLR0912, PLR0915
-    record["constellationID"] = constellation_id_from_solar_system_path(Path(record["_path"]))
+    record["constellationID"] = constellation_id_from_solar_system_path(
+        Path(record["_path"])
+    )
     record["regionID"] = region_id_from_solar_system_path(Path(record["_path"]))
 
-    names = inv_names(Path(record["_path"]).parent.parent.parent.parent.parent.parent / "bsd" / "invNames.yaml")
+    names = inv_names(
+        Path(record["_path"]).parent.parent.parent.parent.parent.parent
+        / "bsd"
+        / "invNames.yaml"
+    )
 
     id_ = record["id"]
     record.pop("sunTypeID", None)
@@ -33,20 +39,26 @@ def _before_load_solar_system(record: dict[str, Any]) -> dict[str, Any]:  # noqa
 
     if "secondarySun" in record:
         record["secondarySun"]["id"] = record["secondarySun"].pop("itemID")
-        record["secondarySun"]["name"] = names.get(record["secondarySun"]["id"], "Name Unknown")
-        record["secondarySun"]["position"] = position_dict_from_array(record["secondarySun"]["position"])
+        record["secondarySun"]["name"] = names.get(
+            record["secondarySun"]["id"], "Name Unknown"
+        )
+        record["secondarySun"]["position"] = position_dict_from_array(
+            record["secondarySun"]["position"]
+        )
 
     if "star" in record:
         record["star"]["name"] = names.get(record["star"]["id"], "Name Unknown")
 
     if "disallowedAnchorCategories" in record:
         record["disallowedAnchorCategories"] = [
-            {"solarSystemID": id_, "categoryID": category_id} for category_id in record["disallowedAnchorCategories"]
+            {"solarSystemID": id_, "categoryID": category_id}
+            for category_id in record["disallowedAnchorCategories"]
         ]
 
     if "disallowedAnchorGroups" in record:
         record["disallowedAnchorGroups"] = [
-            {"solarSystemID": id_, "groupID": group_id} for group_id in record["disallowedAnchorGroups"]
+            {"solarSystemID": id_, "groupID": group_id}
+            for group_id in record["disallowedAnchorGroups"]
         ]
 
     if security := record.get("security"):
@@ -113,8 +125,12 @@ solar_systems_config: "ResourceConfig" = {
     "hints": {
         "primary_key": "id",
         "nested_hints": {
-            "disallowedAnchorCategories": make_nested_hints(primary_key=["solarSystemID", "categoryID"]),
-            "disallowedAnchorGroups": make_nested_hints(primary_key=["solarSystemID", "groupID"]),
+            "disallowedAnchorCategories": make_nested_hints(
+                primary_key=["solarSystemID", "categoryID"]
+            ),
+            "disallowedAnchorGroups": make_nested_hints(
+                primary_key=["solarSystemID", "groupID"]
+            ),
             "planets": make_nested_hints(primary_key=["id"]),
             ("planets", "moons"): make_nested_hints(primary_key=["id"]),
             ("planets", "asteroidBelts"): make_nested_hints(primary_key=["id"]),

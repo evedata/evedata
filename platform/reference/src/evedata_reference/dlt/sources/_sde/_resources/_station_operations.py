@@ -14,7 +14,10 @@ def _before_load_station_operation(record: dict[str, Any]) -> dict[str, Any]:
         station_type["raceID"] = station_type.pop("id")
         station_type["typeID"] = station_type.pop("value")
 
-    record["services"] = [{"operationID": id_, "serviceID": service_id} for service_id in record.get("services", [])]
+    record["services"] = [
+        {"operationID": id_, "serviceID": service_id}
+        for service_id in record.get("services", [])
+    ]
 
     return record
 

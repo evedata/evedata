@@ -9,7 +9,9 @@ if TYPE_CHECKING:
 def _before_load_skin(record: dict[str, Any]) -> dict[str, Any]:
     id_ = record["id"]
     del record["skinID"]
-    record["types"] = [{"skinID": id_, "typeID": type_id} for type_id in record.get("types", [])]
+    record["types"] = [
+        {"skinID": id_, "typeID": type_id} for type_id in record.get("types", [])
+    ]
     return record
 
 

@@ -24,7 +24,9 @@ def load_json_with_normalized_id_keys(
 ) -> "Generator[dict[str, Any]]":
     full_path = Path(path).resolve()
     with full_path.open("r", encoding="utf-8") as file:
-        data: dict[str, dict[str, Any]] | dict[str, Any] | list[dict[str, Any]] = json.loads(file.read())
+        data: dict[str, dict[str, Any]] | dict[str, Any] | list[dict[str, Any]] = (
+            json.loads(file.read())
+        )
     if isinstance(data, list):
         for item in data:
             yield normalize_id_keys(item)

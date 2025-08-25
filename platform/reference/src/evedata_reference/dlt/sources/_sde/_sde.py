@@ -3,7 +3,12 @@ from typing import TYPE_CHECKING, Any
 
 import dlt
 
-from evedata_reference.dlt.sources._utils import before_load, get_yaml_resource, get_yaml_resource_glob, inv_names
+from evedata_reference.dlt.sources._utils import (
+    before_load,
+    get_yaml_resource,
+    get_yaml_resource_glob,
+    inv_names,
+)
 
 from ._resources import *  # noqa: F403
 
@@ -11,7 +16,6 @@ if TYPE_CHECKING:
     from evedata_reference.dlt.sources._types import ResourceConfig
 
 
-# NOTE: Once a config spans multiple lines or has any hook functions it is moved to its own module.
 _RESOURCE_CONFIGS: dict[str, "ResourceConfig"] = {
     "agents": {"hints": {"primary_key": "id"}},
     "agents_in_space": {"hints": {"primary_key": "id"}},
@@ -27,16 +31,30 @@ _RESOURCE_CONFIGS: dict[str, "ResourceConfig"] = {
     "corporation_activities": {"hints": {"primary_key": "id"}},
     "dogma_attribute_categories": {"hints": {"primary_key": "id"}},
     "dogma_attributes": {"hints": {"primary_key": "id"}},
-    "dogma_effects": {"hints": {"primary_key": "id", "columns": {"modifierInfo": {"data_type": "json"}}}},
+    "dogma_effects": {
+        "hints": {
+            "primary_key": "id",
+            "columns": {"modifierInfo": {"data_type": "json"}},
+        }
+    },
     "factions": factions_config,  # noqa: F405
     "graphics": graphics_config,  # noqa: F405
     "groups": {"hints": {"primary_key": "id"}},
     "icons": {"hints": {"primary_key": "id"}},
     "flags": {"rename_columns": {"flagID": "id"}, "hints": {"primary_key": "id"}},
     "items": {"rename_columns": {"itemID": "id"}, "hints": {"primary_key": "id"}},
-    "item_names": {"rename_columns": {"itemID": "id", "itemName": "name"}, "hints": {"primary_key": "id"}},
-    "item_positions": {"rename_columns": {"itemID": "id"}, "hints": {"primary_key": "id"}},
-    "item_unique_names": {"rename_columns": {"itemID": "id", "itemName": "name"}, "hints": {"primary_key": "id"}},
+    "item_names": {
+        "rename_columns": {"itemID": "id", "itemName": "name"},
+        "hints": {"primary_key": "id"},
+    },
+    "item_positions": {
+        "rename_columns": {"itemID": "id"},
+        "hints": {"primary_key": "id"},
+    },
+    "item_unique_names": {
+        "rename_columns": {"itemID": "id", "itemName": "name"},
+        "hints": {"primary_key": "id"},
+    },
     "landmarks": landmarks_config,  # noqa: F405
     "market_groups": {"hints": {"primary_key": "id"}},
     "meta_groups": meta_groups_config,  # noqa: F405
@@ -144,7 +162,9 @@ def sde(path: str | Path | None = None) -> Any:
             write_disposition="replace",
         ).apply_hints(**hints)
         resource = before_load(resource, config)
-        resource = resource.add_map(lambda r: {**r, "_path": str(Path(r["_path"]).relative_to(sde_path))})
+        resource = resource.add_map(
+            lambda r: {**r, "_path": str(Path(r["_path"]).relative_to(sde_path))}
+        )
         resources.append(resource)
 
     yield from resources

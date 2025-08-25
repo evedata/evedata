@@ -11,7 +11,8 @@ def _before_load_school(record: dict[str, Any]) -> dict[str, Any]:
 
     if "startingStations" in record:
         record["startingStations"] = [
-            {"schoolID": id_, "stationID": station_id} for station_id in record["startingStations"]
+            {"schoolID": id_, "stationID": station_id}
+            for station_id in record["startingStations"]
         ]
 
     return record
@@ -22,7 +23,9 @@ schools_config: "ResourceConfig" = {
     "hints": {
         "primary_key": "id",
         "nested_hints": {
-            "startingStations": make_nested_hints(primary_key=["schoolID", "stationID"]),
+            "startingStations": make_nested_hints(
+                primary_key=["schoolID", "stationID"]
+            ),
         },
     },
 }

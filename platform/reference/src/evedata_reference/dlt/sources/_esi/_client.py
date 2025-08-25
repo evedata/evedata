@@ -3,7 +3,12 @@ from typing import Any
 
 import hishel
 import httpx
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential_jitter
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential_jitter,
+)
 
 from evedata_reference._constants import USER_AGENT
 from evedata_reference._exceptions import ESIErrorLimitReachedError
@@ -22,8 +27,12 @@ class ESIClient:
         self._user_agent = user_agent or USER_AGENT
 
         if not http_client:
-            cache_storage = cache_storage or hishel.FileStorage(base_path=Path.cwd() / ".http_cache")
-            http_client = hishel.CacheClient(headers={"User-Agent": self._user_agent}, storage=cache_storage)
+            cache_storage = cache_storage or hishel.FileStorage(
+                base_path=Path.cwd() / ".http_cache"
+            )
+            http_client = hishel.CacheClient(
+                headers={"User-Agent": self._user_agent}, storage=cache_storage
+            )
         self._http_client = http_client
 
     @retry(
@@ -32,7 +41,9 @@ class ESIClient:
         retry=retry_if_exception_type(_RETRIABLE_EXCEPTIONS),
         reraise=True,
     )
-    def get(self, path: str, query: dict[str, Any] | None = None) -> tuple[dict[str, Any] | list[Any], dict[str, Any]]:
+    def get(
+        self, path: str, query: dict[str, Any] | None = None
+    ) -> tuple[dict[str, Any] | list[Any], dict[str, Any]]:
         def raise_for_error_limit(response: httpx.Response) -> None:
             if response.headers.get("x-esi-error-limit-remain") == "0":
                 raise ESIErrorLimitReachedError()
@@ -43,7 +54,9 @@ class ESIClient:
         response_metadata = {
             "compatibility_date": initial_response.headers.get("x-compatibility-date"),
             "expires": http_date_to_iso8601(initial_response.headers.get("expires")),
-            "last_modified": http_date_to_iso8601(initial_response.headers.get("last-modified")),
+            "last_modified": http_date_to_iso8601(
+                initial_response.headers.get("last-modified")
+            ),
         }
         raise_for_error_limit(initial_response)
         initial_response.raise_for_status()
@@ -56,7 +69,9 @@ class ESIClient:
         for page in range(2, total_pages + 1):
             page_query = query.copy()
             page_query["page"] = page
-            paged_response = self._http_client.get(f"https://esi.evetech.net{path}", params=page_query)
+            paged_response = self._http_client.get(
+                f"https://esi.evetech.net{path}", params=page_query
+            )
             raise_for_error_limit(paged_response)
             paged_response.raise_for_status()
             all_data.extend(paged_response.json())
