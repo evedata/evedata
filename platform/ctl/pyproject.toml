@@ -10,7 +10,14 @@ readme = "README.md"
 authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 requires-python = ">=3.13"
 classifiers = ["Private :: Do Not Upload"]
-dependencies = ["evedata-core", "evedata-utils", "rich>=14.1.0", "typer>=0.16.1"]
+dependencies = [
+  "evedata-core",
+  "evedata-utils",
+  "fastapi[all]>=0.116.1",
+  "rich>=14.1.0",
+  "typer>=0.16.1",
+  "uvicorn>=0.35.0",
+]
 
 [dependency-groups]
 dev = [
@@ -27,7 +34,7 @@ dev = [
 ]
 
 [project.scripts]
-evedatactl = "evedata_ctl.cli:main"
+evedatactl = "evedata_ctl._cli:main"
 
 [tool.commitizen]
 name = "cz_conventional_commits"

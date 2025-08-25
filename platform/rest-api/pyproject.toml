@@ -26,6 +26,9 @@ dev = [
 [project.entry-points."evedata_ctl.commands"]
 rest-api = "evedata_rest_api.ctl:cli"
 
+[project.entry-points."evedata_ctl.endpoints"]
+rest-api = "evedata_rest_api.ctl:app"
+
 [tool.commitizen]
 name = "cz_conventional_commits"
 tag_format = "v$version"

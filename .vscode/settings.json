@@ -61,7 +61,8 @@
     "traitstypes",
     "tryceratops",
     "typematerials",
-    "undockable"
+    "undockable",
+    "uvicorn"
   ],
 
   "eslint.workingDirectories": [

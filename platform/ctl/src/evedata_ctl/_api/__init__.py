@@ -1,5 +1,3 @@
-"""Plugin for evedata-ctl for REST API tasks."""
-
 from ._app import app
 from ._cli import cli
 

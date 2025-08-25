@@ -55,6 +55,9 @@ dev = [
 [project.entry-points."evedata_ctl.commands"]
 reference = "evedata_reference.ctl:cli"
 
+[project.entry-points."evedata_ctl.endpoints"]
+reference = "evedata_reference.ctl:app"
+
 [tool.commitizen]
 name = "cz_conventional_commits"
 tag_format = "v$version"

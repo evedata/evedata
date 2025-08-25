@@ -4,7 +4,7 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-entrypoints = metadata.entry_points(group="evedata_rest_api.endpoints")
+entrypoints = metadata.entry_points(group="evedata_ctl.endpoints")
 for entrypoint in entrypoints:
     router = entrypoint.load()
     app.include_router(router, prefix=f"/{entrypoint.name}")

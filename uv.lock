@@ -13,13 +13,13 @@ resolution-markers = [
 [manifest]
 members = [
     "evedata-core",
+    "evedata-ctl",
     "evedata-docs",
     "evedata-infra",
     "evedata-monorepo",
     "evedata-reference",
     "evedata-rest-api",
     "evedata-utils",
-    "evedata-ctl",
 ]
 
 [[package]]
@@ -931,6 +931,57 @@ dev = [
 ]
 
 [[package]]
+name = "evedata-ctl"
+version = "0.1.0"
+source = { editable = "platform/ctl" }
+dependencies = [
+    { name = "evedata-core" },
+    { name = "evedata-utils" },
+    { name = "fastapi", extra = ["all"] },
+    { name = "rich" },
+    { name = "typer" },
+    { name = "uvicorn" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "codespell" },
+    { name = "pre-commit" },
+    { name = "pyright" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "pytest-env" },
+    { name = "pytest-mock" },
+    { name = "pytest-xdist" },
+    { name = "ruff" },
+    { name = "sqlfluff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "evedata-core", editable = "platform/core" },
+    { name = "evedata-utils", editable = "platform/utils" },
+    { name = "fastapi", extras = ["all"], specifier = ">=0.116.1" },
+    { name = "rich", specifier = ">=14.1.0" },
+    { name = "typer", specifier = ">=0.16.1" },
+    { name = "uvicorn", specifier = ">=0.35.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "codespell", specifier = ">=2.4.1" },
+    { name = "pre-commit", specifier = ">=4.3.0" },
+    { name = "pyright", specifier = ">=1.1.403" },
+    { name = "pytest", specifier = ">=8.4.1" },
+    { name = "pytest-cov", specifier = ">=6.2.1" },
+    { name = "pytest-env", specifier = ">=1.1.5" },
+    { name = "pytest-mock", specifier = ">=3.14.1" },
+    { name = "pytest-xdist", specifier = ">=3.8.0" },
+    { name = "ruff", specifier = ">=0.12.9" },
+    { name = "sqlfluff", specifier = ">=3.4.2" },
+]
+
+[[package]]
 name = "evedata-docs"
 version = "0.0.0"
 source = { virtual = "docs" }
@@ -959,6 +1010,7 @@ version = "0.1.0"
 source = { editable = "infra" }
 dependencies = [
     { name = "evedata-utils" },
+    { name = "fastapi", extra = ["all"] },
 ]
 
 [package.dev-dependencies]
@@ -969,7 +1021,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "evedata-utils", editable = "platform/utils" }]
+requires-dist = [
+    { name = "evedata-utils", editable = "platform/utils" },
+    { name = "fastapi", extras = ["all"], specifier = ">=0.116.1" },
+]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1190,53 +1245,6 @@ dev = [
     { name = "pytest-mock", specifier = ">=3.14.1" },
     { name = "pytest-xdist", specifier = ">=3.8.0" },
     { name = "ruff", specifier = ">=0.12.9" },
-]
-
-[[package]]
-name = "evedata-ctl"
-version = "0.1.0"
-source = { editable = "platform/ctl" }
-dependencies = [
-    { name = "evedata-core" },
-    { name = "evedata-utils" },
-    { name = "rich" },
-    { name = "typer" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "codespell" },
-    { name = "pre-commit" },
-    { name = "pyright" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "pytest-env" },
-    { name = "pytest-mock" },
-    { name = "pytest-xdist" },
-    { name = "ruff" },
-    { name = "sqlfluff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "evedata-core", editable = "platform/core" },
-    { name = "evedata-utils", editable = "platform/utils" },
-    { name = "rich", specifier = ">=14.1.0" },
-    { name = "typer", specifier = ">=0.16.1" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "codespell", specifier = ">=2.4.1" },
-    { name = "pre-commit", specifier = ">=4.3.0" },
-    { name = "pyright", specifier = ">=1.1.403" },
-    { name = "pytest", specifier = ">=8.4.1" },
-    { name = "pytest-cov", specifier = ">=6.2.1" },
-    { name = "pytest-env", specifier = ">=1.1.5" },
-    { name = "pytest-mock", specifier = ">=3.14.1" },
-    { name = "pytest-xdist", specifier = ">=3.8.0" },
-    { name = "ruff", specifier = ">=0.12.9" },
-    { name = "sqlfluff", specifier = ">=3.4.2" },
 ]
 
 [[package]]
