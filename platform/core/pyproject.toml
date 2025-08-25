@@ -8,6 +8,7 @@ version = "0.1.0"
 description = ""
 readme = "README.md"
 authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
+classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.13"
 dependencies = []
 
@@ -21,10 +22,6 @@ dev = [
   "pytest-xdist>=3.8.0",
   "ruff>=0.12.9",
 ]
-
-[tool.codespell]
-check-filenames = true
-check-hidden = true
 
 [tool.commitizen]
 name = "cz_conventional_commits"
@@ -48,7 +45,7 @@ addopts = [
   "--tb",
   "short",
   "--cov",
-  "evedata",
+  "evedata_core",
   "--cov-branch",
   "--cov-report",
   "term-missing",

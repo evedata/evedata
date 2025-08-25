@@ -8,6 +8,7 @@ version = "0.1.0"
 description = ""
 readme = "README.md"
 authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
+classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.13"
 dependencies = [
   "evedata-core",
@@ -53,9 +54,6 @@ dev = [
 
 [project.entry-points."evedatactl.commands"]
 reference = "evedata_reference.cli:app"
-
-[project.scripts]
-evedata = "evedata.cli:main"
 
 [tool.commitizen]
 name = "cz_conventional_commits"

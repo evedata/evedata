@@ -4,7 +4,7 @@ from typing import Annotated
 import typer
 from typer import Typer
 
-app = Typer(name="evedata")
+app = Typer(name="evedata-reference")
 
 
 @app.command(name="download-hde")

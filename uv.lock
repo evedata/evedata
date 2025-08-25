@@ -932,8 +932,8 @@ requires-dist = [
 
 [[package]]
 name = "evedata-infra"
-version = "0.0.0"
-source = { virtual = "infra" }
+version = "0.1.0"
+source = { editable = "infra" }
 
 [package.dev-dependencies]
 dev = [
@@ -979,7 +979,7 @@ dev = [
 requires-dist = [
     { name = "evedata-core", editable = "platform/core" },
     { name = "evedata-docs", virtual = "docs" },
-    { name = "evedata-infra", virtual = "infra" },
+    { name = "evedata-infra", editable = "infra" },
     { name = "evedata-reference", editable = "platform/reference" },
     { name = "evedata-utils", editable = "platform/utils" },
 ]

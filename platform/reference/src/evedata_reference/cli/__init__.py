@@ -1,6 +1,5 @@
-"""Provides the `evedata` CLI."""
+"""Plugin for evedatactl for reference data tasks."""
 
 from ._app import app
-from ._main import main
 
-__all__ = ["app", "main"]
+__all__ = ["app"]
