@@ -3,9 +3,9 @@ requires = ["uv_build>=0.8.3,<0.9.0"]
 build-backend = "uv_build"
 
 [project]
-name = "evedatactl"
+name = "evedata-ctl"
 version = "0.1.0"
-description = ""
+description = "Administration API and CLI for EVEData"
 readme = "README.md"
 authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 requires-python = ">=3.13"
@@ -27,7 +27,7 @@ dev = [
 ]
 
 [project.scripts]
-evedatactl = "evedatactl.cli:main"
+evedatactl = "evedata_ctl.cli:main"
 
 [tool.commitizen]
 name = "cz_conventional_commits"

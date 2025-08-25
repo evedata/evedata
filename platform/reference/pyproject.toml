@@ -52,7 +52,7 @@ dev = [
   "sqlfluff>=3.4.2",
 ]
 
-[project.entry-points."evedatactl.commands"]
+[project.entry-points."evedata_ctl.commands"]
 reference = "evedata_reference.ctl:cli"
 
 [tool.commitizen]

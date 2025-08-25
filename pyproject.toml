@@ -151,7 +151,7 @@ package = false
 required-version = ">=0.8.0,<0.9"
 
 [tool.uv.sources]
-evedatactl = { workspace = true }
+evedata-ctl = { workspace = true }
 evedata-core = { workspace = true }
 evedata-docs = { workspace = true }
 evedata-infra = { workspace = true }

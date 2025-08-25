@@ -4,7 +4,7 @@ from typer import Typer
 
 app = Typer(name="evedata")
 
-entrypoints = metadata.entry_points(group="evedatactl.commands")
+entrypoints = metadata.entry_points(group="evedata_ctl.commands")
 for entrypoint in entrypoints:
     command_app = entrypoint.load()
     app.add_typer(command_app, name=entrypoint.name)

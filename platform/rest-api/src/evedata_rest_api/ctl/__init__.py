@@ -1,4 +1,4 @@
-"""Plugin for evedatactl for REST API tasks."""
+"""Plugin for evedata-ctl for REST API tasks."""
 
 from ._cli import cli
 

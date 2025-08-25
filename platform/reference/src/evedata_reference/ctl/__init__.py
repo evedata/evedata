@@ -1,4 +1,4 @@
-"""Plugin for evedatactl for reference data tasks."""
+"""Plugin for evedata-ctl for reference data tasks."""
 
 from ._cli import cli
 

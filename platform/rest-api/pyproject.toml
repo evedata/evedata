@@ -23,7 +23,7 @@ dev = [
   "ruff>=0.12.9",
 ]
 
-[project.entry-points."evedatactl.commands"]
+[project.entry-points."evedata_ctl.commands"]
 rest-api = "evedata_rest_api.ctl:cli"
 
 [tool.commitizen]

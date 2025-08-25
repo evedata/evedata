@@ -15,7 +15,7 @@ dependencies = ["evedata-utils"]
 [dependency-groups]
 dev = ["pyright>=1.1.403", "ruff>=0.12.4", "yamllint>=1.37.1"]
 
-[project.entry-points."evedatactl.commands"]
+[project.entry-points."evedata_ctl.commands"]
 infra = "evedata_infra.ctl:cli"
 
 [tool.pyright]

@@ -19,7 +19,7 @@ members = [
     "evedata-reference",
     "evedata-rest-api",
     "evedata-utils",
-    "evedatactl",
+    "evedata-ctl",
 ]
 
 [[package]]
@@ -1193,7 +1193,7 @@ dev = [
 ]
 
 [[package]]
-name = "evedatactl"
+name = "evedata-ctl"
 version = "0.1.0"
 source = { editable = "platform/ctl" }
 dependencies = [
