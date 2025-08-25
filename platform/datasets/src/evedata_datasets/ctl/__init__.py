@@ -1,4 +1,4 @@
-"""Plugin for evedata-ctl for REST API management."""
+"""Plugin for evedata-ctl for dataset management."""
 
 from ._app import app
 from ._cli import cli

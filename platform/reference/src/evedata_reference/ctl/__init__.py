@@ -1,4 +1,4 @@
-"""Plugin for evedata-ctl for reference data tasks."""
+"""Plugin for evedata-ctl for reference management."""
 
 from ._app import app
 from ._cli import cli

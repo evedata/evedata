@@ -1,4 +1,4 @@
-"""Plugin for the EVEData REST API that provides reference data endpoints."""
+"""Plugin for the EVEData REST API that provides reference endpoints."""
 
 from ._app import app
 

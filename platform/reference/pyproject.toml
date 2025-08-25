@@ -36,7 +36,7 @@ dependencies = [
   "uvloop>=0.21.0",
   "watchdog>=6.0.0",
   "websockets>=15.0.1",
-  "yamllint>=1.37.1",
+  "fastapi[all]>=0.116.1",
 ]
 
 [dependency-groups]
@@ -50,6 +50,7 @@ dev = [
   "respx>=0.22.0",
   "ruff>=0.12.9",
   "sqlfluff>=3.4.2",
+  "yamllint>=1.37.1",
 ]
 
 [project.entry-points."evedata_ctl.commands"]

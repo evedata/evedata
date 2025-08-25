@@ -1,40 +1,44 @@
 [build-system]
-requires = ["uv_build>=0.8.0,<0.9"]
+requires = ["uv_build>=0.8.3,<0.9.0"]
 build-backend = "uv_build"
 
 [project]
-name = "evedata-monorepo"
-version = "0.0.0"
-description = "EVEData monorepo"
+name = "evedata-datasets"
+version = "0.1.0"
+description = ""
 readme = "README.md"
 authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.13"
 dependencies = [
   "evedata-core",
-  "evedata-datasets",
-  "evedata-docs",
-  "evedata-infra",
-  "evedata-reference",
-  "evedata-rest-api",
   "evedata-utils",
+  "fastapi[all]>=0.116.1",
+  "rich>=14.1.0",
+  "typer>=0.16.1",
 ]
 
 [dependency-groups]
 dev = [
-  "codespell[toml]>=2.4.1",
-  "commitizen>=4.8.3",
-  "cz-path>=0.0.1",
-  "pre-commit>=4.2.0",
-  "pyright>=1.1.403",
-  "ruff>=0.12.4",
-  "workers-py>=1.1.3",
-  "yamllint>=1.37.1",
+  "pyright>=1.1.404",
+  "pytest>=8.4.1",
+  "pytest-cov>=6.2.1",
+  "pytest-env>=1.1.5",
+  "pytest-mock>=3.14.1",
+  "pytest-xdist>=3.8.0",
+  "respx>=0.22.0",
+  "ruff>=0.12.9",
+  "sqlfluff>=3.4.2",
 ]
 
-[tool.codespell]
-check-filenames = true
-check-hidden = true
+[project.entry-points."evedata_ctl.commands"]
+reference = "evedata_datasets.ctl:cli"
+
+[project.entry-points."evedata_ctl.endpoints"]
+reference = "evedata_datasets.ctl:app"
+
+[project.entry-points."evedata_rest_api.endpoints"]
+reference = "evedata_datasets.rest:app"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
@@ -48,14 +52,21 @@ annotated_tags = true
 changelog_merge_prerelease = true
 
 [tool.pyright]
+strict = ["src", "tests"]
 venvPath = "."
 venv = ".venv"
-exclude = ["**/.*", "**/__pycache__", "**/node_modules", "**/experiments"]
+exclude = ["**/.*", "**/__pycache__", "**/node_modules"]
 
 [tool.pytest.ini_options]
-addopts = ["--tb", "short", "-n", "auto"]
-asyncio_mode = "auto"
-consider_namespace_packages = true
+addopts = [
+  "--tb",
+  "short",
+  "--cov",
+  "evedata_reference",
+  "--cov-branch",
+  "--cov-report",
+  "term-missing",
+]
 env = { "EVEDATA_ENV" = "test" }
 filterwarnings = ["error"]
 testpaths = ["tests"]
@@ -146,29 +157,6 @@ classmethod-decorators = [
 "**/tests/**" = ["D", "PLR2004", "S101"]
 "*.ipynb" = ["T20"]
 
-[tool.uv]
-default-groups = ["dev"]
-package = false
-required-version = ">=0.8.0,<0.9"
-
 [tool.uv.sources]
-evedata-ctl = { workspace = true }
 evedata-core = { workspace = true }
-evedata-datasets = { workspace = true }
-evedata-docs = { workspace = true }
-evedata-infra = { workspace = true }
-evedata-reference = { workspace = true }
-evedata-rest-api = { workspace = true }
 evedata-utils = { workspace = true }
-
-[tool.uv.workspace]
-members = [
-  "docs",
-  "infra",
-  "platform/core",
-  "platform/datasets",
-  "platform/ctl",
-  "platform/reference",
-  "platform/rest-api",
-  "platform/utils",
-]
