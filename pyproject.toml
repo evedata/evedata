@@ -61,6 +61,8 @@ xfail_strict = true
 
 [tool.ruff]
 target-version = "py313"
+extend-exclude = ["tmp"]
+line-length = 88
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -115,7 +117,6 @@ pydocstyle = { convention = "google" }
 combine-as-imports = true
 extra-standard-library = ["typing_extensions"]
 forced-separate = ["tests"]
-known-first-party = ["evedata"]
 
 [tool.ruff.lint.flake8-type-checking]
 quote-annotations = true

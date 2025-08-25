@@ -882,9 +882,6 @@ wheels = [
 name = "evedata-core"
 version = "0.1.0"
 source = { editable = "platform/core" }
-dependencies = [
-    { name = "rich" },
-]
 
 [package.dev-dependencies]
 dev = [
@@ -898,7 +895,6 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "rich", specifier = ">=14.1.0" }]
 
 [package.metadata.requires-dev]
 dev = [

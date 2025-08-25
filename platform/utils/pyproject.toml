@@ -9,11 +9,7 @@ description = ""
 readme = "README.md"
 authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 requires-python = ">=3.12"
-dependencies = [
-    "orjson>=3.11.2",
-    "pyyaml>=6.0.2",
-    "rich>=14.1.0",
-]
+dependencies = ["orjson>=3.11.2", "pyyaml>=6.0.2", "rich>=14.1.0"]
 
 [dependency-groups]
 dev = [
@@ -25,10 +21,6 @@ dev = [
   "pytest-xdist>=3.8.0",
   "ruff>=0.12.9",
 ]
-
-[tool.codespell]
-check-filenames = true
-check-hidden = true
 
 [tool.commitizen]
 name = "cz_conventional_commits"
