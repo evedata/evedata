@@ -32,10 +32,10 @@ def build_pipeline(  # noqa: PLR0913
     destination_name = destination_name or "duckdb"
     naming_convention_module = naming_convention_module or snake_case
     import_schema_path = import_schema_path or str(
-        Path.cwd() / "data" / "schemas" / "import" / pipeline_name / destination_name
+        Path.cwd() / "data" / "dlt" / "schemas" / "import" / pipeline_name / destination_name
     )
     export_schema_path = export_schema_path or str(
-        Path.cwd() / "data" / "schemas" / "export" / pipeline_name / destination_name
+        Path.cwd() / "data" / "dlt" / "schemas" / "export" / pipeline_name / destination_name
     )
     progress = progress or "alive_progress"
 
