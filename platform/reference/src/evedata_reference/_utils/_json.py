@@ -1,12 +1,12 @@
-from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
-import orjson as json
+from evedata_utils.json import load_json_file
 
-from ._normalize_id_keys import normalize_id_keys
+from ._normalize_id_keys import NormalizedDict, normalize_id_keys
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+    from pathlib import Path
 
 
 def is_int(value: str) -> bool:
@@ -20,21 +20,17 @@ def is_int(value: str) -> bool:
 
 
 def load_json_with_normalized_id_keys(
-    path: str | Path,
+    path: "str | Path",
 ) -> "Generator[dict[str, Any]]":
-    full_path = Path(path).resolve()
-    with full_path.open("r", encoding="utf-8") as file:
-        data: dict[str, dict[str, Any]] | dict[str, Any] | list[dict[str, Any]] = (
-            json.loads(file.read())
-        )
+    data = load_json_file(path)
     if isinstance(data, list):
         for item in data:
-            yield normalize_id_keys(item)
+            yield cast("NormalizedDict", normalize_id_keys(item))
     elif all(is_int(k) and not isinstance(v, dict) for k, v in data.items()):
         for id_, value in data.items():
             yield {"id": int(id_), "value": value}
     elif all(is_int(k) for k in data):
         for id_, item in data.items():
-            yield {"id": int(id_), **normalize_id_keys(item)}
+            yield {"id": int(id_), **cast("NormalizedDict", normalize_id_keys(item))}
     else:
         yield normalize_id_keys(data)

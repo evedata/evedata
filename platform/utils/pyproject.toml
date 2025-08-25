@@ -9,7 +9,11 @@ description = ""
 readme = "README.md"
 authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 requires-python = ">=3.12"
-dependencies = ["rich>=14.1.0"]
+dependencies = [
+    "orjson>=3.11.2",
+    "pyyaml>=6.0.2",
+    "rich>=14.1.0",
+]
 
 [dependency-groups]
 dev = [

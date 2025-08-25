@@ -3,6 +3,7 @@ from typing import Any
 
 import hishel
 import httpx
+from evedata_utils.datetime import http_date_to_iso8601
 from tenacity import (
     retry,
     retry_if_exception_type,
@@ -12,7 +13,6 @@ from tenacity import (
 
 from evedata_reference._constants import USER_AGENT
 from evedata_reference._exceptions import ESIErrorLimitReachedError
-from evedata_reference._utils._datetime import http_date_to_iso8601
 
 _RETRIABLE_EXCEPTIONS = httpx.RequestError
 

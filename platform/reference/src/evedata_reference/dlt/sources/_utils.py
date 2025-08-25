@@ -1,9 +1,10 @@
 from functools import cache, lru_cache
 from typing import TYPE_CHECKING, Any
 
+from evedata_utils.yaml import load_yaml_file
+
 from evedata_reference._utils import (
     load_json_with_normalized_id_keys,
-    load_yaml_file,
     load_yaml_with_normalized_id_keys,
 )
 

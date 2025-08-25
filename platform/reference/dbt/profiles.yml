@@ -3,7 +3,7 @@ evedata:
   outputs:
     dev:
       type: duckdb
-      path: ../data/evedata/evedata.duckdb
+      path: ../../../data/evedata_reference.duckdb
       schema: evedata
       extensions:
         - httpfs
