@@ -1,6 +1,6 @@
 from typer import Typer
 
-cmd = Typer(name="evedata-reference-transform")
+cmd = Typer()
 
 
 @cmd.command(name="transform")

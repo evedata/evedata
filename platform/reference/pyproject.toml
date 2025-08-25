@@ -36,7 +36,8 @@ dependencies = [
   "uvloop>=0.21.0",
   "watchdog>=6.0.0",
   "websockets>=15.0.1",
-  "fastapi[all]>=0.116.1",
+  "fastapi[all]>=0.115.5",
+  "sqlmesh[dlt,github,lsp,slack,web]>=0.210.0",
 ]
 
 [dependency-groups]

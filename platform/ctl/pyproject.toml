@@ -13,10 +13,10 @@ classifiers = ["Private :: Do Not Upload"]
 dependencies = [
   "evedata-core",
   "evedata-utils",
-  "fastapi[all]>=0.116.1",
+  "fastapi[all]>=0.115.5",
   "rich>=14.1.0",
   "typer>=0.16.1",
-  "uvicorn>=0.35.0",
+  "uvicorn>=0.22.0",
 ]
 
 [dependency-groups]

@@ -13,7 +13,7 @@ requires-python = ">=3.13"
 dependencies = [
   "evedata-core",
   "evedata-utils",
-  "fastapi[all]>=0.116.1",
+  "fastapi[all]>=0.115.5",
   "rich>=14.1.0",
   "typer>=0.16.1",
 ]
@@ -32,13 +32,13 @@ dev = [
 ]
 
 [project.entry-points."evedata_ctl.commands"]
-reference = "evedata_datasets.ctl:cli"
+datasets = "evedata_datasets.ctl:cli"
 
 [project.entry-points."evedata_ctl.endpoints"]
-reference = "evedata_datasets.ctl:app"
+datasets = "evedata_datasets.ctl:app"
 
 [project.entry-points."evedata_rest_api.endpoints"]
-reference = "evedata_datasets.rest:app"
+datasets = "evedata_datasets.rest:app"
 
 [tool.commitizen]
 name = "cz_conventional_commits"

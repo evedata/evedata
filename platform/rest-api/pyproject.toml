@@ -10,7 +10,12 @@ readme = "README.md"
 authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.13"
-dependencies = ["evedata-core", "evedata-utils", "fastapi[all]>=0.116.1"]
+dependencies = [
+  "evedata-core",
+  "evedata-utils",
+  "fastapi[all]>=0.115.5",
+  "uvicorn>=0.22.0",
+]
 
 [dependency-groups]
 dev = [

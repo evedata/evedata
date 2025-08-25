@@ -1,8 +1,8 @@
 from typer import Typer
 
-cmd = Typer(name="evedata-reference-export")
+cmd = Typer()
 
 
-@cmd.command(name="extract")
+@cmd.command(name="export")
 def export_cmd() -> None:
     """Export reference datasets."""

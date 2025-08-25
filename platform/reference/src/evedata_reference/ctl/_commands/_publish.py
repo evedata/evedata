@@ -1,6 +1,6 @@
 from typer import Typer
 
-cmd = Typer(name="evedata-reference-publish")
+cmd = Typer()
 
 
 @cmd.command(name="publish")
