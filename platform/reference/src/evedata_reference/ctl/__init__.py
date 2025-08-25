@@ -1,5 +1,5 @@
 """Plugin for evedatactl for reference data tasks."""
 
-from ._app import app
+from ._cli import cli
 
-__all__ = ["app"]
+__all__ = ["cli"]

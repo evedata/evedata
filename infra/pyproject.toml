@@ -16,7 +16,7 @@ dependencies = ["evedata-utils"]
 dev = ["pyright>=1.1.403", "ruff>=0.12.4", "yamllint>=1.37.1"]
 
 [project.entry-points."evedatactl.commands"]
-infra = "evedata_infra.cli:app"
+infra = "evedata_infra.ctl:cli"
 
 [tool.pyright]
 venvPath = "."

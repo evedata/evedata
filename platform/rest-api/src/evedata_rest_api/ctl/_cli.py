@@ -5,4 +5,4 @@ cli = Typer(name="evedata-rest-api")
 
 @cli.callback()
 def main():
-    """Start the EVEData REST API server."""
+    """Start the REST API."""

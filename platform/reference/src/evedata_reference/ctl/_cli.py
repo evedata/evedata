@@ -4,25 +4,25 @@ from typing import Annotated
 import typer
 from typer import Typer
 
-app = Typer(name="evedata-reference")
+cli = Typer(name="evedata-reference")
 
 
-@app.callback()
+@cli.callback()
 def callback() -> None:
     """Manage reference data."""
 
 
-@app.command(name="download-hde")
+@cli.command(name="download-hde")
 def download_hde_cmd() -> None:
     """Download the latest HDE data."""
 
 
-@app.command(name="download-sde")
+@cli.command(name="download-sde")
 def download_sde_cmd() -> None:
     """Download the latest SDE data."""
 
 
-@app.command(name="load-esi-raw")
+@cli.command(name="load-esi-raw")
 def load_esi_raw_cmd(
     *,
     destination: Annotated[
@@ -48,7 +48,7 @@ def load_esi_raw_cmd(
     )
 
 
-@app.command(name="load-hde-raw")
+@cli.command(name="load-hde-raw")
 def load_hde_raw_cmd(
     *,
     hde_path: Annotated[
@@ -92,7 +92,7 @@ def load_hde_raw_cmd(
     ).run(hde_source, loader_file_format="parquet", refresh="drop_sources")
 
 
-@app.command(name="load-sde-raw")
+@cli.command(name="load-sde-raw")
 def load_sde_raw_cmd(
     *,
     sde_path: Annotated[

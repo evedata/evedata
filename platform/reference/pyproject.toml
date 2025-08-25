@@ -53,7 +53,7 @@ dev = [
 ]
 
 [project.entry-points."evedatactl.commands"]
-reference = "evedata_reference.cli:app"
+reference = "evedata_reference.ctl:cli"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
