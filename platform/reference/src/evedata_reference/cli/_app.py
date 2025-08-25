@@ -7,13 +7,18 @@ from typer import Typer
 app = Typer(name="evedata-reference")
 
 
+@app.callback()
+def callback() -> None:
+    """Manage reference data."""
+
+
 @app.command(name="download-hde")
-def download_hde_cmd():
+def download_hde_cmd() -> None:
     """Download the latest HDE data."""
 
 
 @app.command(name="download-sde")
-def download_sde_cmd():
+def download_sde_cmd() -> None:
     """Download the latest SDE data."""
 
 
@@ -28,10 +33,10 @@ def load_esi_raw_cmd(
         str | None,
         typer.Option(help="ESI resources to include in the pipeline"),
     ] = None,
-):
+) -> None:
     """Extract, normalize, and load ESI data from the specified path."""
-    from evedata_reference.dlt.pipelines import build_pipeline  # noqa: PLC0415
-    from evedata_reference.dlt.sources import esi  # noqa: PLC0415
+    from evedata_reference._dlt._pipelines import build_pipeline  # noqa: PLC0415
+    from evedata_reference._dlt._sources import esi  # noqa: PLC0415
 
     esi_source = esi()
     if resources:
@@ -39,7 +44,7 @@ def load_esi_raw_cmd(
         esi_source = esi_source.with_resources(*resource_names)
 
     build_pipeline("esi", "esi_raw", destination_name=destination).run(
-        esi_source, loader_file_format="parquet"
+        esi_source, loader_file_format="parquet", refresh="drop_sources"
     )
 
 
@@ -66,13 +71,13 @@ def load_hde_raw_cmd(
         str | None,
         typer.Option(help="HDE Resources to include in the pipeline"),
     ] = None,
-):
+) -> None:
     """Extract, normalize, and load HDE data from the specified path."""
-    from evedata_reference.dlt.naming import (  # noqa: PLC0415
+    from evedata_reference._dlt._naming import (  # noqa: PLC0415
         hde as hde_naming_convention,
     )
-    from evedata_reference.dlt.pipelines import build_pipeline  # noqa: PLC0415
-    from evedata_reference.dlt.sources import hde  # noqa: PLC0415
+    from evedata_reference._dlt._pipelines import build_pipeline  # noqa: PLC0415
+    from evedata_reference._dlt._sources import hde  # noqa: PLC0415
 
     hde_source = hde(hde_path)
     if resources:
@@ -84,7 +89,7 @@ def load_hde_raw_cmd(
         "hde_raw",
         destination_name=destination,
         naming_convention_module=hde_naming_convention,
-    ).run(hde_source, loader_file_format="parquet")
+    ).run(hde_source, loader_file_format="parquet", refresh="drop_sources")
 
 
 @app.command(name="load-sde-raw")
@@ -110,10 +115,10 @@ def load_sde_raw_cmd(
         str | None,
         typer.Option(help="SDE Resources to include in the pipeline"),
     ] = None,
-):
+) -> None:
     """Extract, normalize, and load SDE data from the specified path."""
-    from evedata_reference.dlt.pipelines import build_pipeline  # noqa: PLC0415
-    from evedata_reference.dlt.sources import sde  # noqa: PLC0415
+    from evedata_reference._dlt._pipelines import build_pipeline  # noqa: PLC0415
+    from evedata_reference._dlt._sources import sde  # noqa: PLC0415
 
     sde_source = sde(sde_path)
     if resources:
@@ -121,5 +126,5 @@ def load_sde_raw_cmd(
         sde_source = sde_source.with_resources(*resource_names)
 
     build_pipeline("sde", "sde_raw", destination_name=destination).run(
-        sde_source, loader_file_format="parquet"
+        sde_source, loader_file_format="parquet", refresh="drop_sources"
     )
