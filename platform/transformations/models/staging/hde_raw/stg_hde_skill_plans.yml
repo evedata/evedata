@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: stg_hde_skill_plans
+    description: "Curated skill training plans that guide new and intermediate players through recommended skill progressions for different career paths in EVE Online. Each plan represents a structured learning path tailored to specific gameplay styles such as combat, exploration, industry, or piracy. These plans help players understand which skills to prioritize for their chosen profession and provide milestone goals to work toward."
+    columns:
+      - name: skill_plan_id
+        description: "Unique identifier for the skill plan"
+        data_tests:
+          - not_null
+          - unique
+      - name: career_path_id
+        description: "Career path category this plan belongs to (4=Explorer, 5=Industrialist, 6=Enforcer, 7=Soldier of Fortune) (nullable)"
+      - name: corporation_division_id
+        description: "NPC corporation division associated with this career path. References stg.sde_corporation_divisions (nullable)"
+      - name: faction_id
+        description: "Faction this skill plan is designed for. References stg.sde_factions (nullable)"
+      - name: description
+        description: "Detailed HTML-formatted description of the career path including recommended ships and activities"
+      - name: internal_name
+        description: 'Internal system name for the skill plan (e.g., "Minmatar Soldier of Fortune - Faction Militia")'
+      - name: name
+        description: 'Display name of the skill plan shown to players (e.g., "Minmatar Militia Fighter", "Gallente Pirate")'

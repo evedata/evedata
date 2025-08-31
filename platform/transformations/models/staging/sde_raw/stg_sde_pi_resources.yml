@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: sde_pi_resources
+    description: "Planetary resource distribution and extraction parameters defining what materials can be harvested from each celestial body. Controls the availability and extraction rates of raw materials used in Planetary Industry production chains across planets and moons."
+    columns:
+      - name: celestial_id
+        description: "Celestial body (planet or moon). References stg.sde_items (required)"
+        data_tests:
+          - not_null
+          - unique
+      - name: reagent_type_id
+        description: "Harvestable resource type. References stg.sde_types (required)"
+      - name: cycle_minutes
+        description: "Extraction cycle duration in minutes"
+      - name: harvest_silo_max
+        description: "Maximum storage capacity for harvested resources"
+      - name: maturation_cycle_minutes
+        description: "Resource maturation cycle duration in minutes"
+      - name: maturation_percent
+        description: "Percentage of resource that matures per cycle"
+      - name: mature_silo_max
+        description: "Maximum storage capacity for matured resources"
+      - name: power
+        description: "Power grid usage in MW for extraction operations"
+      - name: reagent_harvest_amount
+        description: "Quantity of resource extracted per cycle"
+      - name: workforce
+        description: "Number of workers required for extraction operations"

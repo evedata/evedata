@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_hde_blueprint_manufacturing_products
+    description: "Products created from blueprint manufacturing activities. Defines the output items and quantities produced when manufacturing from blueprints in EVE Online. Manufacturing is the primary industrial activity that creates ships, modules, ammunition, and other items from raw materials."
+    columns:
+      - name: blueprint_type_id
+        description: "Blueprint item type that produces these items when manufactured. References stg.sde_types (required)"
+      - name: type_id
+        description: "Item type produced as output from the manufacturing process. References stg.sde_types (required)"
+      - name: quantity
+        description: "Number of items produced per successful manufacturing run (typically 1 for ships and modules, higher for consumables like ammunition)"

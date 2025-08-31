@@ -1,0 +1,70 @@
+version: 2
+
+models:
+  - name: sde_asteroid_belts
+    description: |
+      Rings of asteroids orbiting planets within solar systems, serving as primary
+      mining locations for ore and minerals. Asteroid belts are key resource extraction
+      sites where players mine valuable ores for manufacturing and trade. Each asteroid
+      belt contains various ore types based on system security status and regional
+      location.
+    columns:
+      - name: asteroid_belt_id
+        description: "Unique asteroid belt identifier. Can retrieve name from stg.sde_item_names using this ID"
+        data_tests:
+          - not_null
+          - unique
+      - name: asteroid_belt_type_id
+        description: "Type of asteroid belt determining ore composition. References stg.sde_types (required)"
+        data_tests:
+          - not_null
+      - name: planet_id
+        description: "Planet this asteroid belt orbits. References stg.sde_system_planets (required)"
+        data_tests:
+          - not_null
+      - name: system_id
+        description: "Solar system containing this asteroid belt. References stg.sde_systems (required)"
+        data_tests:
+          - not_null
+      - name: name_id
+        description: "Localization identifier for custom belt names. References external localization tables not available in our data. Only 46 of 40,928 belts have custom names (nullable)"
+      - name: celestial_index
+        description: "Orbital position index of the belt around its planet (1=closest to planet)"
+      - name: position_x
+        description: "Belt center X coordinate position within the solar system in meters (scale ~10^11)"
+      - name: position_y
+        description: "Belt center Y coordinate position within the solar system in meters (scale ~10^11)"
+      - name: position_z
+        description: "Belt center Z coordinate position within the solar system in meters (scale ~10^11)"
+      - name: statistics_density
+        description: "Asteroid material density within the belt in kg/m³"
+      - name: statistics_eccentricity
+        description: "Orbital eccentricity around planet (0=circular, approaching 1=highly elliptical)"
+      - name: statistics_escape_velocity
+        description: "Minimum velocity to escape belt gravity field in meters per second"
+      - name: statistics_is_fragmented
+        description: "Whether belt is dispersed or fragmented. True=fragmented distribution, False=concentrated ring"
+      - name: statistics_is_locked
+        description: "Whether belt rotation is tidally locked to planet. True=tidally locked, False=independently rotating"
+      - name: statistics_life
+        description: "Belt age or depletion stage value"
+      - name: statistics_mass_dust
+        description: "Total mass of dust and small particles in kilograms"
+      - name: statistics_mass_gas
+        description: "Total mass of gaseous material in kilograms (typically minimal)"
+      - name: statistics_orbit_period
+        description: "Time for belt to complete one orbit around the planet in seconds"
+      - name: statistics_orbit_radius
+        description: "Average orbital distance from the planet in meters"
+      - name: statistics_pressure
+        description: "Ambient pressure within the belt in Pascals (essentially vacuum)"
+      - name: statistics_radius
+        description: "Belt thickness or spread radius in meters"
+      - name: statistics_rotation_rate
+        description: "Belt rotation rate in radians per second"
+      - name: statistics_spectral_class
+        description: "Spectral classification code for asteroid composition"
+      - name: statistics_surface_gravity
+        description: "Average gravitational field strength within belt in meters per second squared"
+      - name: statistics_temperature
+        description: "Average temperature within the belt in Kelvin"

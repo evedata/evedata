@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: sde_blueprint_copying_skills
+    description: |
+      Skill prerequisites for blueprint copying activities in EVE Online's industry
+      system. This bridge table defines which character skills and their minimum levels
+      are required to perform blueprint copying operations. Players must train these
+      skills to the specified levels before they can copy a blueprint. Common copying
+      skills include Science, Research, and various specialized technology skills for
+      advanced blueprints.
+    columns:
+      - name: blueprint_copying_material_uuid
+        description: "Unique identifier for the blueprint copying skill requirement record."
+        data_tests:
+          - not_null
+          - unique
+      - name: blueprint_uuid
+        description: "UUID of the blueprint being copied."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('sde_blueprints')
+                field: blueprint_uuid
+      - name: type_id
+        description: "Character skill required for copying. References stg.sde_types where the type is a skill item (required)"
+        data_tests:
+          - not_null
+      - name: level
+        description: "Minimum skill level required. Valid range 0-5 where 0 may indicate no specific level requirement and 5 is maximum skill mastery"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4, 5]
+                quote: false

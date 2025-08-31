@@ -1,0 +1,86 @@
+version: 2
+
+models:
+  - name: stg_hde_graphic_material_sets
+    description: "Material sets defining visual properties for EVE Online graphics rendering. These sets control how ship skins and other visual elements appear in-game by specifying colors (RGBA values for hull, primary, secondary, and window areas), material textures, and Space Object Factory (SOF) rendering parameters. Each material set can be referenced by skin materials to create unique visual appearances for ships and structures."
+    columns:
+      - name: graphic_material_set_id
+        description: "Unique identifier for the graphic material set"
+      - name: color_hull_a
+        description: "Alpha (transparency) channel value for hull color. Range 0.0-1.0"
+      - name: color_hull_b
+        description: "Blue channel value for hull color. Range 0.0-1.0"
+      - name: color_hull_g
+        description: "Green channel value for hull color. Range 0.0-1.0"
+      - name: color_hull_n_fields
+        description: "Number of fields in the hull color tuple. Always 4 for RGBA or null"
+      - name: color_hull_n_sequence_fields
+        description: "Number of sequence fields in hull color data structure. Always 4 for RGBA or null"
+      - name: color_hull_n_unnamed_fields
+        description: "Number of unnamed fields in hull color tuple. Always 0 when present"
+      - name: color_hull_r
+        description: "Red channel value for hull color. Range 0.0-1.0"
+      - name: color_primary_a
+        description: "Alpha (transparency) channel value for primary color accent. Range 0.0-1.0"
+      - name: color_primary_b
+        description: "Blue channel value for primary color accent. Range 0.0-1.0"
+      - name: color_primary_g
+        description: "Green channel value for primary color accent. Range 0.0-1.0"
+      - name: color_primary_n_fields
+        description: "Number of fields in the primary color tuple. Always 4 for RGBA or null"
+      - name: color_primary_n_sequence_fields
+        description: "Number of sequence fields in primary color data structure. Always 4 for RGBA or null"
+      - name: color_primary_n_unnamed_fields
+        description: "Number of unnamed fields in primary color tuple. Always 0 when present"
+      - name: color_primary_r
+        description: "Red channel value for primary color accent. Range 0.0-1.0"
+      - name: color_secondary_a
+        description: "Alpha (transparency) channel value for secondary color accent. Range 0.0-1.0"
+      - name: color_secondary_b
+        description: "Blue channel value for secondary color accent. Range 0.0-1.0"
+      - name: color_secondary_g
+        description: "Green channel value for secondary color accent. Range 0.0-1.0"
+      - name: color_secondary_n_fields
+        description: "Number of fields in the secondary color tuple. Always 4 for RGBA or null"
+      - name: color_secondary_n_sequence_fields
+        description: "Number of sequence fields in secondary color data structure. Always 4 for RGBA or null"
+      - name: color_secondary_n_unnamed_fields
+        description: "Number of unnamed fields in secondary color tuple. Always 0 when present"
+      - name: color_secondary_r
+        description: "Red channel value for secondary color accent. Range 0.0-1.0"
+      - name: color_window_a
+        description: "Alpha (transparency) channel value for window/cockpit areas. Range 0.0-1.0"
+      - name: color_window_b
+        description: "Blue channel value for window/cockpit areas. Range 0.0-1.0"
+      - name: color_window_g
+        description: "Green channel value for window/cockpit areas. Range 0.0-1.0"
+      - name: color_window_n_fields
+        description: "Number of fields in the window color tuple. Always 4 for RGBA or null"
+      - name: color_window_n_sequence_fields
+        description: "Number of sequence fields in window color data structure. Always 4 for RGBA or null"
+      - name: color_window_n_unnamed_fields
+        description: "Number of unnamed fields in window color tuple. Always 0 when present"
+      - name: color_window_r
+        description: "Red channel value for window/cockpit areas. Range 0.0-1.0"
+      - name: custom_material_1
+        description: "First custom material texture name for special effects"
+      - name: custom_material_2
+        description: "Second custom material texture name for special effects"
+      - name: description
+        description: "Human-readable description of the material set"
+      - name: material_1
+        description: "Primary material texture (e.g., silver_true_polished, black_gunmetal_metallic)"
+      - name: material_2
+        description: "Secondary material texture for layered effects"
+      - name: material_3
+        description: "Tertiary material texture for additional detail"
+      - name: material_4
+        description: "Quaternary material texture for complex surfaces"
+      - name: res_path_insert
+        description: "Resource path insertion string for asset loading"
+      - name: sof_faction_name
+        description: "Space Object Factory faction identifier for faction-specific rendering (e.g., amarr, caldari, gallente, minmatar)"
+      - name: sof_pattern_name
+        description: "Space Object Factory pattern name for specialized visual patterns"
+      - name: sof_race_hint
+        description: "Space Object Factory race hint for race-specific shader selection (e.g., amarr, caldari, gallente, minmatar)"

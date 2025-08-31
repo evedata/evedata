@@ -1,0 +1,9 @@
+**/.venv/
+**/data/
+**/target/
+**/dbt_internal_packages/
+**/dbt_packages/
+**/logs/
+**/macros/
+**/node_packages/
+**/tmp/

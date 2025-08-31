@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_hde_industry_modifier_reaction_time
+    description: "Industry modifiers that affect reaction time reductions. Links structure rigs and other modifier sources to their time reduction dogma attributes for chemical reaction processes, with optional filtering for specific reaction types."
+    columns:
+      - name: modifier_source_type_id
+        description: "Type ID of the item providing the modifier (structure rig, etc.). References stg.sde_types (required)"
+      - name: attribute_id
+        description: "Dogma attribute defining the time reduction multiplier. References stg.sde_dogma_attributes (required)"
+      - name: filter_id
+        description: "Optional filter restricting modifier to specific reaction types. References category/group filtering system (nullable)"

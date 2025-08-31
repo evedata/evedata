@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: sde_item_positions
+    description: "Three-dimensional spatial coordinates and orientation data for static universe objects. Defines the exact position and rotation of celestial bodies, stations, stargates, and other fixed objects within their solar systems or other containers. Positions are relative to the parent container (usually the solar system center). The coordinate system uses meters as the base unit, with orientation specified using Euler angles for pitch, roll, and yaw rotations."
+    columns:
+      - name: item_id
+        description: "Universe object being positioned. References stg.sde_items (required)"
+        data_tests:
+          - not_null
+          - unique
+      - name: pitch
+        description: "Pitch rotation angle in radians. Rotation around the X-axis"
+      - name: roll
+        description: "Roll rotation angle in radians. Rotation around the Z-axis"
+      - name: x
+        description: "X-axis coordinate position in meters relative to parent container center"
+      - name: y
+        description: "Y-axis coordinate position in meters relative to parent container center"
+      - name: yaw
+        description: "Yaw rotation angle in radians. Rotation around the Y-axis"
+      - name: z
+        description: "Z-axis coordinate position in meters relative to parent container center"

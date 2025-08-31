@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: sde_regions
+    description: "Top-level geographical divisions in EVE Online universe, representing the largest spatial units that contain constellations and solar systems. Regions define major political boundaries and are the primary navigation reference for pilots. There are 113 regions spanning five universe types, with coordinates at the 10^16 scale representing vast interstellar distances."
+    columns:
+      - name: region_id
+        description: "Unique region identifier. Can retrieve name from stg.sde_item_names using this ID"
+        data_tests:
+          - not_null
+          - unique
+      - name: faction_id
+        description: "NPC faction controlling this region. References stg.sde_factions (nullable)"
+      - name: nebula_id
+        description: "Visual nebula effect identifier for skybox rendering (nullable)"
+      - name: universe
+        description: "Universe type this region belongs to. Possible values: eve (known space), wormhole (J-space), abyssal (abyssal deadspace), void (unused space), hidden (developer regions)"
+      - name: wormhole_class_id
+        description: "Wormhole space classification. 1-6=standard classes (C1-C6), 7-9=special (shattered/Thera), 12=Thera, 13=shattered frigate. References stg.sde_wormhole_classes (nullable)"
+      - name: center_x
+        description: "Region geometric center X coordinate in meters (scale ~10^16)"
+      - name: center_y
+        description: "Region geometric center Y coordinate in meters (scale ~10^16)"
+      - name: center_z
+        description: "Region geometric center Z coordinate in meters (scale ~10^16)"
+      - name: description_id
+        description: "Localization identifier for region description text. References external localization tables not available in our data (nullable)"
+      - name: maximum_x
+        description: "Bounding box maximum X coordinate in meters (scale ~10^16)"
+      - name: maximum_y
+        description: "Bounding box maximum Y coordinate in meters (scale ~10^16)"
+      - name: maximum_z
+        description: "Bounding box maximum Z coordinate in meters (scale ~10^16)"
+      - name: minimum_x
+        description: "Bounding box minimum X coordinate in meters (scale ~10^16)"
+      - name: minimum_y
+        description: "Bounding box minimum Y coordinate in meters (scale ~10^16)"
+      - name: minimum_z
+        description: "Bounding box minimum Z coordinate in meters (scale ~10^16)"
+      - name: name_id
+        description: "Localization identifier for region name. References external localization tables not available in our data (nullable)"

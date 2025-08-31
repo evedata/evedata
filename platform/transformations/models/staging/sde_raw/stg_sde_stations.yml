@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: sde_stations
+    description: "Defines the 5,154 NPC-owned stations throughout EVE Online that provide docking, trading, manufacturing, and other services to players. These permanent structures are found in empire space and some nullsec regions, operated by NPC corporations and offering various service levels based on their operation type and location security."
+    columns:
+      - name: station_id
+        description: "Unique station identifier (60000001-60015148)"
+        data_tests:
+          - not_null
+          - unique
+      - name: constellation_id
+        description: "Constellation containing this station. References stg.sde_constellations (required)"
+      - name: npc_corporation_id
+        description: "NPC corporation owning/operating this station. References stg.sde_npc_corporations (required)"
+      - name: station_operation_id
+        description: "Operation type determining services and costs. References stg.sde_station_operations (required)"
+      - name: region_id
+        description: "Region containing this station. References stg.sde_regions (required)"
+      - name: system_id
+        description: "Solar system containing this station. References stg.sde_systems (required)"
+      - name: station_type_id
+        description: "Station structure type determining model and size. References stg.sde_types (required)"
+      - name: docking_cost_per_volume
+        description: "ISK fee per cubic meter for docking (typically 0-10 ISK/m³)"
+      - name: max_ship_volume_dockable
+        description: "Maximum ship volume allowed to dock in cubic meters (m³). Restricts capital ships at some stations"
+      - name: name
+        description: "Full station name including system and owner designation"
+      - name: office_rental_cost
+        description: "Base ISK cost per month to rent a corporate office"
+      - name: position_x
+        description: "X coordinate position within solar system in meters"
+      - name: position_y
+        description: "Y coordinate position within solar system in meters"
+      - name: position_z
+        description: "Z coordinate position within solar system in meters"
+      - name: reprocessing_efficiency
+        description: "Base mineral recovery rate for reprocessing (0.0-1.0, where 0.5 = 50% efficiency)"
+      - name: reprocessing_hangar_flag_id
+        description: "Hangar location flag for reprocessed materials. References stg.sde_flags"
+      - name: reprocessing_stations_take
+        description: "Station tax rate on reprocessing value (0.0-1.0, where 0.05 = 5% tax)"
+      - name: security
+        description: "Effective security status at station location (-1.0 to 1.0)"

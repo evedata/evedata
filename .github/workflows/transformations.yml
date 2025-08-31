@@ -1,0 +1,89 @@
+name: Platform - Transformations
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "platform/transformations/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "platform/transformations/**"
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: "Deployment target"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+          - production
+          - both
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  UV_CACHE_DIR: .uv_cache
+  PYTHONUNBUFFERED: "1"
+  FORCE_COLOR: "1"
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ankane/setup-postgres@v1
+        with:
+          database: evedata
+          user: postgres
+          password: postgres
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version-file: "pyproject.toml"
+          enable-cache: true
+          cache-dependency-glob: |
+            **/packages.yml
+            **/package-lock.yml
+            **/pyproject.toml
+            **/uv.lock
+      - run: uv python install 3.13
+      - run: |
+          uv sync --frozen --all-extras
+          uv pip list
+      - working-directory: platform/transformations
+        run: make dbt-deps
+      - working-directory: platform/transformations
+        run: make lint
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ankane/setup-postgres@v1
+        with:
+          database: evedata
+          user: postgres
+          password: postgres
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version-file: "pyproject.toml"
+          enable-cache: true
+          cache-dependency-glob: |
+            **/packages.yml
+            **/package-lock.yml
+            **/pyproject.toml
+            **/uv.lock
+      - run: uv python install 3.13
+      - run: |
+          uv sync --frozen --all-extras
+          uv pip list
+      - working-directory: platform/transformations
+        run: make dbt-deps
+      - working-directory: platform/transformations
+        run: make lint

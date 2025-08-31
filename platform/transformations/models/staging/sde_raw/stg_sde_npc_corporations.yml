@@ -1,0 +1,107 @@
+version: 2
+
+models:
+  - name: sde_npc_corporations
+    description: "NPC corporations with standings, LP stores, and faction associations"
+    columns:
+      - name: npc_corporation_id
+        description: "Unique corporation identifier"
+        data_tests:
+          - not_null
+          - unique
+      - name: ceo_id
+        description: "References sde_agents (CEO)"
+      - name: enemy_id
+        description: "Self-reference (enemy corp)"
+      - name: faction_id
+        description: "References sde_factions"
+      - name: friend_id
+        description: "Self-reference (friendly corp)"
+      - name: home_station_id
+        description: "References sde_stations"
+      - name: icon_id
+        description: "References sde_icons"
+      - name: main_activity_id
+        description: "References sde_corporation_activities"
+      - name: race_id
+        description: "References sde_races"
+      - name: secondary_activity_id
+        description: "References sde_corporation_activities"
+      - name: system_id
+        description: "References sde_systems (HQ system)"
+      - name: is_deleted
+        description: "Deleted corporation flag"
+      - name: corporation_trades
+        description: "JSON trade configuration"
+      - name: description_de
+        description: "German description"
+      - name: description_en
+        description: "English description"
+      - name: description_es
+        description: "Spanish description"
+      - name: description_fr
+        description: "French description"
+      - name: description_it
+        description: "Italian description"
+      - name: description_ja
+        description: "Japanese description"
+      - name: description_ko
+        description: "Korean description"
+      - name: description_ru
+        description: "Russian description"
+      - name: description_zh
+        description: "Chinese description"
+      - name: exchange_rates
+        description: "JSON LP exchange rates"
+      - name: extent
+        description: "Corporation reach/extent"
+      - name: has_player_personnel_manager
+        description: "Has player manager flag"
+      - name: initial_price
+        description: "Initial share price"
+      - name: investors
+        description: "JSON investor data"
+      - name: is_unique
+        description: "Unique corporation flag"
+      - name: lp_offer_tables
+        description: "JSON LP store offers"
+      - name: member_limit
+        description: "Max member count"
+      - name: minimum_security
+        description: "Min security for missions"
+      - name: minimum_join_standing
+        description: "Min standing to join"
+      - name: name_de
+        description: "German name"
+      - name: name_en
+        description: "English name"
+      - name: name_es
+        description: "Spanish name"
+      - name: name_fr
+        description: "French name"
+      - name: name_it
+        description: "Italian name"
+      - name: name_ja
+        description: "Japanese name"
+      - name: name_ko
+        description: "Korean name"
+      - name: name_ru
+        description: "Russian name"
+      - name: name_zh
+        description: "Chinese name"
+      - name: public_shares
+        description: "Public share count"
+      - name: send_char_termination_message
+        description: "Send termination message flag"
+      - name: shares
+        description: "Total shares"
+      - name: size
+        description: "Corporation size category"
+      - name: size_factor
+        description: "Size scaling factor"
+      - name: tax_rate
+        description: "Corporation tax rate"
+      - name: ticker_name
+        description: "Corporation ticker symbol"
+      - name: url
+        description: "Corporation info URL"

@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: sde_faction_races
+    description: "Maps the 30 relationships between factions and their member races. Each faction can have one or more races as members, representing the ethnic composition of that political entity. For example, the Caldari State faction includes only the Caldari race, while pirate factions may include multiple races."
+    columns:
+      - name: faction_id
+        description: "Faction containing member races. References stg.sde_factions (required)"
+        data_tests:
+          - not_null
+      - name: race_id
+        description: "Member race belonging to this faction. References stg.sde_races (required)"
+        data_tests:
+          - not_null

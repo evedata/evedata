@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: stg_hde_buff_location_modifiers
+    description: "Defines which Dogma attributes are modified when a buff is applied to an entire location. Location modifiers affect all entities within a solar system or constellation, applying the same attribute changes to every ship, structure, or item present. These are typically used for system-wide effects like wormhole environmental modifiers or event-specific bonuses."
+    columns:
+      - name: buff_id
+        description: "Buff that modifies attributes for all entities in a location. References stg.hde_dbuffs (required)"
+      - name: attribute_id
+        description: "Dogma attribute to be modified on all entities in the location. References stg.sde_dogma_attributes (required)"

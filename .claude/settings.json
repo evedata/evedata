@@ -48,7 +48,15 @@
       "Bash(whereis:*)",
       "Bash(which:*)",
       "Bash(whoami:*)",
-      "Bash(yq:*)"
+      "Bash(yq:*)",
+
+      "WebFetch(domain:127.0.0.1)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:docs.getdbt.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:localhost)",
+
+      "WebSearch(**)"
     ],
     "deny": [],
     "ask": []

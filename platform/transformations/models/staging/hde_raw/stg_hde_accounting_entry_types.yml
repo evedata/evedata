@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: stg_hde_accounting_entry_types
+    description: "Reference table defining all types of accounting entries used in the wallet journal system. Each entry type represents a specific kind of financial transaction that can occur in the game, from market trades to contract collateral, bounty payouts to tax collections. This model provides both the internal identifiers and localized display text that players see in their wallet history, making it essential for understanding and categorizing financial flows in the EVE economy."
+    columns:
+      - name: accounting_entry_type_id
+        description: "Unique identifier for the accounting entry type. Values above 10000 are DUST 514/Project Nova related entries"
+        data_tests:
+          - not_null
+          - unique
+      - name: description
+        description: "Internal description or notes about the entry type usage (nullable)"
+      - name: entry_journal_message_id
+        description: "Localization ID for the journal entry message template. References external localization table (nullable)"
+      - name: entry_journal_message_translated
+        description: "Translated journal message template shown in wallet history. May contain placeholders for dynamic values (nullable)"
+      - name: entry_type_description_id
+        description: "Localization ID for the detailed description of this entry type. References external localization table (nullable)"
+      - name: entry_type_description_translated
+        description: "Translated detailed description explaining what this entry type represents (nullable)"
+      - name: entry_type_name_id
+        description: "Localization ID for the display name of this entry type. References external localization table (required)"
+      - name: entry_type_name_translated
+        description: "Translated display name shown to players in the wallet journal (required)"
+      - name: name
+        description: "Internal technical name of the accounting entry type used in game systems"

@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: sde_landmarks
+    description: "Notable landmarks and points of interest throughout the EVE universe including historical sites, unique celestial phenomena, and important lore locations. These landmarks provide exploration content and contribute to the rich backstory of New Eden."
+    columns:
+      - name: landmark_id
+        description: "Unique landmark identifier"
+        data_tests:
+          - not_null
+          - unique
+      - name: icon_id
+        description: "Visual representation icon. References stg.sde_icons (nullable)"
+      - name: description_id
+        description: "Localization ID for landmark description (references external localization table not available in our data)"
+      - name: landmark_name_id
+        description: "Localization ID for landmark name (references external localization table not available in our data)"
+      - name: system_id
+        description: "Solar system containing the landmark. References stg.sde_systems (nullable)"

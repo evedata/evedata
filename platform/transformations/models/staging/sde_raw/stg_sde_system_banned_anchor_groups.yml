@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: sde_system_banned_anchor_groups
+    description: "System-specific anchoring restrictions for item groups. Provides granular control over which structure types can be deployed in particular systems, supporting gameplay mechanics like preventing certain structures near trade routes or in rookie systems."
+    columns:
+      - name: system_id
+        description: "Solar system with anchoring restrictions. References stg.sde_systems (required)"
+      - name: group_id
+        description: "Prohibited item group. References stg.sde_groups (required)"

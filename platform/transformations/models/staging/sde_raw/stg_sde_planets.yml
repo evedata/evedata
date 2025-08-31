@@ -1,0 +1,67 @@
+version: 2
+
+models:
+  - name: sde_planets
+    description: "Planets orbiting stars within solar systems, representing major celestial bodies that can host moons, stations, and serve as anchors for asteroid belts. Each planet has detailed physical properties including composition, atmosphere, and orbital characteristics. Planets are key locations for planetary interaction (PI) and may host NPC stations. There are 67,961 planets across all systems with coordinates at the 10^10 scale."
+    columns:
+      - name: planet_id
+        description: "Unique planet identifier. Can retrieve name from stg.sde_item_names using this ID"
+        data_tests:
+          - not_null
+          - unique
+      - name: celestial_index
+        description: "Orbital position index of the planet within its solar system (1=closest to star)"
+      - name: name_id
+        description: "Localization identifier for custom planet names. References external localization tables not available in our data. Only 43 of 67,961 planets have custom names (nullable)"
+      - name: planet_type_id
+        description: "Type of planet determining its appearance and properties. References stg.sde_types (required)"
+      - name: system_id
+        description: "Solar system containing this planet. References stg.sde_systems (required)"
+      - name: has_population
+        description: "Whether planet has NPC population. True=populated world, False=uninhabited"
+      - name: height_map_1_id
+        description: "Primary terrain elevation map identifier for surface rendering"
+      - name: height_map_2_id
+        description: "Secondary terrain elevation map identifier for surface detail"
+      - name: shader_preset_id
+        description: "Visual rendering shader preset identifier for planet appearance"
+      - name: position_x
+        description: "Planet X coordinate position within the solar system in meters (scale ~10^10)"
+      - name: position_y
+        description: "Planet Y coordinate position within the solar system in meters (scale ~10^10)"
+      - name: position_z
+        description: "Planet Z coordinate position within the solar system in meters (scale ~10^10)"
+      - name: radius
+        description: "Planet radius in meters"
+      - name: statistics_density
+        description: "Planet material density in kg/m³"
+      - name: statistics_eccentricity
+        description: "Orbital eccentricity (0=circular, approaching 1=highly elliptical)"
+      - name: statistics_escape_velocity
+        description: "Minimum velocity to escape planet gravity in meters per second"
+      - name: statistics_is_fragmented
+        description: "Whether planet is broken or shattered. True=fragmented, False=intact"
+      - name: statistics_is_locked
+        description: "Whether planet is tidally locked to its star. True=tidally locked (same face always facing star), False=rotating"
+      - name: statistics_life
+        description: "Planet age or evolutionary stage value"
+      - name: statistics_mass_dust
+        description: "Total mass of solid/dust material in kilograms"
+      - name: statistics_mass_gas
+        description: "Total mass of gaseous material in kilograms"
+      - name: statistics_orbit_period
+        description: "Time to complete one orbit around the star in seconds"
+      - name: statistics_orbit_radius
+        description: "Average orbital distance from the star in meters"
+      - name: statistics_pressure
+        description: "Atmospheric surface pressure in Pascals"
+      - name: statistics_radius
+        description: "Statistical mean radius of the planet in meters"
+      - name: statistics_rotation_rate
+        description: "Rotational period in radians per second"
+      - name: statistics_spectral_class
+        description: "Spectral classification code for the planet type"
+      - name: statistics_surface_gravity
+        description: "Gravitational acceleration at surface in meters per second squared"
+      - name: statistics_temperature
+        description: "Average surface temperature in Kelvin"

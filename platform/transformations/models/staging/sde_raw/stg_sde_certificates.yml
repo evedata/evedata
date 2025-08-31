@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: sde_certificates
+    description: "Legacy skill certification system that defined mastery levels for ship classes and gameplay roles. Certificates grouped related skills into progression paths, though this system has been largely replaced by the ship mastery system in modern EVE Online."
+    columns:
+      - name: certificate_id
+        description: "Unique certificate identifier"
+        data_tests:
+          - not_null
+          - unique
+      - name: group_id
+        description: "Certificate category. References stg.sde_groups (nullable)"
+      - name: description
+        description: "Detailed description of the certificate purpose and skill requirements"
+      - name: name
+        description: "Certificate display name"

@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_hde_blueprint_research_material_materials
+    description: "Materials consumed during Material Efficiency (ME) research for blueprints. ME research improves the material efficiency of blueprint manufacturing, reducing material requirements by up to 10%. This table defines the research materials (typically datacores and R.Db items) required to perform ME research on each blueprint type. Materials listed here are consumed when initiating the research job."
+    columns:
+      - name: blueprint_type_id
+        description: "Blueprint item type requiring ME research. References stg.sde_types (required). Can retrieve name from stg.sde_item_names using this ID"
+      - name: type_id
+        description: "Research material item type consumed during ME research. References stg.sde_types (required). Typically datacores, R.Db (Research Database) items, or other research materials. Can retrieve name from stg.sde_item_names using this ID"
+      - name: quantity
+        description: "Number of material units consumed per ME research job. Ranges from 1 to 140 units depending on blueprint complexity"

@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: stg_hde_skins
+    description: "Core SKIN definitions for EVE Online cosmetic ship customizations. SKINs are permanent, tradeable items that change the visual appearance of ships without affecting their statistics or performance. Each SKIN references a skin material which defines its visual properties and can be applied to specific ship types. This table includes metadata about SKIN availability on different EVE servers (Tranquility for worldwide players, Serenity for China) and special access restrictions."
+    columns:
+      - name: skin_id
+        description: "Unique identifier for the SKIN item"
+        data_tests:
+          - not_null
+          - unique
+      - name: skin_material_id
+        description: "Material definition for this SKIN''s visual appearance. References stg.hde_skin_materials (nullable)"
+      - name: allows_ccp_devs
+        description: "Developer access flag. True=CCP developers can use this SKIN, False=restricted from developers"
+      - name: internal_name
+        description: 'Internal development name describing the SKIN (e.g., "Megathron Quafe", "Oracle Khanid")'
+      - name: is_structure_skin
+        description: "Structure applicability flag. True=can be applied to structures, False=ships only, NULL=ships only"
+      - name: is_visible_serenity
+        description: "China server visibility. True=available on Serenity (China), False=hidden on Serenity"
+      - name: is_visible_tranquility
+        description: "Worldwide server visibility. True=available on Tranquility (worldwide), False=hidden on Tranquility"
+      - name: skin_description
+        description: "Player-facing description text for the SKIN item"

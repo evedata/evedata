@@ -11,12 +11,16 @@ authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.13"
 dependencies = [
+  "evedata-admin",
+  "evedata-admin-core",
   "evedata-core",
   "evedata-datasets",
   "evedata-docs",
   "evedata-infra",
-  "evedata-reference",
-  "evedata-rest-api",
+  "evedata-rest",
+  "evedata-rest-core",
+  "evedata-static",
+  "evedata-transformations",
   "evedata-utils",
 ]
 
@@ -28,6 +32,9 @@ dev = [
   "pre-commit>=4.2.0",
   "pyright>=1.1.403",
   "ruff>=0.12.4",
+  "shandy-sqlfmt[jinjafmt]>=0.27.0",
+  "sqlfluff-templater-dbt>=3.4.2",
+  "sqlfluff>=3.4.2",
   "workers-py>=1.1.3",
   "yamllint>=1.37.1",
 ]
@@ -35,6 +42,7 @@ dev = [
 [tool.codespell]
 check-filenames = true
 check-hidden = true
+ignore-words = "eve_words.txt"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
@@ -48,6 +56,27 @@ annotated_tags = true
 changelog_merge_prerelease = true
 
 [tool.pyright]
+strict = [
+  "platform/admin/src",
+  "platform/admin/tests",
+  "platform/admin-core/src",
+  "platform/admin-core/tests",
+  "platform/core/src",
+  "platform/core/tests",
+  "platform/datasets/src",
+  "platform/datasets/tests",
+  "platform/rest/src",
+  "platform/rest/tests",
+  "platform/rest-core/src",
+  "platform/rest-core/tests",
+  "platform/static/src",
+  "platform/static/tests",
+  "platform/transformations/src",
+  "platform/transformations/tests",
+  "platform/utils/src",
+  "platform/utils/tests",
+  "platform/transformations/src",
+]
 venvPath = "."
 venv = ".venv"
 exclude = ["**/.*", "**/__pycache__", "**/node_modules", "**/experiments"]
@@ -63,7 +92,14 @@ xfail_strict = true
 
 [tool.ruff]
 target-version = "py313"
-extend-exclude = ["tmp"]
+extend-exclude = [
+  "**/data",
+  "**/dbt_internal_packages",
+  "**/dbt_packages",
+  "**/logs",
+  "**/target",
+  "**/tmp",
+]
 line-length = 88
 
 [tool.ruff.format]
@@ -146,29 +182,44 @@ classmethod-decorators = [
 "**/tests/**" = ["D", "PLR2004", "S101"]
 "*.ipynb" = ["T20"]
 
+[tool.sqlfmt]
+exclude = [
+  "**/dbt_internal_packages/**/*",
+  "**/dbt_packages/**/*",
+  "**/snapshots/**/*",
+  "**/target/**/*",
+  "**/tmp/**/*",
+]
+
 [tool.uv]
 default-groups = ["dev"]
 package = false
 required-version = ">=0.8.0,<0.9"
 
 [tool.uv.sources]
-evedata-ctl = { workspace = true }
+evedata-admin = { workspace = true }
+evedata-admin-core = { workspace = true }
 evedata-core = { workspace = true }
 evedata-datasets = { workspace = true }
 evedata-docs = { workspace = true }
 evedata-infra = { workspace = true }
-evedata-reference = { workspace = true }
-evedata-rest-api = { workspace = true }
+evedata-rest = { workspace = true }
+evedata-rest-core = { workspace = true }
+evedata-static = { workspace = true }
 evedata-utils = { workspace = true }
+evedata-transformations = { workspace = true }
 
 [tool.uv.workspace]
 members = [
   "docs",
   "infra",
+  "platform/admin",
+  "platform/admin-core",
   "platform/core",
   "platform/datasets",
-  "platform/ctl",
-  "platform/reference",
-  "platform/rest-api",
+  "platform/rest",
+  "platform/rest-core",
+  "platform/static",
   "platform/utils",
+  "platform/transformations",
 ]

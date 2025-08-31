@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: sde_sovereignty_upgrade_types
+    description: "Sovereignty infrastructure upgrades (27 records) for null-security space territorial control. These upgrades are installed in Infrastructure Hubs to provide system bonuses like reduced POS fuel usage, improved anomaly spawns, cynosural field jammers, and jump bridge capabilities in player-controlled nullsec systems."
+    columns:
+      - name: type_id
+        description: "Sovereignty upgrade module type. References stg.sde_types (required)"
+        data_tests:
+          - not_null
+          - unique
+      - name: fuel_type_id
+        description: "Required fuel block type for operation. References stg.sde_types (required)"
+      - name: fuel_hourly_upkeep
+        description: "Fuel blocks consumed per hour while upgrade is active"
+      - name: fuel_startup_cost
+        description: "Initial fuel blocks required to online the upgrade"
+      - name: mutually_exclusive_group
+        description: "Upgrade exclusivity group. Only one upgrade per group can be active"
+      - name: power_allocation
+        description: "Power grid units consumed from Infrastructure Hub capacity"
+      - name: workforce_allocation
+        description: "Workforce units consumed from Infrastructure Hub capacity"

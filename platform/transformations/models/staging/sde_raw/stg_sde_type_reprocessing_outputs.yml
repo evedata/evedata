@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_sde_type_reprocessing_outputs
+    description: "Reprocessing output definitions showing materials recovered when items are refined or scrapped. Maps which materials and quantities are obtained from reprocessing each item type. Used by refineries and reprocessing facilities to calculate mineral yields from ores, salvage from wrecks, and materials from modules. The actual yield is modified by reprocessing skills and facility efficiency."
+    columns:
+      - name: type_id
+        description: "Item type being reprocessed. References stg.sde_types (required)"
+      - name: type_id
+        description: "Material type recovered from reprocessing. References stg.sde_types (required)"
+      - name: quantity
+        description: "Base quantity of material recovered per portion_size of the input type. Actual yield modified by skills and facility efficiency"

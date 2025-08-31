@@ -1,0 +1,43 @@
+version: 2
+
+models:
+  - name: sde_station_services
+    description: "Defines the 27 types of services that can be available at NPC stations, including Market, Reprocessing, Cloning, Repair, Manufacturing, Research, Mission Agents, and more. Each station operation type determines which subset of these services are offered. Essential for understanding what players can do at each station."
+    columns:
+      - name: station_service_id
+        description: "Unique station service identifier (1-27)"
+        data_tests:
+          - not_null
+          - unique
+      - name: description_de
+        description: "German language detailed service description"
+      - name: description_en
+        description: "English language detailed service description"
+      - name: description_es
+        description: "Spanish language detailed service description"
+      - name: description_fr
+        description: "French language detailed service description"
+      - name: description_ja
+        description: "Japanese language detailed service description"
+      - name: description_ko
+        description: "Korean language detailed service description"
+      - name: description_ru
+        description: "Russian language detailed service description"
+      - name: description_zh
+        description: "Chinese language detailed service description"
+      - name: name_de
+        description: "German language service name"
+      - name: name_en
+        description: "English language service name"
+      - name: name_es
+        description: "Spanish language service name"
+      - name: name_fr
+        description: "French language service name"
+      - name: name_ja
+        description: "Japanese language service name"
+      - name: name_ko
+        description: "Korean language service name"
+      - name: name_ru
+        description: "Russian language service name"
+      - name: name_zh
+        description: "Chinese language service name"

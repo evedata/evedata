@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_hde_buff_location_group_modifiers
+    description: "Defines which Dogma attributes are modified for specific item groups when a buff is applied to a location. These modifiers target only items belonging to specified groups within a solar system or constellation, such as affecting only propulsion modules or specific weapon types. This allows for selective buffs that affect certain ship modules or equipment types while leaving others unchanged."
+    columns:
+      - name: buff_id
+        description: "Buff that modifies attributes for specific groups in a location. References stg.hde_dbuffs (required)"
+      - name: attribute_id
+        description: "Dogma attribute to be modified on items of the specified group. References stg.sde_dogma_attributes (required)"
+      - name: group_id
+        description: "Item group to which this modifier applies. References stg.sde_groups (required)"

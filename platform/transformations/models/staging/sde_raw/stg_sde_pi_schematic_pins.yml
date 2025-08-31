@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: sde_pi_schematic_pins
+    description: "Planetary Industry facility types (pins) compatible with each production schematic. Pins are the structures placed on planets that perform extraction, processing, storage, and launch operations in the PI system."
+    columns:
+      - name: pi_schematic_id
+        description: "Production schematic. References stg.sde_pi_schematics (required)"
+      - name: pin_type_id
+        description: "PI facility structure type. References stg.sde_types (required)"

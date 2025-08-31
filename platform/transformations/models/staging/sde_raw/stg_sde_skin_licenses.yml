@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: sde_skin_licenses
+    description: "SKIN license items that grant access to visual customizations. Licenses can be permanent or time-limited, and link the consumable item in game inventory to the visual SKIN that gets unlocked for a character."
+    columns:
+      - name: license_type_id
+        description: "License item type. References stg.sde_types (required)"
+      - name: skin_id
+        description: "Visual SKIN unlocked by this license. References stg.sde_skins (required)"
+      - name: duration
+        description: "License duration in days. -1=permanent, positive values=time-limited"
+      - name: is_single_use
+        description: "Consumption behavior. True=consumed on activation, False=reusable"

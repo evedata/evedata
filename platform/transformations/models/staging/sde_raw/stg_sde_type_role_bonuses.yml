@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: stg_sde_type_role_bonuses
+    description: "Role-based bonuses that define the specialized capabilities of ships based on their intended combat or support role. These bonuses are inherent to the ship hull and apply regardless of pilot skills, representing the fundamental design philosophy of each ship class. Examples include the interceptor''s tackle range bonus or the logistics cruiser''s remote repair bonuses. Each bonus includes localized descriptions for all supported languages."
+    columns:
+      - name: type_id
+        description: "Ship type receiving this role bonus. References stg.sde_types (required)"
+      - name: bonus_index
+        description: "Order index for displaying multiple bonuses. Lower numbers display first"
+      - name: unit_id
+        description: "Unit of measurement for the bonus value. References stg.hde_dogma_units (nullable, cross-source reference to HDE data)"
+      - name: bonus
+        description: "Numeric bonus value. Interpretation depends on unit_id (e.g., percentage, absolute value, multiplier)"
+      - name: description_de
+        description: "German localized description of the role bonus"
+      - name: description_en
+        description: "English localized description of the role bonus"
+      - name: description_es
+        description: "Spanish localized description of the role bonus"
+      - name: description_fr
+        description: "French localized description of the role bonus"
+      - name: description_ja
+        description: "Japanese localized description of the role bonus"
+      - name: description_ko
+        description: "Korean localized description of the role bonus"
+      - name: description_ru
+        description: "Russian localized description of the role bonus"
+      - name: description_zh
+        description: "Chinese localized description of the role bonus"
+      - name: importance
+        description: "Display priority for UI sorting. Lower values show first in ship traits window"

@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: stg_hde_buff_item_modifiers
+    description: "Defines which Dogma attributes are modified when a buff is applied directly to items. These modifiers affect specific attributes of items that have the buff applied, such as modifying velocity, mass, or other item characteristics. Each record links a buff to a specific attribute it modifies on the target item."
+    columns:
+      - name: buff_id
+        description: "Buff that modifies item attributes. References stg.hde_dbuffs (required)"
+      - name: attribute_id
+        description: "Dogma attribute to be modified on the target item. References stg.sde_dogma_attributes (required)"

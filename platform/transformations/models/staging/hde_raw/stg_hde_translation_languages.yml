@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: stg_hde_translation_languages
+    description: "Language codes supported by EVE Online for localization of game content. This HDE-sourced model provides the ISO 639-1 standard language codes (and variants like en-us) that EVE uses for translating game text, UI elements, and descriptions to support its global player base. These codes are used as keys to retrieve localized text from various translation tables throughout the game data."
+    columns:
+      - name: code
+        description: "ISO 639-1 language code or variant (e.g., en-us, fr, de, ja, ko, ru, zh). Used as the key for retrieving localized text from translation tables"
+        data_tests:
+          - not_null
+          - unique

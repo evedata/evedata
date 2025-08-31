@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_sde_type_attributes
+    description: "Dogma attribute values that define the gameplay properties and statistics for each item type. The Dogma system is EVE''s core mechanics engine, with attributes controlling everything from ship speed and cargo capacity to weapon damage and module effects. Contains over 1.2 million attribute assignments with an average of 24 attributes per type. These values determine how items behave in-game and interact with other items through the Dogma calculation engine."
+    columns:
+      - name: type_id
+        description: "Item type these attributes apply to. References stg.sde_types (required)"
+      - name: attribute_id
+        description: "Specific attribute being defined. References stg.sde_dogma_attributes (required)"
+      - name: value
+        description: "Numeric value for this attribute on this type. Interpretation depends on the attribute (e.g., meters for radius, hit points for shields, multiplier for bonuses)"

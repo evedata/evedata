@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: sde_blueprint_reaction_skills
+    description: "Skill prerequisites for operating reaction processes in EVE Online''s moon mining and advanced material production. This bridge table defines the specialized skills required to run reactions in refineries and other reaction-capable structures. Common skills include Reactions, Mass Reactions, and Advanced Mass Reactions, with higher levels enabling more complex reaction types and improving efficiency through reduced fuel consumption."
+    columns:
+      - name: blueprint_type_id
+        description: "Reaction formula requiring skills to operate. References stg.sde_blueprint and stg.sde_types.type_id (required)"
+      - name: type_id
+        description: "Reaction operation skill required. References stg.sde_types where the type is a skill item (required)"
+      - name: level
+        description: "Minimum skill level required. Valid range 0-5 where higher levels may reduce fuel consumption and enable advanced reactions"

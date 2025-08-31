@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: sde_blueprints
+    description: "Core blueprint definitions containing activity times and production limits for EVE Online''s industry system. This table defines the master records for all 5,031 blueprints in the game, including their base time requirements for various industrial activities (manufacturing, copying, invention, research, and reactions). Each blueprint has a sparse ID matching its corresponding item type_id in sde_types, ranging from 681 to 88,734. Related activity-specific materials, products, and skill requirements are stored in separate bridge tables that reference this master table."
+    columns:
+      - name: blueprint_id
+        description: "Unique blueprint identifier matching the blueprint item''s type. References stg.sde_types (required)"
+        data_tests:
+          - not_null
+          - unique
+      - name: copying_duration_seconds
+        description: "Base time in seconds to create a blueprint copy. NULL if blueprint cannot be copied"
+      - name: invention_duration_seconds
+        description: "Base time in seconds for invention (T1 to T2/T3 blueprint conversion). NULL if blueprint cannot be used for invention"
+      - name: manufacturing_duration_seconds
+        description: "Base time in seconds to manufacture items from this blueprint. NULL if blueprint produces no items (23 blueprints have time but no products)"
+      - name: max_production_limit
+        description: "Maximum production runs per blueprint copy. Ranges from 1 to 1,000,000 depending on blueprint type"
+      - name: research_material_duration_seconds
+        description: "Base time in seconds for Material Efficiency (ME) research to reduce material requirements. NULL if ME research not applicable"
+      - name: reaction_duration_seconds
+        description: "Base time in seconds for reaction processes (moon material and biochemical reactions). NULL for non-reaction blueprints (only 112 are reaction formulas)"
+      - name: research_time_duration_seconds
+        description: "Base time in seconds for Time Efficiency (TE) research to reduce production time. NULL if TE research not applicable"

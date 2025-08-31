@@ -1,0 +1,77 @@
+version: 2
+
+models:
+  - name: sde_bloodlines
+    description: |
+      Defines the character bloodlines that provide racial sub-divisions within the four
+      main empires. Each bloodline determines starting attributes (charisma,
+      intelligence, memory, perception, willpower), starting NPC corporation, and
+      cultural heritage. Bloodlines are a key part of character creation and provide
+      lore-based differentiation within races.
+    columns:
+      - name: bloodline_uuid
+        description: "Unique identifier for the bloodline record."
+        data_tests:
+          - not_null
+          - unique
+      - name: bloodline_id
+        description: "Unique bloodline identifier."
+        data_tests:
+          - not_null
+          - unique
+      - name: icon_id
+        description: "Icon for bloodline display. References stg.sde_icons (nullable)"
+      - name: npc_corporation_id
+        description: "Starting NPC corporation for new characters of this bloodline. References stg.sde_npc_corporations (required)"
+        data_tests:
+          - not_null
+      - name: race_id
+        description: "Parent race for this bloodline. References stg.sde_races (required)"
+        data_tests:
+          - not_null
+      - name: charisma
+        description: "Base charisma attribute value (affects social skills training speed)"
+      - name: description_de
+        description: "German language bloodline lore description"
+      - name: description_en
+        description: "English language bloodline lore description"
+      - name: description_es
+        description: "Spanish language bloodline lore description"
+      - name: description_fr
+        description: "French language bloodline lore description"
+      - name: description_it
+        description: "Italian language bloodline lore description"
+      - name: description_ja
+        description: "Japanese language bloodline lore description"
+      - name: description_ko
+        description: "Korean language bloodline lore description"
+      - name: description_ru
+        description: "Russian language bloodline lore description"
+      - name: description_zh
+        description: "Chinese language bloodline lore description"
+      - name: intelligence
+        description: "Base intelligence attribute value (affects science/engineering skills training speed)"
+      - name: memory
+        description: "Base memory attribute value (affects industry/corporation skills training speed)"
+      - name: name_de
+        description: "German language bloodline name"
+      - name: name_en
+        description: "English language bloodline name"
+      - name: name_es
+        description: "Spanish language bloodline name"
+      - name: name_fr
+        description: "French language bloodline name"
+      - name: name_it
+        description: "Italian language bloodline name"
+      - name: name_ja
+        description: "Japanese language bloodline name"
+      - name: name_ko
+        description: "Korean language bloodline name"
+      - name: name_ru
+        description: "Russian language bloodline name"
+      - name: name_zh
+        description: "Chinese language bloodline name"
+      - name: perception
+        description: "Base perception attribute value (affects gunnery/missile skills training speed)"
+      - name: willpower
+        description: "Base willpower attribute value (affects leadership/trade skills training speed)"

@@ -1,0 +1,77 @@
+version: 2
+
+models:
+  - name: sde_factions
+    description: "Defines the 27 major NPC political entities in EVE Online including the four main empires (Caldari State, Gallente Federation, Amarr Empire, Minmatar Republic), pirate factions (Guristas, Serpentis, etc.), and other organizations. Factions control territory, have standings relationships, and provide faction warfare gameplay."
+    columns:
+      - name: faction_id
+        description: "Unique faction identifier (500001-500027)"
+        data_tests:
+          - not_null
+          - unique
+      - name: npc_corporation_id
+        description: "Primary NPC corporation representing this faction. References stg.sde_npc_corporations (nullable)"
+      - name: icon_id
+        description: "Icon for faction display. References stg.sde_icons (nullable)"
+      - name: militia_corporation_id
+        description: "Faction Warfare militia corporation for empire factions. References stg.sde_npc_corporations (nullable)"
+      - name: system_id
+        description: "Home solar system for this faction. References stg.sde_systems (nullable)"
+      - name: description_de
+        description: "German language faction lore description"
+      - name: description_en
+        description: "English language faction lore description"
+      - name: description_es
+        description: "Spanish language faction lore description"
+      - name: description_fr
+        description: "French language faction lore description"
+      - name: description_ja
+        description: "Japanese language faction lore description"
+      - name: description_ko
+        description: "Korean language faction lore description"
+      - name: description_ru
+        description: "Russian language faction lore description"
+      - name: description_zh
+        description: "Chinese language faction lore description"
+      - name: flat_logo
+        description: "File path to flat logo image asset"
+      - name: flat_logo_with_name
+        description: "File path to logo with faction name image asset"
+      - name: is_unique
+        description: "Indicates if faction has unique game mechanics. True=special faction, False=standard faction"
+      - name: name_de
+        description: "German language faction name"
+      - name: name_en
+        description: "English language faction name"
+      - name: name_es
+        description: "Spanish language faction name"
+      - name: name_fr
+        description: "French language faction name"
+      - name: name_it
+        description: "Italian language faction name"
+      - name: name_ja
+        description: "Japanese language faction name"
+      - name: name_ko
+        description: "Korean language faction name"
+      - name: name_ru
+        description: "Russian language faction name"
+      - name: name_zh
+        description: "Chinese language faction name"
+      - name: short_description_de
+        description: "German language brief faction description"
+      - name: short_description_en
+        description: "English language brief faction description"
+      - name: short_description_es
+        description: "Spanish language brief faction description"
+      - name: short_description_fr
+        description: "French language brief faction description"
+      - name: short_description_ja
+        description: "Japanese language brief faction description"
+      - name: short_description_ko
+        description: "Korean language brief faction description"
+      - name: short_description_ru
+        description: "Russian language brief faction description"
+      - name: short_description_zh
+        description: "Chinese language brief faction description"
+      - name: size_factor
+        description: "Relative size/power scaling factor for faction (typically 0.5-2.0)"

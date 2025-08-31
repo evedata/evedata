@@ -4,7 +4,13 @@
     "charliermarsh.ruff",
     "esbenp.prettier-vscode",
     "hashicorp.terraform",
-    "ms-vscode.makefile-tools"
+    "ms-vscode.makefile-tools",
+    "samuelcolvin.jinjahtml",
+    "matthewpi.caddyfile-support",
+    "streetsidesoftware.code-spell-checker",
+    "dbtlabsinc.dbt",
+    "editorconfig.editorconfig",
+    "ms-pyright.pyright"
   ],
   "unwantedRecommendations": []
 }

@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: sde_contraband_types
+    description: "Lists the 312 item types classified as illegal contraband in high-security space. These items trigger customs scans and potential confiscation by faction navies when transported through empire space. Includes drugs, boosters, illegal implants, and faction-specific restricted items."
+    columns:
+      - name: contraband_type_id
+        description: "Illegal item type. References stg.sde_types (required)"
+        data_tests:
+          - not_null
+          - unique

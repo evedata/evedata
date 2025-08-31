@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: stg_hde_industry_installation_assembly_lines
+    description: "Bridge table linking industry installation types (structures/outposts) to their available assembly lines. Defines which production activities (manufacturing, research, copying, etc.) can be performed at each facility type."
+    columns:
+      - name: industry_installation_type_id
+        description: "Installation type identifier for structures and outposts. References stg.sde_types (required)"
+      - name: industry_assembly_line_id
+        description: "Assembly line defining available production activities. References stg.hde_industry_assembly_lines (required)"

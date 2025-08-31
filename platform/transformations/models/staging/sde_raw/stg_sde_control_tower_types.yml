@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: sde_control_tower_types
+    description: "Player-Owned Starbase (POS) control tower types (44 records). These are deployable structures that could be anchored at moons before the introduction of Upwell structures. Each tower type has different fuel requirements and bonuses based on size (small, medium, large) and faction variants."
+    columns:
+      - name: control_tower_type_id
+        description: "Control tower item type. References stg.sde_types (required)"
+        data_tests:
+          - not_null
+          - unique

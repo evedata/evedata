@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: stg_hde_industry_modifier_invention_time
+    description: "Industry modifiers that affect invention time reductions. Links structure rigs, implants, and other modifier sources to their time reduction dogma attributes for Tech 2 blueprint invention activities in EVE Online."
+    columns:
+      - name: modifier_source_type_id
+        description: "Type ID of the item providing the modifier (structure rig, implant, etc.). References stg.sde_types (required)"
+      - name: attribute_id
+        description: "Dogma attribute defining the time reduction multiplier. References stg.sde_dogma_attributes (required)"

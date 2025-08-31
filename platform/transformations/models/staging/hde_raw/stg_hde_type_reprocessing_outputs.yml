@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: stg_hde_type_reprocessing_outputs
+    description: "Material composition of items when reprocessed or scraped in EVE Online. Defines the materials and quantities recovered when items are reprocessed at stations or structures. Essential for industrialists calculating reprocessing yields, material efficiency, and determining the mineral value of items. Includes both standard minerals and advanced materials recovered from Tech 2 and faction items."
+    columns:
+      - name: type_id
+        description: "Item type being reprocessed. References stg.sde_types (required)"
+        data_tests:
+          - not_null
+          - unique
+      - name: type_id
+        description: "Material type recovered from reprocessing. References stg.sde_types (required)"
+      - name: quantity
+        description: "Base quantity of material recovered at 100% reprocessing efficiency (before skills and facility bonuses)"

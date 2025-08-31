@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: stg_sde_type_type_bonus_details
+    description: 'Type-to-type bonuses that define how specific item types interact with or provide bonuses for other specific types. These bonuses typically represent ship skill bonuses that scale with pilot training levels, such as "5% bonus to Medium Projectile Turret damage per level of Minmatar Cruiser skill". The bonusing_type_id identifies which skill or item type provides the scaling factor. Contains specialized bonuses that create synergies between specific item combinations.'
+    columns:
+      - name: type_id
+        description: "Item type receiving this bonus. References stg.sde_types (required)"
+      - name: bonus_index
+        description: "Order index for displaying multiple bonuses. Lower numbers display first"
+      - name: bonusing_type_id
+        description: "Skill or item type that provides or scales this bonus. References stg.sde_types (required). Usually a skill that provides per-level scaling"
+      - name: unit_id
+        description: "Unit of measurement for the bonus value. References stg.hde_dogma_units (nullable, cross-source reference to HDE data)"
+      - name: bonus
+        description: "Numeric bonus value per level or unit. Interpretation depends on unit_id (e.g., percentage per skill level)"
+      - name: description_de
+        description: "German localized description of the type-specific bonus"
+      - name: description_en
+        description: "English localized description of the type-specific bonus"
+      - name: description_es
+        description: "Spanish localized description of the type-specific bonus"
+      - name: description_fr
+        description: "French localized description of the type-specific bonus"
+      - name: description_ja
+        description: "Japanese localized description of the type-specific bonus"
+      - name: description_ko
+        description: "Korean localized description of the type-specific bonus"
+      - name: description_ru
+        description: "Russian localized description of the type-specific bonus"
+      - name: description_zh
+        description: "Chinese localized description of the type-specific bonus"
+      - name: importance
+        description: "Display priority for UI sorting. Lower values show first in ship traits window"

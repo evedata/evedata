@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: stg_hde_mutaplasmids
+    description: 'Core reference table for EVE Online mutaplasmids - specialized items used to modify existing modules creating unique "Abyssal" variants with randomized stats. Each mutaplasmid can only be applied to specific module types and will produce a one-of-a-kind item with attributes modified within defined ranges. This is EVE''s primary crafting system for creating unique, randomized equipment that cannot be replicated.'
+    columns:
+      - name: type_id
+        description: "Unique identifier for the mutaplasmid item type. References stg.sde_types (required). Can retrieve name from stg.sde_item_names using this ID"
+        data_tests:
+          - not_null
+          - unique

@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: sde_blueprint_research_material_skills
+    description: "Skill prerequisites for Material Efficiency (ME) research on blueprint originals in EVE Online''s industry optimization system. This bridge table defines which science and research skills are required to perform ME research on different blueprint types. Common skills include Metallurgy, Research, and specialized science skills. Higher skill levels reduce research time, making efficient skill training crucial for competitive manufacturing."
+    columns:
+      - name: blueprint_type_id
+        description: "Blueprint original requiring skills for ME research. References stg.sde_blueprint and stg.sde_types.type_id (required)"
+      - name: type_id
+        description: "Research skill required for ME improvement. References stg.sde_types where the type is a skill item (required)"
+      - name: level
+        description: "Minimum skill level required. Valid range 0-5 where higher levels reduce research time"

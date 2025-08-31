@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: stg_hde_attribute_localizations
+    description: "Localized display names and descriptions for Dogma attributes across all supported EVE Online languages. Provides player-facing text for attributes that supplements the technical attribute definitions in sde_dogma_attributes. Essential for UI display and understanding what each attribute represents to players in their preferred language."
+    columns:
+      - name: attribute_id
+        description: "Dogma attribute identifier. References stg.sde_dogma_attributes (required)"
+      - name: display_name_de
+        description: "German translation of the attribute display name (nullable)"
+      - name: display_name_en
+        description: "English (US) translation of the attribute display name (nullable)"
+      - name: display_name_es
+        description: "Spanish translation of the attribute display name (nullable)"
+      - name: display_name_fr
+        description: "French translation of the attribute display name (nullable)"
+      - name: display_name_it
+        description: "Italian translation of the attribute display name (nullable)"
+      - name: display_name_ja
+        description: "Japanese translation of the attribute display name (nullable)"
+      - name: display_name_ko
+        description: "Korean translation of the attribute display name (nullable)"
+      - name: display_name_ru
+        description: "Russian translation of the attribute display name (nullable)"
+      - name: display_name_zh
+        description: "Chinese translation of the attribute display name (nullable)"
+      - name: description_de
+        description: "German translation of the attribute description explaining its effect (nullable)"
+      - name: description_en
+        description: "English (US) translation of the attribute description explaining its effect (nullable)"
+      - name: description_es
+        description: "Spanish translation of the attribute description explaining its effect (nullable)"
+      - name: description_fr
+        description: "French translation of the attribute description explaining its effect (nullable)"
+      - name: description_it
+        description: "Italian translation of the attribute description explaining its effect (nullable)"
+      - name: description_ja
+        description: "Japanese translation of the attribute description explaining its effect (nullable)"
+      - name: description_ko
+        description: "Korean translation of the attribute description explaining its effect (nullable)"
+      - name: description_ru
+        description: "Russian translation of the attribute description explaining its effect (nullable)"
+      - name: description_zh
+        description: "Chinese translation of the attribute description explaining its effect (nullable)"

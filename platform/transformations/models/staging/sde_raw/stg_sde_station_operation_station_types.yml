@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: sde_station_operation_station_types
+    description: "Station structure types (224 records) available for each operation-race combination. Maps which physical station models can be used for different operational roles based on the controlling faction race, ensuring visual and functional consistency within each empire space."
+    columns:
+      - name: station_operation_id
+        description: "Station operation type. References stg.sde_station_operations (required)"
+      - name: race_id
+        description: "Faction race controlling the station. References stg.sde_races (required)"
+      - name: station_type_id
+        description: "Physical station structure model. References stg.sde_types (required)"

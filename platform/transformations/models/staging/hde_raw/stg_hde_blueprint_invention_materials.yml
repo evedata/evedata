@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_hde_blueprint_invention_materials
+    description: "Materials consumed during blueprint invention activity for creating Tech 2 blueprints from Tech 1 originals. Invention requires specific datacores and optional decryptors to attempt creating advanced blueprint copies with varying success rates."
+    columns:
+      - name: blueprint_type_id
+        description: "Tech 1 blueprint being used for invention. References stg.sde_types (required)"
+      - name: type_id
+        description: "Material consumed during invention (datacores, decryptors). Can retrieve name from stg.sde_item_names using this ID"
+      - name: quantity
+        description: "Number of units consumed per invention attempt"

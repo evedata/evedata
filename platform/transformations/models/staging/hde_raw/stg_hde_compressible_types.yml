@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: stg_hde_compressible_types
+    description: "Mapping of compressible item types to their compressed versions in EVE Online. This table primarily contains ores and ice products that can be compressed to reduce volume for easier transport. Compression is a key mechanic in EVE for hauling raw materials, as compressed versions typically have 100x less volume while retaining the same mineral content when reprocessed."
+    columns:
+      - name: compressible_type_id
+        description: "Type ID of the uncompressed item (ore or ice). References stg.sde_types (required)"
+      - name: compressed_type_id
+        description: "Type ID of the compressed version of the item. References stg.sde_types (required)"

@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: sde_control_tower_type_resources
+    description: "Resource consumption requirements (339 records) for POS control towers. Defines fuel block and strontium consumption rates for different tower types, with faction bonuses reducing fuel usage in sovereignty space. Consumption varies by tower operational state (online vs reinforced mode)."
+    columns:
+      - name: control_tower_type_id
+        description: "Control tower type. References stg.sde_control_tower_types (required)"
+      - name: resource_type_id
+        description: "Consumed resource (fuel blocks or strontium). References stg.sde_types (required)"
+      - name: faction_id
+        description: "Faction providing sovereignty fuel bonus. References stg.sde_factions (nullable)"
+      - name: purpose
+        description: "Operational state for consumption. Possible values: 1=online (normal operation), 4=reinforced (siege mode)"
+      - name: quantity
+        description: "Units of resource consumed per hour"
+      - name: min_security_level
+        description: "Minimum system security level where this consumption applies. Empire towers need higher security"

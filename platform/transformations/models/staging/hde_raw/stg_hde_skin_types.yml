@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: stg_hde_skin_types
+    description: "Bridge table defining which ship types can use specific SKINs. This many-to-many relationship table maps each SKIN to the ship types it can be applied to. Since SKINs are designed for specific hull designs, not all SKINs work with all ships - this table enforces those restrictions. For example, a Megathron SKIN can only be applied to Megathron-class battleships. Each record represents one valid SKIN-to-ship combination."
+    columns:
+      - name: skin_id
+        description: "SKIN item identifier. References stg.hde_skins (required)"
+      - name: skin_type_id
+        description: "Ship type that can use this SKIN. References stg.sde_types (required)"

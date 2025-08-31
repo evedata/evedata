@@ -1,0 +1,68 @@
+version: 2
+
+models:
+  - name: sde_npc_corporation_division_types
+    description: |
+      Defines the standard organizational divisions used by player corporations for
+      hangar and wallet organization (Division 1-7 plus Master Wallet). While this
+      table exists in the SDE, it primarily supports player corporation mechanics
+      rather than NPC corporations. Each division can have custom names and purposes
+      set by corporation leadership.
+    columns:
+      - name: npc_corporation_division_type_id
+        description: "Unique NPC corporation division identifier"
+        data_tests:
+          - not_null
+          - unique
+      - name: description
+        description: "Base description text for this division type"
+      - name: description_de
+        description: "German language division purpose description"
+      - name: description_en
+        description: "English language division purpose description"
+      - name: description_es
+        description: "Spanish language division purpose description"
+      - name: description_fr
+        description: "French language division purpose description"
+      - name: description_ja
+        description: "Japanese language division purpose description"
+      - name: description_ko
+        description: "Korean language division purpose description"
+      - name: description_ru
+        description: "Russian language division purpose description"
+      - name: description_zh
+        description: "Chinese language division purpose description"
+      - name: internal_name
+        description: 'System code name for the division (e.g., "1st", "2nd", "Master")'
+      - name: leader_type_name_de
+        description: "German language title for division manager role"
+      - name: leader_type_name_en
+        description: "English language title for division manager role"
+      - name: leader_type_name_es
+        description: "Spanish language title for division manager role"
+      - name: leader_type_name_fr
+        description: "French language title for division manager role"
+      - name: leader_type_name_ja
+        description: "Japanese language title for division manager role"
+      - name: leader_type_name_ko
+        description: "Korean language title for division manager role"
+      - name: leader_type_name_ru
+        description: "Russian language title for division manager role"
+      - name: leader_type_name_zh
+        description: "Chinese language title for division manager role"
+      - name: name_de
+        description: "German language default division name"
+      - name: name_en
+        description: "English language default division name"
+      - name: name_es
+        description: "Spanish language default division name"
+      - name: name_fr
+        description: "French language default division name"
+      - name: name_ja
+        description: "Japanese language default division name"
+      - name: name_ko
+        description: "Korean language default division name"
+      - name: name_ru
+        description: "Russian language default division name"
+      - name: name_zh
+        description: "Chinese language default division name"

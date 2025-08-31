@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: sde_blueprint_research_material_materials
+    description: "Material requirements for Material Efficiency (ME) research on blueprint originals in EVE Online''s industry optimization system. ME research reduces the base material requirements for manufacturing, with levels from 0% to 10% reduction. This bridge table defines the research materials (typically datacores and data sheets) consumed during ME research attempts. Each level of ME research becomes progressively more expensive and time-consuming, creating a strategic decision about optimization investment."
+    columns:
+      - name: blueprint_type_id
+        description: "Blueprint original being researched for material efficiency. References stg.sde_blueprint and stg.sde_types.type_id (required)"
+      - name: type_id
+        description: "Research material consumed during ME research. References stg.sde_types (required)"
+      - name: quantity
+        description: "Number of material units consumed per ME research level. Higher ME levels require exponentially more materials"

@@ -1,0 +1,114 @@
+version: 2
+
+models:
+  - name: dim_celestials
+    description: |
+      Dimension table containing all celestial objects in EVE Online, including:
+
+      - Regions
+      - Constellations
+      - Solar systems
+      - Stars
+      - Secondary suns
+      - Planets
+      - Asteroid belts
+      - Moons
+      - Stargates
+      - Stations
+    columns:
+      - name: celestial_key
+        data_tests:
+          - not_null
+          - unique
+      - name: celestial_id
+        data_tests:
+          - not_null
+      - name: celestial_type
+        data_tests:
+          - not_null
+      - name: constellation_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('int_constellations')
+                field: constellation_id
+      - name: faction_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('int_factions')
+                field: faction_id
+      - name: parent_celestial_id
+        description: "Immediate parent celestial object ID (e.g., a planet's parent is its star system)"
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_celestials')
+                field: celestial_id
+      - name: region_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('int_regions')
+                field: region_id
+      - name: system_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('int_systems')
+                field: system_id
+      - name: type_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('int_types')
+                field: type_id
+      - name: wormhole_class_id
+        data_tests:
+          - accepted_values:
+              arguments:
+                values:
+                  [
+                    null,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22,
+                    23,
+                    25,
+                  ]
+      - name: coordinate_system
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["universe", "system"]
+      - name: name
+        data_tests:
+          - not_null
+          - unique
+      - name: universe_name
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["abyssal", "eve", "hidden", "void", "wormhole"]

@@ -1,0 +1,59 @@
+version: 2
+
+models:
+  - name: sde_station_operations
+    description: "Station operation types (66 records) defining services and cost modifiers for NPC stations based on system security classification. These operations determine what industrial activities and services are available at stations, with cost modifiers varying by system location type (hub, border, corridor, fringe)."
+    columns:
+      - name: station_operation_id
+        description: "Unique station operation identifier"
+        data_tests:
+          - not_null
+          - unique
+      - name: corporation_activity_id
+        description: "Corporation activity type. References stg.sde_corporation_activities (nullable)"
+      - name: border_cost_modifier
+        description: "Industry cost modifier for border systems (connection between regions). Range 0.0-0.5"
+      - name: corridor_cost_modifier
+        description: "Industry cost modifier for corridor systems (trade routes). Range 0.0-0.5"
+      - name: description_de
+        description: "German language description of the operation"
+      - name: description_en
+        description: "English language description of the operation"
+      - name: description_es
+        description: "Spanish language description of the operation"
+      - name: description_fr
+        description: "French language description of the operation"
+      - name: description_ja
+        description: "Japanese language description of the operation"
+      - name: description_ko
+        description: "Korean language description of the operation"
+      - name: description_ru
+        description: "Russian language description of the operation"
+      - name: description_zh
+        description: "Chinese language description of the operation"
+      - name: fringe_cost_modifier
+        description: "Industry cost modifier for fringe systems (edge of civilization). Range 0.0-0.9"
+      - name: hub_cost_modifier
+        description: "Industry cost modifier for hub systems (major trade centers). Range 0.0-0.9"
+      - name: manufacturing_factor
+        description: "Manufacturing job cost multiplier. Higher values increase production costs"
+      - name: name_de
+        description: "German language name of the station operation"
+      - name: name_en
+        description: "English language name of the station operation"
+      - name: name_es
+        description: "Spanish language name of the station operation"
+      - name: name_fr
+        description: "French language name of the station operation"
+      - name: name_ja
+        description: "Japanese language name of the station operation"
+      - name: name_ko
+        description: "Korean language name of the station operation"
+      - name: name_ru
+        description: "Russian language name of the station operation"
+      - name: name_zh
+        description: "Chinese language name of the station operation"
+      - name: efficiency_ratio
+        description: "Base operation efficiency ratio affecting output quantities"
+      - name: research_factor
+        description: "Research job cost multiplier. Higher values increase research costs"

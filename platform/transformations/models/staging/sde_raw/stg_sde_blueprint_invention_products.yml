@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: sde_blueprint_invention_products
+    description: "Output blueprints produced from successful invention attempts in EVE Online''s advanced manufacturing system. This bridge table maps Tech 1 blueprint copies to their potential Tech 2 or Tech 3 blueprint outputs, along with success probabilities. With 1,101 unique invention blueprints producing advanced variants, success rates range from 14% to 34% depending on skills, decryptors, and base probabilities. Successful invention creates limited-run blueprint copies that enable manufacturing of advanced ships, modules, and equipment."
+    columns:
+      - name: blueprint_type_id
+        description: "Tech 1 blueprint used as invention base. References stg.sde_blueprint and stg.sde_types.type_id (required)"
+      - name: type_id
+        description: "Tech 2/3 blueprint produced on successful invention. References stg.sde_types for the resulting blueprint item (required)"
+      - name: probability
+        description: "Base success chance for invention attempt. Decimal value from 0.14 to 0.34 (14%-34%). Modified by skills and optional decryptors"
+      - name: quantity
+        description: "Number of blueprint copy runs produced per successful invention. Typically 1 but can vary with decryptors"

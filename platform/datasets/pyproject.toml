@@ -11,7 +11,9 @@ authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.13"
 dependencies = [
+  "evedata-admin-core",
   "evedata-core",
+  "evedata-rest-core",
   "evedata-utils",
   "fastapi[all]>=0.115.5",
   "rich>=14.1.0",
@@ -31,14 +33,14 @@ dev = [
   "sqlfluff>=3.4.2",
 ]
 
-[project.entry-points."evedata_ctl.commands"]
-datasets = "evedata_datasets.ctl:cli"
+[project.entry-points."evedata.admin.commands"]
+datasets = "evedata_datasets.admin:commands"
 
-[project.entry-points."evedata_ctl.endpoints"]
-datasets = "evedata_datasets.ctl:app"
+[project.entry-points."evedata.admin.endpoints"]
+datasets = "evedata_datasets.admin:endpoints"
 
-[project.entry-points."evedata_rest_api.endpoints"]
-datasets = "evedata_datasets.rest:app"
+[project.entry-points."evedata.rest.endpoints"]
+datasets = "evedata_datasets.rest:endpoints"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
@@ -62,7 +64,7 @@ addopts = [
   "--tb",
   "short",
   "--cov",
-  "evedata_reference",
+  "evedata_static",
   "--cov-branch",
   "--cov-report",
   "term-missing",
@@ -158,5 +160,7 @@ classmethod-decorators = [
 "*.ipynb" = ["T20"]
 
 [tool.uv.sources]
+evedata-admin-core = { workspace = true }
 evedata-core = { workspace = true }
+evedata-rest-core = { workspace = true }
 evedata-utils = { workspace = true }

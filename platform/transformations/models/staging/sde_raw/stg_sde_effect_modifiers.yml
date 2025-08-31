@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: stg_sde_effect_modifiers
+    description: "Effect-to-attribute modifier mappings (4,846 records) defining how dogma effects change attribute values. These modifiers implement the mathematical transformations that occur when effects are applied, such as skill bonuses increasing damage or modules reducing resistance values. Core to EVE combat and fitting calculations."
+    columns:
+      - name: effect_id
+        description: "Effect applying this modifier. References stg.sde_dogma_effects (required)"
+      - name: modifier_index
+        description: "Index of the modifier within the effect. Used for ordering and prioritization."
+      - name: group_id
+        description: "Item group filter for targeted application. References stg.sde_groups (nullable)"
+      - name: modified_attribute_id
+        description: "Target attribute being changed. References stg.sde_dogma_attributes (required)"
+      - name: modifying_attribute_id
+        description: "Source attribute providing the modification value. References stg.sde_dogma_attributes (nullable)"
+      - name: skill_type_id
+        description: "Required skill for modifier to apply. References stg.sde_types (nullable)"
+      - name: domain
+        description: "Target domain scope. Common values: shipID (ship attributes), charID (character), targetID (target ship), itemID (module), otherID (gang/fleet), structureID"
+      - name: func
+        description: "Modifier function type. Common values: ItemModifier, LocationModifier, LocationGroupModifier, LocationRequiredSkillModifier, OwnerRequiredSkillModifier"
+      - name: operator
+        description: "Mathematical operation code. Common values: -1=preAssignment, 0=preMultiply, 2=modPercent, 3=postPercent, 4=postDiv, 5=postMul, 6=postAssignment, 7=skillCheck, 9=additive"

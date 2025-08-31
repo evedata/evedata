@@ -1,0 +1,71 @@
+name: Platform - Static Data
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "platform/static/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "platform/static/**"
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: "Deployment target"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+          - production
+          - both
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  UV_CACHE_DIR: .uv_cache
+  PYTHONUNBUFFERED: "1"
+  FORCE_COLOR: "1"
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version-file: "pyproject.toml"
+          enable-cache: true
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/uv.lock
+      - run: uv python install 3.13
+      - run: |
+          uv sync --frozen --all-extras
+          uv pip list
+      - working-directory: platform/static
+        run: make lint
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version-file: "pyproject.toml"
+          enable-cache: true
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/uv.lock
+      - run: uv python install 3.13
+      - run: |
+          uv sync --frozen --all-extras
+          uv pip list
+      - working-directory: platform/static
+        run: make lint

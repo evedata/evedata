@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: sde_blueprint_invention_skills
+    description: "Skill prerequisites for invention activities in EVE Online''s Tech 2/3 production system. This bridge table defines the science and technology skills required to attempt invention on Tech 1 blueprints. Higher skill levels not only enable invention but also improve success chances and can affect the quality of invented blueprints. Common invention skills include racial encryption methods, datacore skills, and specialized science disciplines corresponding to the item type being invented."
+    columns:
+      - name: blueprint_type_id
+        description: "Tech 1 blueprint requiring skills for invention. References stg.sde_blueprint and stg.sde_types.type_id (required)"
+      - name: type_id
+        description: "Science or technology skill required for invention. References stg.sde_types where the type is a skill item (required)"
+      - name: level
+        description: "Minimum skill level required. Valid range 0-5 where higher levels improve invention success probability"

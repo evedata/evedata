@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_hde_blueprint_invention_products
+    description: "Possible Tech 2 blueprint outputs from invention activity. Each Tech 1 blueprint can produce multiple Tech 2 variants with different probabilities. The actual product created is randomly selected based on probability weights, making some Tech 2 blueprints rarer than others."
+    columns:
+      - name: blueprint_type_id
+        description: "Tech 1 blueprint used as input for invention. References stg.sde_types (required)"
+      - name: type_id
+        description: "Tech 2 blueprint copy that can be produced. Can retrieve name from stg.sde_item_names using this ID"
+      - name: probability
+        description: "Base probability weight for producing this Tech 2 variant. Range 0.14-0.34, used for weighted random selection"
+      - name: quantity
+        description: "Number of blueprint runs created on successful invention (typically 1 for ship BPCs, varies for modules)"

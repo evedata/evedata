@@ -1,0 +1,12 @@
+evedata:
+  target: dev
+  outputs:
+    dev:
+      type: timescaledb
+      host: localhost
+      user: postgres
+      password: postgres
+      port: 5432
+      dbname: evedata
+      schema: evedata
+      threads: 16

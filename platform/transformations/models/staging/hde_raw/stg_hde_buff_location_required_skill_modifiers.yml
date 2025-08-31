@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_hde_buff_location_required_skill_modifiers
+    description: "Defines which Dogma attributes are modified for specific skills when a buff is applied to a location. These modifiers affect the attributes of skills or skill-dependent modules within a solar system or constellation, such as improving shield repair skills or electronic warfare effectiveness. This enables targeted improvements to specific gameplay roles or skill categories while in certain locations."
+    columns:
+      - name: buff_id
+        description: "Buff that modifies attributes for specific skills in a location. References stg.hde_dbuffs (required)"
+      - name: attribute_id
+        description: "Dogma attribute to be modified on the specified skill or skill-dependent modules. References stg.sde_dogma_attributes (required)"
+      - name: type_id
+        description: "Skill type to which this modifier applies. References stg.sde_types where the type is a skill (required)"

@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: sde_skin_materials
+    description: "Material definitions for SKIN rendering, linking visual properties to graphic material sets. These materials define the shaders, textures, and visual effects that give each SKIN its unique appearance."
+    columns:
+      - name: skin_material_id
+        description: "Skin material identifier shared with HDE data sources"
+        data_tests:
+          - not_null
+          - unique
+      - name: display_name_id
+        description: "Localization ID for material display name (references external localization table not available in our data)"
+      - name: material_set_id
+        description: "Graphic material set defining visual properties (references HDE graphic material sets)"

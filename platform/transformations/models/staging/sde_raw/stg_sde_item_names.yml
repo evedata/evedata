@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: sde_item_names
+    description: 'Custom display names for specific static universe objects that differ from their type''s default name. Used to give unique names to special celestial objects, named stations, or other notable universe fixtures. For example, while the type might be "Caldari Station", this table provides the specific name like "Jita IV - Moon 4 - Caldari Navy Assembly Plant". Contains localized names in 8 languages with 99.8% coverage.'
+    columns:
+      - name: item_id
+        description: "Universe object with a custom name. References stg.sde_items (required)"
+        data_tests:
+          - not_null
+          - unique
+      - name: name
+        description: "Custom display name for this specific item instance, overriding the generic type name"

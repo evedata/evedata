@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: stg_hde_industry_activities
+    description: "Industry activity types that define the different production and research operations available in EVE Online. These activities form the foundation of the industrial system, allowing players to manufacture items, research blueprints, copy blueprints, invent new technologies, and perform reactions. Each activity has specific requirements, materials, and time factors that are modified by skills, installations, and system bonuses."
+    columns:
+      - name: industry_activity_id
+        description: "Unique identifier for the industry activity type. Values: 1=Manufacturing, 3=Time Efficiency Research, 4=Material Efficiency Research, 5=Copying, 8=Invention, 9=Reactions"
+        data_tests:
+          - not_null
+          - unique
+      - name: name
+        description: 'Display name of the industry activity (e.g., "Manufacturing", "Invention")'
+      - name: description
+        description: "Detailed explanation of what the industry activity does and its purpose in the game"

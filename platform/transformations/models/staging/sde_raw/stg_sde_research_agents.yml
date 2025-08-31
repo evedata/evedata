@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: sde_research_agents
+    description: "Research and development agents (422 records) that generate datacores for Tech 2 blueprint invention. These specialized agents accumulate research points daily based on player skills, which can be exchanged for datacores. Only a subset of the total agent population offers R&D services."
+    columns:
+      - name: agent_id
+        description: "Research agent identifier. References stg.sde_agents (nullable - contains orphaned references)"
+        data_tests:
+          - not_null
+          - unique

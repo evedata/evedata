@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: sde_agents
+    description: |
+      NPC mission agents stationed throughout EVE providing missions from levels 1-5.
+      Agents offer various mission types (security, distribution, mining) based on their
+      corporation division and provide standings-based rewards. Some agents also offer
+      locator services to find other players.
+    columns:
+      - name: agent_id
+        description: "Unique agent identifier"
+        data_tests:
+          - not_null
+          - unique
+      - name: agent_type_id
+        description: "Agent mission type (security, distribution, mining, etc). References stg.hde_agent_types (required)"
+        data_tests:
+          - not_null
+      - name: npc_corporation_id
+        description: "NPC corporation employing this agent. References stg.sde_npc_corporations (required)"
+        data_tests:
+          - not_null
+      - name: corporation_division_id
+        description: "Corporate division determining mission types. References stg.sde_corporation_divisions (required)"
+        data_tests:
+          - not_null
+      - name: is_locator
+        description: "Locator service availability. True=can locate players for a fee, False=standard mission agent only"
+      - name: level
+        description: "Agent mission difficulty level. Range 1-5, with higher levels requiring better standings"
+      - name: station_id
+        description: "Station where agent is located. References stg.sde_stations (required)"
+        data_tests:
+          - not_null

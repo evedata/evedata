@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_hde_blueprint_research_time_materials
+    description: "Materials required for performing time efficiency (TE) research on blueprints. TE research reduces manufacturing time up to a maximum of 20% reduction (10 research levels at 2% each). Research materials include datacores and other specialized components that are consumed during the research process. Each blueprint type may require different materials depending on its complexity and tech level."
+    columns:
+      - name: blueprint_type_id
+        description: "Blueprint being researched for time efficiency. References stg.sde_types (required)"
+      - name: type_id
+        description: "Material required for TE research (datacores, reports, consumer electronics). References stg.sde_types (required)"
+      - name: quantity
+        description: "Number of material units consumed per research level"

@@ -4,18 +4,18 @@ on:
     branches:
       - main
     paths:
-      - 'infra/terraform/**'
+      - "infra/terraform/**"
   pull_request:
     branches:
       - main
     paths:
-      - 'infra/terraform/**'
+      - "infra/terraform/**"
   workflow_dispatch:
     inputs:
       deploy_target:
-        description: 'Deployment target'
+        description: "Deployment target"
         required: true
-        default: 'staging'
+        default: "staging"
         type: choice
         options:
           - staging

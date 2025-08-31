@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: sde_blueprint_research_time_skills
+    description: "Skill prerequisites for Time Efficiency (TE) research on blueprint originals in EVE Online''s industry optimization system. This bridge table defines which science and research skills are required to perform TE research on different blueprint types. Common skills include Research, Science, and specialized technology skills. Higher skill levels significantly reduce research time, making efficient skill training essential for competitive manufacturing operations."
+    columns:
+      - name: blueprint_type_id
+        description: "Blueprint original requiring skills for TE research. References stg.sde_blueprint and stg.sde_types.type_id (required)"
+      - name: type_id
+        description: "Research skill required for TE improvement. References stg.sde_types where the type is a skill item (required)"
+      - name: level
+        description: "Minimum skill level required. Valid range 0-5 where higher levels significantly reduce research time"

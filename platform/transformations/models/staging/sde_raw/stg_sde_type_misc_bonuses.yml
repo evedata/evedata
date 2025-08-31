@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: stg_sde_type_misc_bonuses
+    description: "Miscellaneous trait bonuses that apply to item types, primarily ships and structures. These bonuses represent special characteristics that don''t fit into role or type-specific categories, such as warp core strength bonuses, cargo hold bonuses, or special resistances. Each bonus includes localized descriptions that explain the effect to players. The bonus text contains placeholders that are substituted with actual values in the game client."
+    columns:
+      - name: type_id
+        description: "Item type receiving this bonus. References stg.sde_types (required)"
+      - name: bonus_index
+        description: "Order index for displaying multiple bonuses. Lower numbers display first"
+      - name: unit_id
+        description: "Unit of measurement for the bonus value. References stg.hde_dogma_units (nullable, cross-source reference to HDE data)"
+      - name: bonus
+        description: "Numeric bonus value. Interpretation depends on unit_id (e.g., percentage, absolute value, multiplier)"
+      - name: description_de
+        description: "German localized description of the bonus effect"
+      - name: description_en
+        description: "English localized description of the bonus effect"
+      - name: description_es
+        description: "Spanish localized description of the bonus effect"
+      - name: description_fr
+        description: "French localized description of the bonus effect"
+      - name: description_ja
+        description: "Japanese localized description of the bonus effect"
+      - name: description_ko
+        description: "Korean localized description of the bonus effect"
+      - name: description_ru
+        description: "Russian localized description of the bonus effect"
+      - name: description_zh
+        description: "Chinese localized description of the bonus effect"
+      - name: importance
+        description: "Display priority for UI sorting. Lower values show first in trait lists"
+      - name: is_positive
+        description: "Bonus polarity. True=beneficial effect (buff), False=negative effect (penalty)"

@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_hde_industry_assembly_line_groups
+    description: "Defines which item groups can be processed on specific assembly lines, with associated cost, material, and time multipliers. Groups are more specific classifications within categories, such as Frigate, Cruiser, or Strategic Cruiser Blueprints. Works in conjunction with category filters to determine blueprint compatibility."
+    columns:
+      - name: industry_assembly_line_id
+        description: "Assembly line this group restriction applies to. References stg.hde_industry_assembly_lines (required)"
+      - name: group_id
+        description: "Item group allowed on this assembly line. References stg.sde_groups (required)"
+      - name: cost_multiplier
+        description: "Cost adjustment factor for this group on this line. NULL means default cost (nullable)"
+      - name: material_multiplier
+        description: "Material requirement adjustment factor. 1.0 = standard materials (required)"
+      - name: time_multiplier
+        description: "Production time adjustment factor. 1.0 = standard time (required)"

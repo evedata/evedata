@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: sde_moon_stations
+    description: "NPC-owned space stations located on or orbiting moons within solar systems. These stations represent 77% of all NPC stations and are commonly found in low-security and null-security space. Moon stations often serve as mining outposts, research facilities, and strategic military installations. Each station is owned by an NPC corporation and provides services based on its operation type."
+    columns:
+      - name: station_id
+        description: "Unique station identifier. Can retrieve name from stg.sde_item_names using this ID"
+        data_tests:
+          - not_null
+          - unique
+      - name: graphic_id
+        description: "Visual model used for station rendering. References stg.sde_graphics (nullable)"
+      - name: moon_id
+        description: "Moon this station is located on or orbiting. References stg.sde_system_moons (required)"
+      - name: operation_id
+        description: "Station service operations offered. References stg.sde_station_operations (nullable)"
+      - name: owner_id
+        description: "NPC corporation that owns and operates this station. References stg.sde_npc_corporations (required)"
+      - name: planet_id
+        description: "Planet that the moon orbits (parent celestial body). References stg.sde_system_planets (required)"
+      - name: system_id
+        description: "Solar system containing this station. References stg.sde_systems (required)"
+      - name: station_type_id
+        description: "Type of station structure determining its appearance and capabilities. References stg.sde_types (required)"
+      - name: is_conquerable
+        description: "Whether this station can be conquered by player alliances. True=conquerable (null-sec outposts), False=permanent NPC station"
+      - name: position_x
+        description: "Station X coordinate position within the solar system in meters"
+      - name: position_y
+        description: "Station Y coordinate position within the solar system in meters"
+      - name: position_z
+        description: "Station Z coordinate position within the solar system in meters"
+      - name: reprocessing_efficiency
+        description: "Base efficiency for ore/item reprocessing at this station as a decimal (0.5 = 50% efficiency)"
+      - name: reprocessing_hangar_flag_id
+        description: "Hangar division flag for reprocessed materials. References stg.sde_flags (nullable)"
+      - name: reprocessing_stations_take
+        description: "Station tax percentage on reprocessing as a decimal (0.05 = 5% tax)"
+      - name: uses_operation_name
+        description: 'Whether to display operation type in station name. True=include operation (e.g., "Mining Outpost"), False=use standard name'

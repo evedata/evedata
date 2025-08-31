@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: sde_tournament_rule_set_group_points
+    description: "Point costs for ship and module groups in tournament scoring systems. Teams must balance their fleet composition to stay within point limits, with more powerful ship classes costing more points to field."
+    columns:
+      - name: tournament_rule_set_id
+        description: "Tournament rules defining these costs. References stg.sde_tournament_rule_sets (required)"
+      - name: group_id
+        description: "Item group with assigned point value. References stg.sde_groups (required)"
+      - name: points
+        description: "Point cost to field any item from this group (higher values indicate more powerful items)"

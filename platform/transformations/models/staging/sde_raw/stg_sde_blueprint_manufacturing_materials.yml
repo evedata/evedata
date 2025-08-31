@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: sde_blueprint_manufacturing_materials
+    description: "Input material requirements for manufacturing items from blueprints in EVE Online''s production system. This bridge table is the core of the manufacturing economy, defining what materials are consumed to produce ships, modules, structures, and other items. With 4,811 unique blueprints requiring combinations of 1,571 different material types, this represents the most common industrial activity. Material requirements can be reduced through Material Efficiency (ME) research, making optimization a key competitive advantage in EVE''s player-driven economy."
+    columns:
+      - name: blueprint_type_id
+        description: "Blueprint defining the manufacturing recipe. References stg.sde_blueprint and stg.sde_types.type_id (required)"
+      - name: type_id
+        description: "Input material consumed during manufacturing. References stg.sde_types (required)"
+      - name: quantity
+        description: "Base material units required per manufacturing run. Can be reduced by Material Efficiency research (ME level 0-10)"

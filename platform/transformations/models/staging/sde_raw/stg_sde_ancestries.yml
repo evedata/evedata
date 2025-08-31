@@ -1,0 +1,67 @@
+version: 2
+
+models:
+  - name: sde_ancestries
+    description: |
+      Defines the character backgrounds available during character creation. Each
+      ancestry provides additional attribute bonuses on top of bloodline base attributes
+      and represents the character''s pre-capsuleer profession or social background
+      (e.g., Activists, Entrepreneurs, Monks, Tinkerers).
+    columns:
+      - name: ancestry_id
+        description: "Unique ancestry identifier"
+        data_tests:
+          - not_null
+          - unique
+      - name: bloodline_id
+        description: "Parent bloodline for this ancestry. References stg.sde_bloodlines (required)"
+        data_tests:
+          - not_null
+      - name: icon_id
+        description: "Icon for ancestry display. References stg.sde_icons (nullable)"
+        data_tests:
+          - not_null
+      - name: charisma
+        description: "Charisma attribute bonus added to bloodline base (typically +1 to +3)"
+      - name: description_de
+        description: "German language ancestry background story"
+      - name: description_en
+        description: "English language ancestry background story"
+      - name: description_es
+        description: "Spanish language ancestry background story"
+      - name: description_fr
+        description: "French language ancestry background story"
+      - name: description_ja
+        description: "Japanese language ancestry background story"
+      - name: description_ko
+        description: "Korean language ancestry background story"
+      - name: description_ru
+        description: "Russian language ancestry background story"
+      - name: description_zh
+        description: "Chinese language ancestry background story"
+      - name: intelligence
+        description: "Intelligence attribute bonus added to bloodline base (typically +1 to +3)"
+      - name: memory
+        description: "Memory attribute bonus added to bloodline base (typically +1 to +3)"
+      - name: name_de
+        description: "German language ancestry name"
+      - name: name_en
+        description: "English language ancestry name"
+      - name: name_es
+        description: "Spanish language ancestry name"
+      - name: name_fr
+        description: "French language ancestry name"
+      - name: name_ja
+        description: "Japanese language ancestry name"
+      - name: name_ko
+        description: "Korean language ancestry name"
+      - name: name_ru
+        description: "Russian language ancestry name"
+      - name: name_zh
+        description: "Chinese language ancestry name"
+      - name: perception
+        description: "Perception attribute bonus added to bloodline base (typically +1 to +3)"
+      - name: short_description
+        description: "Brief one-line description of the ancestry background"
+      - name: willpower
+        description: "Willpower attribute bonus added to bloodline base (typically +1 to +3)"

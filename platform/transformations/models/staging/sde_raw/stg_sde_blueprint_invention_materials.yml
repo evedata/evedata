@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: sde_blueprint_invention_materials
+    description: "Material requirements for invention activities in EVE Online''s Tech 2 and Tech 3 production pipeline. Invention is the process of converting Tech 1 blueprint copies into advanced Tech 2 or Tech 3 blueprint copies, with success rates ranging from 14% to 34%. This bridge table defines the datacores, decryptors, and other specialized materials consumed during each invention attempt. Materials are consumed regardless of success or failure, making invention a probabilistic investment in advanced manufacturing capabilities."
+    columns:
+      - name: blueprint_type_id
+        description: "Tech 1 blueprint used as the base for invention. References stg.sde_blueprint and stg.sde_types.type_id (required)"
+      - name: type_id
+        description: "Material consumed per invention attempt (typically datacores or decryptors). References stg.sde_types (required)"
+      - name: quantity
+        description: "Number of material units consumed per invention attempt. Materials are lost regardless of success or failure"

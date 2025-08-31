@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_hde_clone_state_skill_types
+    description: "Skills available to each clone state with their maximum trainable levels. This bridge table defines the skill restrictions for Alpha clone states, specifying which skills are available and the maximum level each can be trained to. Alpha clones have limited access to skills compared to Omega clones, with racial variations determining which ship and weapon skills are emphasized."
+    columns:
+      - name: clone_state_id
+        description: "Clone state this skill restriction applies to. References stg.hde_clone_states (required)"
+      - name: type_id
+        description: "Type ID of the skill. References stg.sde_types (required). Can retrieve skill name from stg.sde_types using this ID"
+      - name: level
+        description: "Maximum trainable level for this skill in this clone state. Range: 1-5 where 1=basic, 5=mastery"

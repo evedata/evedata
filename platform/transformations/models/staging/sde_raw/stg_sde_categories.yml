@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: sde_categories
+    description: "Top-level categorization hierarchy for all item types in EVE Online. Categories form the highest level of the three-tier classification system (Category → Group → Type) with 47 total categories, of which 33 are published and visible in-game. Major categories include Ship (6), Module (7), Blueprint (9), and Charge (8)."
+    columns:
+      - name: category_id
+        description: "Unique category identifier. Primary key for the category"
+      - name: icon_id
+        description: "Icon used for this category. References stg.sde_icons (nullable)"
+      - name: is_published
+        description: "Publication status. True=visible to players in-game, False=hidden or development only"
+      - name: name_de
+        description: "German localized name for the category"
+      - name: name_en
+        description: "English localized name for the category"
+      - name: name_es
+        description: "Spanish localized name for the category"
+      - name: name_fr
+        description: "French localized name for the category"
+      - name: name_ja
+        description: "Japanese localized name for the category"
+      - name: name_ko
+        description: "Korean localized name for the category"
+      - name: name_ru
+        description: "Russian localized name for the category"
+      - name: name_zh
+        description: "Chinese localized name for the category"

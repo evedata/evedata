@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_hde_blueprint_copying_materials
+    description: "Material requirements for blueprint copying activities from Hoboleaks Data Export. Blueprint copying creates additional blueprint copies from an original blueprint, consuming specific materials in the process. Each record represents a unique material requirement for copying a specific blueprint."
+    columns:
+      - name: blueprint_type_id
+        description: "Blueprint item type being copied. References stg.sde_types and stg.sde_types.type_id (required)"
+      - name: type_id
+        description: "Material item type consumed during copying. References stg.sde_types (required)"
+      - name: quantity
+        description: "Number of material units required for one copying operation. Range: 1-600 units"

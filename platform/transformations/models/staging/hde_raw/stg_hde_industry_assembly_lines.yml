@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: stg_hde_industry_assembly_lines
+    description: "Assembly line configurations that define how industry activities are performed at installations. Each assembly line supports a specific activity type (manufacturing, research, copying, etc.) and applies multipliers to base costs, materials, and time. These multipliers represent the efficiency bonuses or penalties of using that particular assembly line. Assembly lines are associated with installation types through a many-to-many relationship."
+    columns:
+      - name: industry_assembly_line_id
+        description: "Unique identifier for the assembly line configuration"
+        data_tests:
+          - not_null
+          - unique
+      - name: industry_activity_id
+        description: "Industry activity this assembly line performs. References stg.hde_industry_activities (required)"
+      - name: base_cost_multiplier
+        description: "Multiplier applied to base job installation costs. Lower values mean cheaper operations (nullable)"
+      - name: base_material_multiplier
+        description: "Multiplier applied to material requirements. 1.0=standard, <1.0=material savings, >1.0=extra materials needed"
+      - name: base_time_multiplier
+        description: "Multiplier applied to base activity duration. 1.0=standard, <1.0=faster, >1.0=slower"
+      - name: description
+        description: "Human-readable description of the assembly line purpose"
+      - name: name
+        description: 'Display name of the assembly line (e.g., "STATION manufacturing", "Lab Slot")'

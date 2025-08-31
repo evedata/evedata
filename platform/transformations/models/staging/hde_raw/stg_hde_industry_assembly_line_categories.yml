@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_hde_industry_assembly_line_categories
+    description: "Defines which item categories can be processed on specific assembly lines, with associated cost, material, and time multipliers. Categories are broad classifications like Module, Charge, or Celestial. This filtering system determines which blueprints are compatible with each facility."
+    columns:
+      - name: industry_assembly_line_id
+        description: "Assembly line this category restriction applies to. References stg.hde_industry_assembly_lines (required)"
+      - name: category_id
+        description: "Item category allowed on this assembly line. References stg.sde_categories (required)"
+      - name: cost_multiplier
+        description: "Cost adjustment factor for this category on this line. NULL means default cost (nullable)"
+      - name: material_multiplier
+        description: "Material requirement adjustment factor. 1.0 = standard materials (required)"
+      - name: time_multiplier
+        description: "Production time adjustment factor. 1.0 = standard time (required)"

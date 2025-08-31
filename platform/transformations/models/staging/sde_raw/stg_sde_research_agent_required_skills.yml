@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: stg_sde_research_agent_required_skills
+    description: "Research field specializations (1,149 records) offered by R&D agents. Maps which scientific fields each research agent specializes in, determining what types of datacores they can produce. Players must have the corresponding science skill trained to work with an agent in that field."
+    columns:
+      - name: agent_id
+        description: "Research agent offering this specialization. References stg.sde_research_agents (required)"
+      - name: type_id
+        description: "Science skill required for this research field. References stg.sde_types (required)"

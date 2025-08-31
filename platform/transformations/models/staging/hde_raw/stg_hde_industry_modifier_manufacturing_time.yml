@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_hde_industry_modifier_manufacturing_time
+    description: "Industry modifiers that affect manufacturing time reductions. Links structure rigs, implants, and other modifier sources to their time reduction dogma attributes for manufacturing activities, with optional filtering for specific item categories."
+    columns:
+      - name: modifier_source_type_id
+        description: "Type ID of the item providing the modifier (structure rig, implant, etc.). References stg.sde_types (required)"
+      - name: attribute_id
+        description: "Dogma attribute defining the time reduction multiplier. References stg.sde_dogma_attributes (required)"
+      - name: filter_id
+        description: "Optional filter restricting modifier to specific item categories. References category/group filtering system (nullable)"

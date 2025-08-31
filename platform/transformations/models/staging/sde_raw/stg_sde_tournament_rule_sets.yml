@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: sde_tournament_rule_sets
+    description: "Configuration sets for EVE Online competitive tournaments including the Alliance Tournament (AT) and Anger Games (AG). Defines team composition limits and point budgets used to balance competitive matches by restricting ship choices."
+    columns:
+      - name: tournament_rule_set_id
+        description: "Unique rule set identifier using tournament abbreviations (e.g., at_xviii for Alliance Tournament 18, ag_2022 for Anger Games 2022)"
+        data_tests:
+          - not_null
+          - unique
+      - name: name
+        description: "Human-readable tournament rule set display name"
+      - name: maximum_pilots_match
+        description: "Maximum number of pilots allowed per team in a match"
+      - name: maximum_points_match
+        description: "Maximum total point value a team can field (ships have point costs based on power)"

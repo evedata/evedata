@@ -15,11 +15,11 @@ dependencies = ["evedata-utils", "fastapi[all]>=0.115.5"]
 [dependency-groups]
 dev = ["pyright>=1.1.403", "ruff>=0.12.4", "yamllint>=1.37.1"]
 
-[project.entry-points."evedata_ctl.commands"]
-infra = "evedata_infra.ctl:cli"
+[project.entry-points."evedata.admin.commands"]
+infra = "evedata_infra.admin:commands"
 
-[project.entry-points."evedata_ctl.endpoints"]
-infra = "evedata_infra.ctl:app"
+[project.entry-points."evedata.admin.endpoints"]
+infra = "evedata_infra.admin:endpoints"
 
 [tool.pyright]
 venvPath = "."
@@ -110,6 +110,10 @@ classmethod-decorators = [
 "**/__main__.py" = ["D100"]
 "**/tests/**" = ["D", "PLR2004", "S101"]
 "*.ipynb" = ["T20"]
+
+[tool.uv]
+package = false
+required-version = ">=0.8.0,<0.9"
 
 [tool.uv.sources]
 evedata-utils = { workspace = true }

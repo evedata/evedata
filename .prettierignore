@@ -4,6 +4,14 @@ CHANGELOG.md
 *.lock
 *.log
 
+**/.http_cache
+**/data
+**/dbt_internal_packages
+**/dbt_packages
+**/logs
+**/node_modules
+**/target
+**/tmp
 **/*.hbs
 .turbo/**
 

@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: sde_station_operation_services
+    description: "Many-to-many mapping (927 records) between station operations and available services. Defines which services (reprocessing, cloning, repair, etc.) are available for each station operation type, allowing stations to offer different combinations of services based on their operational focus."
+    columns:
+      - name: station_operation_id
+        description: "Station operation type. References stg.sde_station_operations (required)"
+      - name: station_service_id
+        description: "Available service at this operation. References stg.sde_station_services (required)"

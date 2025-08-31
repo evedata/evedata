@@ -274,3 +274,7 @@ settings.local.json
 *.zip
 
 **/logs/
+dbt_internal_packages/
+dbt_packages/
+/cache
+.user.yml

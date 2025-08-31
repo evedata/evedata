@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: stg_hde_units
+    description: "Measurement units used by the Dogma attribute system in EVE Online. Defines how attribute values should be displayed to players, including standard SI units (meters, seconds, kilograms) and game-specific units (hitpoints, teraflops, capacitor GJ). Critical for correctly interpreting and displaying attribute values with appropriate units and formatting."
+    columns:
+      - name: unit_id
+        description: "Unique identifier for the unit. Common IDs: 1=meters, 2=kg, 3=seconds, 104=multiplier, 105=percentage, 107=MW, 113=HP, 114=GJ"
+        data_tests:
+          - not_null
+          - unique
+      - name: description
+        description: "Full description of the unit (e.g., Meter, Kilogram, Percentage)"
+      - name: display_name
+        description: "Abbreviated display format shown to players (e.g., m, kg, sec, %, MW, HP, GJ)"
+      - name: name
+        description: "Internal name of the unit used in calculations and formulas"

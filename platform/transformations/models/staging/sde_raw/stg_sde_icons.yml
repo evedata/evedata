@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: sde_icons
+    description: "User interface icons used throughout EVE Online for representing items, categories, market groups, and UI elements. Contains file paths to icon assets used in inventory, market browsing, and other game interfaces."
+    columns:
+      - name: icon_id
+        description: "Unique icon resource identifier"
+        data_tests:
+          - not_null
+          - unique
+      - name: description
+        description: "Human-readable description of the icon purpose and usage context"
+      - name: icon_file
+        description: "File path to the icon image asset in the game resources"
+      - name: is_obsolete
+        description: "Deprecation status. True=no longer used, False=currently active"

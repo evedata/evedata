@@ -1,0 +1,87 @@
+version: 2
+
+models:
+  - name: sde_types
+    description: "Comprehensive catalog of all item type definitions in EVE Online, serving as templates for every game object. Contains 50,235 types including ships, modules, ammunition, blueprints, skills, celestial objects, and more. Types are the foundational data layer - they define what things can exist, while items (in sde_items) are the actual instances in space. Only 51.4% of types are published and visible to players. Types with market_group_id NULL cannot be traded on the market. Critical for manufacturing calculations via portion_size field."
+    columns:
+      - name: type_id
+        description: "Unique type identifier. Primary key used throughout the system as type_id"
+        data_tests:
+          - not_null
+          - unique
+      - name: faction_id
+        description: "Faction that manufactures or owns this type. References stg.sde_factions (nullable, has 6 orphaned IDs for removed factions)"
+      - name: graphic_id
+        description: "Visual representation for this type. References stg.sde_graphics (nullable)"
+      - name: group_id
+        description: "Parent group classification. References stg.sde_groups (required)"
+        data_tests:
+          - not_null
+      - name: icon_id
+        description: "Icon image for UI display. References stg.sde_icons (nullable)"
+      - name: market_group_id
+        description: "Market category for trading. References stg.sde_market_groups (nullable, NULL=not tradeable on market)"
+      - name: meta_group_id
+        description: "Tech/meta level classification. References stg.sde_meta_groups (nullable). Values: 1=Tech I, 2=Tech II, 3=Storyline, 4=Faction, 5=Officer, 6=Deadspace, 14=Tech III, 15=Abyssal"
+      - name: race_id
+        description: "Racial design origin. References stg.sde_races (nullable)"
+      - name: sof_material_set_id
+        description: "Space Object Factory material set ID for ship skins and visual variants (no reference table in SDE)"
+      - name: sound_id
+        description: "Audio effect identifier for activation/ambient sounds (no reference table in SDE)"
+      - name: traits_icon_id
+        description: "Icon for traits display panel. References stg.sde_icons (nullable)"
+      - name: variation_parent_type_id
+        description: "Parent type for variants. Self-references stg.sde_types.type_id (nullable). Used for Tech II, Faction, and other variations"
+      - name: base_price
+        description: "Base ISK value for NPC transactions, insurance calculations, and kill mail values"
+      - name: capacity
+        description: "Cargo hold capacity in cubic meters (m³). Applies to ships and containers"
+      - name: description_de
+        description: "German localized description text"
+      - name: description_en
+        description: "English localized description text"
+      - name: description_es
+        description: "Spanish localized description text"
+      - name: description_fr
+        description: "French localized description text"
+      - name: description_it
+        description: "Italian localized description text"
+      - name: description_ja
+        description: "Japanese localized description text"
+      - name: description_ko
+        description: "Korean localized description text"
+      - name: description_ru
+        description: "Russian localized description text"
+      - name: description_zh
+        description: "Chinese localized description text"
+      - name: is_published
+        description: "Publication status. True=visible to players in-game, False=hidden/development/legacy items"
+      - name: mass
+        description: "Mass in kilograms (kg). Affects ship agility and warp speed"
+      - name: name_de
+        description: "German localized name"
+      - name: name_en
+        description: "English localized name"
+      - name: name_es
+        description: "Spanish localized name"
+      - name: name_fr
+        description: "French localized name"
+      - name: name_it
+        description: "Italian localized name"
+      - name: name_ja
+        description: "Japanese localized name"
+      - name: name_ko
+        description: "Korean localized name"
+      - name: name_ru
+        description: "Russian localized name"
+      - name: name_zh
+        description: "Chinese localized name"
+      - name: portion_size
+        description: "Manufacturing batch size. Number of items produced per manufacturing run. Critical for blueprint calculations"
+      - name: radius
+        description: "Physical collision radius in meters (m). Used for collision detection and visual scaling"
+      - name: volume
+        description: "Packaged volume in cubic meters (m³). Space occupied in cargo holds when packaged"
+      - name: sof_faction_name
+        description: "Space Object Factory faction name for SKIN system identification"

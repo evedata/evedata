@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_hde_mutaplasmid_input_output_mappings
+    description: "Maps which base modules (input) can be modified by each mutaplasmid and what type of Abyssal module (output) will be created. Multiple input modules can be modified by the same mutaplasmid, but they all produce the same output type ID - the actual stats of the resulting Abyssal module are randomized based on the attributes defined in hde_mutaplasmid_attributes. This enforces the crafting rules ensuring mutaplasmids can only be applied to compatible module types."
+    columns:
+      - name: mutaplasmid_type_id
+        description: "Mutaplasmid item that performs the modification. References stg.hde_mutaplasmids (required)"
+      - name: input_type_id
+        description: "Base module type that can be modified by this mutaplasmid. References stg.sde_types (required). Can retrieve name from stg.sde_item_names using this ID"
+      - name: output_type_id
+        description: "Abyssal module type that will be created after modification. References stg.sde_types (required). All modifications produce the same output type but with randomized stats"

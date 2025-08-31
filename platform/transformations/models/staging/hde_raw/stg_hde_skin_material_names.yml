@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: stg_hde_skin_material_names
+    description: 'Human-readable names for skin materials, providing a direct mapping between skin material IDs and their display names. This table contains the actual text names for SKIN themes (e.g., "Quafe", "Khanid", "Blood Raiders") that identify the visual style of each skin material. These names help identify the faction, corporation, or theme associated with each SKIN''s appearance.'
+    columns:
+      - name: skin_material_id
+        description: "Skin material identifier. References stg.hde_skin_materials (required)"
+      - name: name
+        description: 'Display name for the skin material theme (e.g., "Ardishapur", "Quafe", "Blood Raiders")'

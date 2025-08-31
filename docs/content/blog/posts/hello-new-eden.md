@@ -3,6 +3,7 @@ date: 2025-08-09
 categories:
   - Announcements
 ---
+
 # Hello, New Eden
 
 EVEData is a new data platform for EVE Online, built to make game data accessible and delightful to work with. As a solo passion project that's just getting started, I'm working to create developer-first APIs that eliminate the complexity of working with ESI and the SDE, offering unified access to market data, killmails, industry information, and more through modern, performant endpoints built on top of a robust ESI ingestion architecture and data lake.

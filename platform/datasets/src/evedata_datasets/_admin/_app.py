@@ -1,0 +1,10 @@
+from typing import Any
+
+from fastapi import APIRouter
+
+app = APIRouter()
+
+
+@app.get("/")
+def get_root() -> dict[str, Any]:
+    return {}
