@@ -103,7 +103,8 @@
     "undockable",
     "usbutils",
     "utinyint",
-    "uvicorn"
+    "uvicorn",
+    "wantlist"
   ],
 
   "eslint.workingDirectories": [
