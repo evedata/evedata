@@ -1,5 +1,15 @@
-ignore:
-  - "*lock.yaml"
-  - "**/node_modules"
-  - "**/.terraform"
-  - ".venv"
+---
+extends: default
+
+ignore: |
+  *lock.yaml
+  **/node_modules
+  **/.terraform
+  .venv
+
+rules:
+  line-length:
+    max: 120
+    level: warning
+  truthy:
+    allowed-values: ['true', 'false', 'yes', 'no']

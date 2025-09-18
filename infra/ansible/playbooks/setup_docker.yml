@@ -1,0 +1,56 @@
+---
+- name: Setup Docker on Ubuntu servers
+  hosts: ubuntu
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Verify target hosts are Ubuntu 24.04 LTS
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Ubuntu"
+          - ansible_distribution_version is version('24.04', '>=')
+        fail_msg: >-
+          This playbook requires Ubuntu 24.04 LTS or later.
+          Found: {{ ansible_distribution }} {{ ansible_distribution_version }}
+        success_msg: "Target host OS validated: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+      tags:
+        - always
+
+    - name: Display target host information
+      ansible.builtin.debug:
+        msg:
+          - "Hostname: {{ inventory_hostname }}"
+          - "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+          - "Architecture: {{ ansible_architecture }}"
+          - "Kernel: {{ ansible_kernel }}"
+      tags:
+        - always
+
+  roles:
+    - role: docker
+      tags:
+        - docker
+
+  post_tasks:
+    - name: Display Docker installation summary
+      ansible.builtin.debug:
+        msg:
+          - "Docker installation completed on {{ inventory_hostname }}"
+          - "Docker and containerd services are enabled and running"
+          - "The ansible user has been added to the docker group"
+          - "Note: Group membership changes require a new session to take effect"
+      tags:
+        - docker
+        - summary
+
+    - name: Reminder about group membership
+      ansible.builtin.debug:
+        msg: |
+          IMPORTANT: For the ansible user to use Docker without sudo,
+          you need to log out and log back in for group membership to take effect.
+          Alternatively, you can run: newgrp docker
+      when: docker_add_users_to_group | default(true)
+      tags:
+        - docker
+        - summary

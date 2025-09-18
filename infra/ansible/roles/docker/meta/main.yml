@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  author: EVEData Infrastructure Team
+  description: Install and configure Docker on Ubuntu 24.04 LTS
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - noble  # Ubuntu 24.04 LTS
+
+  galaxy_tags:
+    - docker
+    - container
+    - ubuntu
+    - system
+
+dependencies: []

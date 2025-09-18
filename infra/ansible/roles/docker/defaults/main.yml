@@ -1,0 +1,20 @@
+---
+# Docker GPG key and repository configuration
+docker_gpg_key_url: "https://download.docker.com/linux/ubuntu/gpg"
+docker_repository_url: "https://download.docker.com/linux/ubuntu"
+docker_arch: "amd64"
+
+# Docker packages to install
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
+
+# User management
+docker_add_users_to_group: true
+docker_users_to_add: ansible
+
+# Testing
+docker_test_installation: false
