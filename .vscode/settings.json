@@ -9,6 +9,7 @@
   ],
   "cSpell.words": [
     "adbc",
+    "alertmanager",
     "atproto",
     "bonusing",
     "boto",
@@ -80,6 +81,7 @@
     "PGPASSWORD",
     "psql",
     "pylint",
+    "pyroscope",
     "RDBMS",
     "refurb",
     "repackagedvolumes",
