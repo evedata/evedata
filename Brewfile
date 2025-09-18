@@ -1,12 +1,9 @@
-tap "hashicorp/tap"
-
 brew "cairo"
 brew "freetype"
 brew "libffi"
 brew "libjpeg"
 brew "libpng"
+brew "opentofu"
 brew "pngquant"
 brew "tflint"
 brew "zlib"
-
-brew "hashicorp/tap/terraform"

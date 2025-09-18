@@ -1,7 +1,7 @@
 resource "cloudflare_r2_bucket" "stg-lake-weu" {
   account_id = var.cloudflare_account_id
   name       = "stg-lake-weu"
-  location   = "weur"
+  location   = "WEUR"
 }
 
 resource "cloudflare_r2_bucket_lifecycle" "stg-lake-weu-lifecycle" {

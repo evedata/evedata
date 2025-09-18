@@ -1,7 +1,7 @@
 resource "cloudflare_r2_bucket" "dev-lake-weu" {
   account_id = var.cloudflare_account_id
   name       = "dev-lake-weu"
-  location   = "weur"
+  location   = "WEUR"
 }
 
 # Note: R2 data catalog is not yet supported in the Cloudflare Terraform provider.

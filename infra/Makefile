@@ -22,7 +22,7 @@ format-python:
 format-toml:
 	pnpm run format:toml
 
-lint: lint-markdown lint-python lint-terraform lint-yaml
+lint: lint-markdown lint-python lint-tflint lint-yaml
 
 lint-markdown:
 	pnpm run lint:markdown
@@ -30,8 +30,8 @@ lint-markdown:
 lint-python:
 	uv run ruff check
 
-lint-terraform:
-	tflint --chdir terraform --recursive -f compact
+lint-tflint:
+	tflint --chdir tofu --recursive -f compact
 
 lint-yaml:
 	uv run yamllint --strict .
