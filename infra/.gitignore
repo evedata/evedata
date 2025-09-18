@@ -388,3 +388,5 @@ vite.config.ts.timestamp-*
 
 ansible/collections/ansible_collections/
 ansible/reports/
+
+.ansible
