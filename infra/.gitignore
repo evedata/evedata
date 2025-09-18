@@ -390,3 +390,5 @@ ansible/collections/ansible_collections/
 ansible/reports/
 
 .ansible
+ansible/galaxy_cache/
+ansible/galaxy_token

@@ -1,0 +1,26 @@
+---
+- name: Harden operating system
+  tags: os
+  hosts: "{{ target_hosts | default('ubuntu') }}"
+  become: true
+  become_user: root
+  gather_facts: true
+  roles:
+    - devsec.hardening.os_hardening
+  vars:
+    os_ignore_users:
+      - ansible
+    sysctl_overwrite:
+      net.ipv4.ip_forward: 1 # For routing VMs/containers
+
+- name: Harden SSH
+  tags: ssh
+  hosts: "{{ target_hosts | default('ubuntu') }}"
+  become: true
+  become_user: root
+  gather_facts: true
+  roles:
+    - devsec.hardening.ssh_hardening
+  vars:
+    network_ipv6_enable: false
+    sftp_enabled: false

@@ -1,9 +1,6 @@
 ---
-# Ansible Bootstrap Playbook
-# Bootstraps Ubuntu 24.04 LTS hosts for Ansible management
-
 - name: Bootstrap hosts for Ansible management
-  hosts: "{{ target_hosts | default('all') }}"
+  hosts: "{{ target_hosts | default('ubuntu') }}"
   become: true
   become_user: root
   gather_facts: true
