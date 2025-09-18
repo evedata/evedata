@@ -104,7 +104,8 @@
     "usbutils",
     "utinyint",
     "uvicorn",
-    "wantlist"
+    "wantlist",
+    "weur"
   ],
 
   "eslint.workingDirectories": [
