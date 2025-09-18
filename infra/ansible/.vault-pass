@@ -1,0 +1,2 @@
+#!/bin/bash
+op item get "evedata-infra-ansible-vault" --vault evedata --reveal --format json | jq -r '.fields[] | select(.id == "password") | .value'

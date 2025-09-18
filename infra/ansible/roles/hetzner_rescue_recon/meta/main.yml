@@ -1,0 +1,26 @@
+---
+galaxy_info:
+  author: EVEData Team
+  description: Role for Hetzner Rescue System reconnaissance and system information gathering
+  company: EVEData
+  license: MIT
+  min_ansible_version: "2.19"
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - noble
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+
+  galaxy_tags:
+    - hetzner
+    - rescue
+    - reconnaissance
+    - system-info
+    - hardware
+    - disk-analysis
+
+dependencies: []

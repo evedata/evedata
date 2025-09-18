@@ -1,0 +1,26 @@
+---
+profile: production
+
+exclude_paths:
+  - .ansible/
+  - collections/
+  - galaxy-roles/
+  - tmp/
+  - tests/
+
+skip_list:
+  - yaml[line-length] # Lines can be longer than 160 chars
+
+warn_list:
+  - experimental # Experimental rules are opt-in
+
+enable_list:
+  - fqcn # Use FQCN for all modules
+  - no-log-password # Ensure passwords are not logged
+
+kinds:
+  - tasks: "tasks/**/*.yml"
+  - vars: "vars/**/*.yml"
+  - meta: "meta/main.yml"
+  - yaml: "**/*.yaml"
+  - playbook: "playbooks/**/*.yml"

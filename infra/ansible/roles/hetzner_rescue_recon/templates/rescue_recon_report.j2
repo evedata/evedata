@@ -1,0 +1,282 @@
+# Hetzner Rescue System Reconnaissance Report
+
+**Host**: {{ inventory_hostname }}
+**Generated**: {{ ansible_date_time.iso8601 }}
+**Report Version**: 1.0
+
+---
+
+## Table of Contents
+1. [System Information](#system-information)
+2. [Hardware Details](#hardware-details)
+3. [Storage Configuration](#storage-configuration)
+4. [Network Configuration](#network-configuration)
+5. [Kernel and Boot Information](#kernel-and-boot-information)
+6. [Raw Command Outputs](#raw-command-outputs)
+
+---
+
+## System Information
+
+### Basic Facts
+- **Hostname**: {{ ansible_hostname }}
+- **FQDN**: {{ ansible_fqdn }}
+- **Operating System**: {{ ansible_distribution }} {{ ansible_distribution_version }}
+- **Kernel Version**: {{ ansible_kernel }}
+- **Architecture**: {{ ansible_architecture }}
+- **Virtualization Type**: {{ ansible_virtualization_type | default('bare-metal') }}
+- **Virtualization Role**: {{ ansible_virtualization_role | default('host') }}
+- **System Vendor**: {{ ansible_system_vendor | default('Unknown') }}
+- **Product Name**: {{ ansible_product_name | default('Unknown') }}
+- **Product Serial**: {{ ansible_product_serial | default('Unknown') }}
+- **BIOS Version**: {{ ansible_bios_version | default('Unknown') }}
+- **BIOS Date**: {{ ansible_bios_date | default('Unknown') }}
+
+### System Time
+- **Current Time**: {{ ansible_date_time.date }} {{ ansible_date_time.time }}
+- **Timezone**: {{ ansible_date_time.tz }}
+- **Uptime Seconds**: {{ ansible_uptime_seconds }}
+
+---
+
+## Hardware Details
+
+### CPU Information
+- **Processor Model**: {{ ansible_processor[2] | default('Unknown') }}
+- **Physical CPUs**: {{ ansible_processor_count }}
+- **Total Cores**: {{ ansible_processor_cores }}
+- **Threads per Core**: {{ ansible_processor_threads_per_core }}
+- **Virtual CPUs**: {{ ansible_processor_vcpus }}
+- **CPU Architecture**: {{ ansible_architecture }}
+
+#### Detailed CPU Information
+{% for item in recon_data if item.item.key == 'cpu_details' %}
+```
+{{ item.stdout | default('CPU details not available') }}
+```
+{% endfor %}
+
+### Memory Information
+- **Total Memory**: {{ ansible_memtotal_mb }} MB ({{ (ansible_memtotal_mb / 1024) | round(2) }} GB)
+- **Free Memory**: {{ ansible_memfree_mb }} MB
+- **Swap Total**: {{ ansible_swaptotal_mb }} MB
+- **Swap Free**: {{ ansible_swapfree_mb }} MB
+
+#### Detailed Memory Information
+{% for item in recon_data if item.item.key == 'memory_details' %}
+```
+{{ item.stdout | default('Memory details not available') }}
+```
+{% endfor %}
+
+### PCI Devices
+{% for item in recon_data if item.item.key == 'pci_devices' %}
+```
+{{ item.stdout | default('PCI device information not available') }}
+```
+{% endfor %}
+
+### DMI Information
+{% for item in recon_data if item.item.key == 'dmi_info' %}
+```
+{{ item.stdout | default('DMI information not available') }}
+```
+{% endfor %}
+
+---
+
+## Storage Configuration
+
+### Block Devices Overview
+- **Total Devices**: {{ ansible_devices | length }}
+- **Device List**: {{ ansible_devices.keys() | list | join(', ') }}
+
+#### Device Details
+{% for device, details in ansible_devices.items() %}
+##### {{ device }}
+- **Size**: {{ details.size | default('Unknown') }}
+- **Model**: {{ details.model | default('Unknown') }}
+- **Vendor**: {{ details.vendor | default('Unknown') }}
+- **Rotational**: {{ details.rotational | default('Unknown') }}
+- **Scheduler**: {{ details.scheduler_mode | default('Unknown') }}
+- **Sectors**: {{ details.sectors | default('Unknown') }}
+- **Sectorsize**: {{ details.sectorsize | default('Unknown') }}
+{% if details.partitions %}
+- **Partitions**:
+  {% for part, part_details in details.partitions.items() %}
+  - {{ part }}: {{ part_details.size | default('Unknown') }} (sectors: {{ part_details.sectors | default('Unknown') }})
+  {% endfor %}
+{% endif %}
+
+{% endfor %}
+
+### Block Device Tree
+{% for item in recon_data if item.item.key == 'block_devices' %}
+```
+{{ item.stdout | default('Block device information not available') }}
+```
+{% endfor %}
+
+### Disk Details (fdisk)
+{% for item in recon_data if item.item.key == 'disk_details' %}
+```
+{{ item.stdout | default('Disk details not available') }}
+```
+{% endfor %}
+
+### Partition Information
+{% for item in recon_data if item.item.key == 'partition_info' %}
+```
+{{ item.stdout | default('Partition information not available') }}
+```
+{% endfor %}
+
+### Filesystem Information
+{% for item in recon_data if item.item.key == 'filesystem_info' %}
+```
+{{ item.stdout | default('Filesystem information not available') }}
+```
+{% endfor %}
+
+### Mount Points
+{% for mount in ansible_mounts %}
+- **{{ mount.mount }}**
+  - Device: {{ mount.device }}
+  - Filesystem: {{ mount.fstype }}
+  - Size: {{ mount.size_total | filesizeformat }}
+  - Used: {{ (mount.size_total - mount.size_available) | filesizeformat }}
+  - Available: {{ mount.size_available | filesizeformat }}
+  - Options: {{ mount.options }}
+{% endfor %}
+
+### RAID Configuration
+#### MD Status
+```
+{{ mdstat_data }}
+```
+
+#### MDADM Details
+{% for item in recon_data if item.item.key == 'mdadm_status' %}
+```
+{{ item.stdout | default('No RAID arrays found') }}
+```
+{% endfor %}
+
+#### MDADM Examine
+{% for item in recon_data if item.item.key == 'mdadm_examine' %}
+```
+{{ item.stdout | default('No RAID metadata found') }}
+```
+{% endfor %}
+
+### SMART Information
+{% for item in recon_data if item.item.key == 'smart_info' %}
+```
+{{ item.stdout | default('SMART information not available') }}
+```
+{% endfor %}
+
+### Disk Performance Characteristics
+```
+{{ disk_perf_data }}
+```
+
+---
+
+## Network Configuration
+
+### Network Interfaces
+{% for interface in ansible_interfaces %}
+- **{{ interface }}**
+  {% if ansible_facts[interface] is defined %}
+  {% set iface = ansible_facts[interface] %}
+  - Type: {{ iface.type | default('Unknown') }}
+  - Active: {{ iface.active | default(false) }}
+  - Speed: {{ iface.speed | default('Unknown') }}
+  - MTU: {{ iface.mtu | default('1500') }}
+  - MAC: {{ iface.macaddress | default('Unknown') }}
+  {% if iface.ipv4 is defined %}
+  - IPv4: {{ iface.ipv4.address }}/{{ iface.ipv4.prefix }}
+  {% endif %}
+  {% if iface.ipv6 is defined and iface.ipv6 | length > 0 %}
+  - IPv6: {% for ipv6 in iface.ipv6 %}{{ ipv6.address }}/{{ ipv6.prefix }}{% if not loop.last %}, {% endif %}{% endfor %}
+  {% endif %}
+  {% endif %}
+{% endfor %}
+
+### Default Network Configuration
+- **Default Interface**: {{ ansible_default_ipv4.interface | default('Unknown') }}
+- **Default IP**: {{ ansible_default_ipv4.address | default('Unknown') }}
+- **Default Gateway**: {{ ansible_default_ipv4.gateway | default('Unknown') }}
+- **Default Network**: {{ ansible_default_ipv4.network | default('Unknown') }}
+- **Default Netmask**: {{ ansible_default_ipv4.netmask | default('Unknown') }}
+- **Default Broadcast**: {{ ansible_default_ipv4.broadcast | default('Unknown') }}
+
+### DNS Configuration
+- **Nameservers**: {{ ansible_dns.nameservers | default([]) | join(', ') }}
+- **Search Domains**: {{ ansible_dns.search | default([]) | join(', ') }}
+
+### Detailed Network Information
+```
+{{ network_data }}
+```
+
+### Network Configuration Files
+{% for item in recon_data if item.item.key == 'network_config' %}
+```
+{{ item.stdout | default('Network configuration not found') }}
+```
+{% endfor %}
+
+---
+
+## Kernel and Boot Information
+
+### Kernel Details
+- **Version**: {{ ansible_kernel }}
+- **Command Line**:
+{% for item in recon_data if item.item.key == 'kernel_cmdline' %}
+```
+{{ item.stdout | default('Kernel command line not available') }}
+```
+{% endfor %}
+
+### Loaded Kernel Modules
+{% for item in recon_data if item.item.key == 'kernel_modules' %}
+```
+{{ item.stdout | default('Kernel modules not available') }}
+```
+{% endfor %}
+
+---
+
+## Raw Command Outputs
+
+{% for item in recon_data %}
+### {{ item.item.key | replace('_', ' ') | title }}
+```
+{{ item.stdout | default('Command output not available') | truncate(50000) }}
+```
+{% if item.stderr and item.stderr != '' %}
+**Errors**:
+```
+{{ item.stderr }}
+```
+{% endif %}
+
+{% endfor %}
+
+---
+
+## Hardware Inventory (lshw)
+{% if lshw_data %}
+```json
+{{ lshw_data }}
+```
+{% else %}
+Hardware inventory data not available
+{% endif %}
+
+---
+
+*End of Report - Generated by Ansible Hetzner Rescue Reconnaissance Playbook*

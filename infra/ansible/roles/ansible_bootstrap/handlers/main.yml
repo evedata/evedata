@@ -1,0 +1,13 @@
+---
+- name: Restart sshd
+  ansible.builtin.systemd:
+    name: ssh
+    state: restarted
+    daemon_reload: true
+  listen: restart sshd
+
+- name: Reload nftables
+  ansible.builtin.systemd:
+    name: nftables
+    state: reloaded
+  listen: reload nftables

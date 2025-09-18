@@ -1,0 +1,248 @@
+---
+# Hetzner Rescue System Reconnaissance Playbook
+# Purpose: Gather comprehensive system and disk information from Hetzner rescue systems
+# Target: All hosts ending with -rescue in the inventory
+# Output: Structured reports saved locally for analysis
+
+- name: Hetzner Rescue System Reconnaissance
+  hosts: "*-rescue"
+  gather_facts: true
+  gather_subset:
+    - all
+    - hardware
+    - network
+    - virtual
+
+  vars:
+    # Local directory for storing reconnaissance reports
+    recon_base_dir: "{{ playbook_dir }}/../reports/rescue-recon"
+    recon_timestamp: "{{ ansible_date_time.epoch }}"
+    recon_report_dir: "{{ recon_base_dir }}/{{ recon_timestamp }}"
+
+    # Commands for detailed system information gathering
+    recon_commands:
+      cpu_details: "lscpu -J"
+      memory_details: "free -h && cat /proc/meminfo"
+      block_devices: "lsblk -J -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT,MODEL,SERIAL,WWN,ROTA,DISC-MAX,STATE"
+      disk_details: "fdisk -l"
+      mdadm_status: "mdadm --detail --scan 2>/dev/null || echo 'No RAID arrays found'"
+      mdadm_examine: "mdadm --examine /dev/sd* 2>/dev/null || echo 'No RAID metadata found'"
+      network_interfaces: "ip -j addr show"
+      network_routes: "ip -j route show"
+      kernel_info: "uname -a"
+      kernel_modules: "lsmod"
+      kernel_cmdline: "cat /proc/cmdline"
+      pci_devices: "lspci -vvnn"
+      usb_devices: "lsusb -v 2>/dev/null || echo 'lsusb not available'"
+      dmi_info: "dmidecode --type system,baseboard,chassis,processor,memory"
+      smart_info: 'for disk in $(lsblk -d -n -o NAME | grep -E ''^(sd|nvme)''); do echo "=== /dev/$disk ==="; smartctl -a /dev/$disk 2>/dev/null || echo ''smartctl not available''; done'
+      partition_info: "parted -l -s 2>/dev/null || echo 'parted not available'"
+      filesystem_info: "df -hT"
+      mount_info: "mount -v"
+      systemd_info: "systemctl status --no-pager 2>/dev/null || echo 'systemd not available'"
+      network_config: "cat /etc/network/interfaces 2>/dev/null || cat /etc/netplan/*.yaml 2>/dev/null || echo 'Network config not found'"
+
+  tasks:
+    - name: Ensure local report directory exists
+      ansible.builtin.file:
+        path: "{{ recon_report_dir }}/{{ inventory_hostname }}"
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+      run_once: false
+
+    - name: Gather basic system facts
+      ansible.builtin.setup:
+        gather_subset:
+          - all
+          - hardware
+          - network
+          - virtual
+
+    - name: Install required tools if not present
+      ansible.builtin.package:
+        name:
+          - lshw
+          - smartmontools
+          - dmidecode
+          - pciutils
+          - usbutils
+          - mdadm
+          - parted
+        state: present
+      ignore_errors: true
+      when: ansible_os_family == "Debian"
+
+    - name: Execute reconnaissance commands
+      ansible.builtin.shell: "{{ item.value }}"
+      register: recon_results
+      loop: "{{ recon_commands | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+      changed_when: false
+      failed_when: false
+
+    - name: Gather hardware information with lshw
+      ansible.builtin.command: lshw -json -quiet
+      register: lshw_output
+      changed_when: false
+      failed_when: false
+
+    - name: Check for RAID arrays
+      ansible.builtin.command: cat /proc/mdstat
+      register: mdstat_output
+      changed_when: false
+      failed_when: false
+
+    - name: Get detailed network information
+      ansible.builtin.shell: |
+        echo "=== Network Interfaces ==="
+        ip -d link show
+        echo ""
+        echo "=== IP Addresses ==="
+        ip -d addr show
+        echo ""
+        echo "=== Routing Table ==="
+        ip route show table all
+        echo ""
+        echo "=== Network Statistics ==="
+        ss -s
+        echo ""
+        echo "=== DNS Configuration ==="
+        cat /etc/resolv.conf
+      register: network_detailed
+      changed_when: false
+
+    - name: Get disk performance characteristics
+      ansible.builtin.shell: |
+        for disk in $(lsblk -d -n -o NAME | grep -E '^(sd|nvme)'); do
+          echo "=== /dev/$disk ==="
+          hdparm -I /dev/$disk 2>/dev/null || echo "hdparm not available for $disk"
+          echo ""
+          cat /sys/block/$disk/queue/rotational
+          cat /sys/block/$disk/queue/scheduler
+          cat /sys/block/$disk/device/model 2>/dev/null || echo "Model info not available"
+          echo ""
+        done
+      register: disk_performance
+      changed_when: false
+      failed_when: false
+
+    - name: Create comprehensive system report
+      ansible.builtin.template:
+        src: rescue_recon_report.j2
+        dest: "{{ recon_report_dir }}/{{ inventory_hostname }}/system_report.md"
+      delegate_to: localhost
+      vars:
+        recon_data: "{{ recon_results.results }}"
+        system_facts: "{{ ansible_facts }}"
+        lshw_data: "{{ lshw_output.stdout | default('') }}"
+        mdstat_data: "{{ mdstat_output.stdout | default('') }}"
+        network_data: "{{ network_detailed.stdout | default('') }}"
+        disk_perf_data: "{{ disk_performance.stdout | default('') }}"
+
+    - name: Save raw JSON data for programmatic analysis
+      ansible.builtin.copy:
+        content: |
+          {
+            "hostname": "{{ inventory_hostname }}",
+            "timestamp": "{{ ansible_date_time.iso8601 }}",
+            "ansible_facts": {{ ansible_facts | to_nice_json }},
+            "reconnaissance_data": {
+              {% for item in recon_results.results %}
+              "{{ item.item.key }}": {{ item.stdout | default('') | to_json }},
+              {% endfor %}
+              "lshw": {{ lshw_output.stdout | default('{}') }},
+              "mdstat": {{ mdstat_output.stdout | default('') | to_json }},
+              "network_detailed": {{ network_detailed.stdout | default('') | to_json }},
+              "disk_performance": {{ disk_performance.stdout | default('') | to_json }}
+            }
+          }
+        dest: "{{ recon_report_dir }}/{{ inventory_hostname }}/raw_data.json"
+      delegate_to: localhost
+
+    - name: Create disk layout visualization
+      ansible.builtin.shell: |
+        echo "# Disk Layout for {{ inventory_hostname }}"
+        echo "Generated: {{ ansible_date_time.iso8601 }}"
+        echo ""
+        echo "## Physical Disks"
+        lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT,MODEL,SERIAL,ROTA
+        echo ""
+        echo "## Partition Tables"
+        for disk in $(lsblk -d -n -o NAME | grep -E '^(sd|nvme)'); do
+          echo "### /dev/$disk"
+          parted /dev/$disk print 2>/dev/null || echo "No partition table"
+          echo ""
+        done
+        echo ""
+        echo "## RAID Configuration"
+        if [ -f /proc/mdstat ]; then
+          cat /proc/mdstat
+          mdadm --detail /dev/md* 2>/dev/null || echo "No RAID arrays active"
+        else
+          echo "No RAID support in kernel"
+        fi
+      register: disk_layout
+      changed_when: false
+
+    - name: Save disk layout visualization
+      ansible.builtin.copy:
+        content: "{{ disk_layout.stdout }}"
+        dest: "{{ recon_report_dir }}/{{ inventory_hostname }}/disk_layout.md"
+      delegate_to: localhost
+
+    - name: Generate summary report
+      ansible.builtin.copy:
+        content: |
+          # Hetzner Rescue System Reconnaissance Summary
+
+          ## Host: {{ inventory_hostname }}
+          **Date**: {{ ansible_date_time.iso8601 }}
+          **IP Address**: {{ ansible_host | default(ansible_default_ipv4.address) }}
+
+          ## System Overview
+          - **OS**: {{ ansible_distribution }} {{ ansible_distribution_version }}
+          - **Kernel**: {{ ansible_kernel }}
+          - **Architecture**: {{ ansible_architecture }}
+          - **Virtualization**: {{ ansible_virtualization_type | default('bare-metal') }}
+
+          ## Hardware Summary
+          - **CPU Model**: {{ ansible_processor[2] | default('Unknown') }}
+          - **CPU Cores**: {{ ansible_processor_cores }} cores, {{ ansible_processor_count }} CPUs
+          - **Total Memory**: {{ ansible_memtotal_mb }} MB
+          - **Product Name**: {{ ansible_product_name | default('Unknown') }}
+          - **BIOS Version**: {{ ansible_bios_version | default('Unknown') }}
+
+          ## Storage Summary
+          - **Total Disk Space**: {{ ansible_mounts | map(attribute='size_total') | sum | filesizeformat }}
+          - **Number of Block Devices**: {{ ansible_devices | length }}
+          - **Devices**: {{ ansible_devices.keys() | list | join(', ') }}
+
+          ## Network Summary
+          - **Primary Interface**: {{ ansible_default_ipv4.interface | default('Unknown') }}
+          - **Primary IP**: {{ ansible_default_ipv4.address | default('Unknown') }}
+          - **Gateway**: {{ ansible_default_ipv4.gateway | default('Unknown') }}
+          - **DNS Servers**: {{ ansible_dns.nameservers | default([]) | join(', ') }}
+
+          ## Report Files Generated
+          1. `system_report.md` - Detailed system report
+          2. `raw_data.json` - Complete JSON data for analysis
+          3. `disk_layout.md` - Disk and partition visualization
+
+          ---
+          *Generated by Ansible Reconnaissance Playbook*
+        dest: "{{ recon_report_dir }}/{{ inventory_hostname }}/summary.md"
+      delegate_to: localhost
+
+    - name: Create index file for all reconnaissance reports
+      ansible.builtin.template:
+        src: recon_index.j2
+        dest: "{{ recon_report_dir }}/index.md"
+      delegate_to: localhost
+      run_once: true
+
+  handlers:
+    - name: Display report location
+      ansible.builtin.debug:
+        msg: "Reconnaissance reports saved to: {{ recon_report_dir }}"

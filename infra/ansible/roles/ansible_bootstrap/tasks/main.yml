@@ -1,0 +1,243 @@
+---
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - ansible_bootstrap_user_public_key is defined
+      - ansible_bootstrap_user_public_key | length > 0
+    fail_msg: "ansible_bootstrap_user_public_key must be defined with a valid SSH public key"
+    success_msg: "Required variables validated"
+
+- name: Bootstrap host for Ansible management
+  block:
+    - name: Create ansible management user
+      block:
+        - name: Create ansible user account
+          ansible.builtin.user:
+            name: ansible
+            comment: "Ansible Management User"
+            shell: /bin/bash
+            home: /home/ansible
+            createhome: true
+            state: present
+            password_expire_max: -1
+            groups: []
+            append: false
+          register: _ansible_bootstrap_user_created
+
+        - name: Create SSH directory for ansible user
+          ansible.builtin.file:
+            path: /home/ansible/.ssh
+            state: directory
+            owner: ansible
+            group: ansible
+            mode: "0700"
+
+        - name: Deploy SSH public key for ansible user
+          ansible.posix.authorized_key:
+            user: ansible
+            key: "{{ ansible_bootstrap_user_public_key }}"
+            state: present
+            exclusive: true
+            comment: "Ansible management key"
+          no_log: false # Public keys are not sensitive
+
+        - name: Configure passwordless sudo for ansible user
+          ansible.builtin.copy:
+            content: |
+              # Ansible management user - passwordless sudo access
+              ansible ALL=(ALL:ALL) NOPASSWD: ALL
+            dest: /etc/sudoers.d/90-ansible-user
+            owner: root
+            group: root
+            mode: "0440"
+            validate: "visudo -cf %s"
+
+        - name: Test ansible user sudo access
+          ansible.builtin.command: sudo -u ansible sudo whoami
+          changed_when: false
+          register: _ansible_bootstrap_sudo_test
+
+        - name: Validate sudo test result
+          ansible.builtin.assert:
+            that:
+              - _ansible_bootstrap_sudo_test.stdout == "root"
+            fail_msg: "Ansible user sudo verification failed"
+            success_msg: "Ansible user sudo access verified"
+
+      rescue:
+        - name: User creation failed - stop execution
+          ansible.builtin.fail:
+            msg: |
+              CRITICAL: Failed to create ansible user. Bootstrap aborted.
+              Error: {{ ansible_failed_result.msg | default('Unknown error') }}
+              No system modifications (firewall, SSH) were made.
+              Please check the error and retry.
+
+    - name: Configure nftables firewall
+      block:
+        - name: Install nftables package
+          ansible.builtin.apt:
+            name: nftables
+            state: present
+            update_cache: true
+            cache_valid_time: 3600
+
+        - name: Deploy nftables configuration
+          ansible.builtin.template:
+            src: nftables.conf.j2
+            dest: /etc/nftables.conf
+            owner: root
+            group: root
+            mode: "0640"
+            backup: true
+            validate: "nft -c -f %s"
+          notify: reload nftables
+
+        - name: Enable and start nftables service
+          ansible.builtin.systemd:
+            name: nftables
+            enabled: true
+            state: started
+            daemon_reload: true
+
+        - name: Verify nftables is active
+          ansible.builtin.systemd:
+            name: nftables
+            state: started
+          register: _ansible_bootstrap_nftables_check
+          check_mode: true
+          changed_when: false
+
+        - name: Validate nftables service
+          ansible.builtin.assert:
+            that:
+              - not _ansible_bootstrap_nftables_check.changed
+            fail_msg: "nftables service failed to start"
+            success_msg: "nftables service is active"
+
+      rescue:
+        - name: Firewall configuration failed
+          ansible.builtin.fail:
+            msg: |
+              Failed to configure nftables firewall.
+              Error: {{ ansible_failed_result.msg | default('Unknown error') }}
+              The ansible user was created successfully but firewall setup failed.
+              Manual intervention may be required.
+
+    - name: Harden SSH configuration
+      block:
+        - name: Backup original SSH configuration
+          ansible.builtin.copy:
+            src: /etc/ssh/sshd_config
+            dest: /etc/ssh/sshd_config.backup.{{ ansible_date_time.epoch }}
+            remote_src: true
+            owner: root
+            group: root
+            mode: "0644"
+          changed_when: false
+
+        - name: Configure SSH security settings
+          ansible.builtin.lineinfile:
+            path: /etc/ssh/sshd_config
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+            state: present
+            validate: "sshd -t -f %s"
+            backup: false # We already created a backup
+          loop:
+            - regexp: "^#?PermitRootLogin"
+              line: "PermitRootLogin no"
+            - regexp: "^#?PasswordAuthentication"
+              line: "PasswordAuthentication no"
+            - regexp: "^#?PubkeyAuthentication"
+              line: "PubkeyAuthentication yes"
+            - regexp: "^#?ChallengeResponseAuthentication"
+              line: "ChallengeResponseAuthentication no"
+            - regexp: "^#?KbdInteractiveAuthentication"
+              line: "KbdInteractiveAuthentication no"
+            - regexp: "^#?UsePAM"
+              line: "UsePAM yes"
+            - regexp: "^#?PermitEmptyPasswords"
+              line: "PermitEmptyPasswords no"
+            - regexp: "^#?MaxAuthTries"
+              line: "MaxAuthTries 3"
+            - regexp: "^#?ClientAliveInterval"
+              line: "ClientAliveInterval 300"
+            - regexp: "^#?ClientAliveCountMax"
+              line: "ClientAliveCountMax 2"
+          notify: restart sshd
+
+        - name: Ensure SSH service is enabled and running
+          ansible.builtin.systemd:
+            name: ssh
+            enabled: true
+            state: started
+
+      rescue:
+        - name: SSH configuration failed
+          ansible.builtin.fail:
+            msg: |
+              Failed to harden SSH configuration.
+              Error: {{ ansible_failed_result.msg | default('Unknown error') }}
+              The ansible user and firewall were configured successfully.
+              SSH hardening failed - manual intervention may be required.
+              WARNING: Root login may have been disabled.
+
+  rescue:
+    - name: Bootstrap failed
+      ansible.builtin.fail:
+        msg: |
+          Bootstrap process failed at an unexpected point.
+          Error: {{ ansible_failed_result.msg | default('Unknown error') }}
+          Please review the error and check what changes were applied.
+
+- name: Final bootstrap validation
+  block:
+    - name: Verify ansible user exists
+      ansible.builtin.user:
+        name: ansible
+        state: present
+      check_mode: true
+      register: _ansible_bootstrap_user_check
+      changed_when: false
+
+    - name: Verify ansible user sudo access
+      ansible.builtin.command: sudo -u ansible sudo whoami
+      changed_when: false
+      register: _ansible_bootstrap_sudo_check
+
+    - name: Verify nftables is running
+      ansible.builtin.systemd:
+        name: nftables
+        state: started
+      check_mode: true
+      register: _ansible_bootstrap_nftables_check
+      changed_when: false
+
+    - name: Verify SSH service is running
+      ansible.builtin.systemd:
+        name: ssh
+        state: started
+      check_mode: true
+      register: _ansible_bootstrap_ssh_check
+      changed_when: false
+
+    - name: Validate all services
+      ansible.builtin.assert:
+        that:
+          - not _ansible_bootstrap_user_check.changed
+          - _ansible_bootstrap_sudo_check.stdout == "root"
+          - not _ansible_bootstrap_nftables_check.changed
+          - not _ansible_bootstrap_ssh_check.changed
+        fail_msg: "Post-bootstrap validation failed"
+        success_msg: "All bootstrap components validated successfully"
+
+  rescue:
+    - name: Validation failed warning
+      ansible.builtin.debug:
+        msg: |
+          WARNING: Bootstrap appeared to complete but validation failed.
+          Please manually verify:
+          - Ansible user exists and has sudo access
+          - nftables firewall is active
+          - SSH service is running with hardened configuration

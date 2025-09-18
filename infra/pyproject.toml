@@ -10,10 +10,10 @@ readme = "README.md"
 authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.13"
-dependencies = ["evedata-utils", "fastapi[all]>=0.115.5"]
+dependencies = ["ansible>=12.0.0", "evedata-utils", "fastapi[all]>=0.115.5"]
 
 [dependency-groups]
-dev = ["pyright>=1.1.403", "ruff>=0.12.4", "yamllint>=1.37.1"]
+dev = ["ansible-lint>=25.9.0", "pyright>=1.1.403", "ruff>=0.12.4", "yamllint>=1.37.1"]
 
 [project.entry-points."evedata.admin.commands"]
 infra = "evedata_infra.admin:commands"

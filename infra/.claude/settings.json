@@ -2,6 +2,9 @@
   "permissions": {
     "additionalDirectories": [".."],
     "allow": [
+      "Bash(ansible-galaxy:*)",
+      "Bash(ansible-lint:*)",
+      "Bash(ansible-test:*)",
       "Bash(awk:*)",
       "Bash(cal:*)",
       "Bash(cat:*)",
@@ -61,7 +64,12 @@
       "Bash(whereis:*)",
       "Bash(which:*)",
       "Bash(whoami:*)",
-      "Bash(yq:*)"
+      "Bash(yamllint:*)",
+      "Bash(yq:*)",
+
+      "WebFetch(domain:docs.ansible.com)",
+
+      "WebSearch"
     ],
     "deny": []
   }

@@ -1,0 +1,6 @@
+---
+# handlers file for hetzner_rescue_recon
+
+- name: Display report location
+  ansible.builtin.debug:
+    msg: "Reconnaissance reports saved to: {{ hostvars['localhost']['recon_report_dir'] }}"

@@ -1,0 +1,38 @@
+---
+# defaults file for hetzner_rescue_recon
+
+# Local directory for storing reconnaissance reports
+recon_base_dir: "{{ playbook_dir }}/../reports/rescue-recon"
+
+# Commands for detailed system information gathering
+recon_commands:
+  cpu_details: "lscpu -J"
+  memory_details: "free -h && cat /proc/meminfo"
+  block_devices: "lsblk -J -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT,MODEL,SERIAL,WWN,ROTA,DISC-MAX,STATE"
+  disk_details: "fdisk -l"
+  mdadm_status: "mdadm --detail --scan 2>/dev/null || echo 'No RAID arrays found'"
+  mdadm_examine: "mdadm --examine /dev/sd* 2>/dev/null || echo 'No RAID metadata found'"
+  network_interfaces: "ip -j addr show"
+  network_routes: "ip -j route show"
+  kernel_info: "uname -a"
+  kernel_modules: "lsmod"
+  kernel_cmdline: "cat /proc/cmdline"
+  pci_devices: "lspci -vvnn"
+  usb_devices: "lsusb -v 2>/dev/null || echo 'lsusb not available'"
+  dmi_info: "dmidecode --type system,baseboard,chassis,processor,memory"
+  smart_info: 'for disk in $(lsblk -d -n -o NAME | grep -E ''^(sd|nvme)''); do echo "=== /dev/$disk ==="; smartctl -a /dev/$disk 2>/dev/null || echo ''smartctl not available''; done'
+  partition_info: "parted -l -s 2>/dev/null || echo 'parted not available'"
+  filesystem_info: "df -hT"
+  mount_info: "mount -v"
+  systemd_info: "systemctl status --no-pager 2>/dev/null || echo 'systemd not available'"
+  network_config: "cat /etc/network/interfaces 2>/dev/null || cat /etc/netplan/*.yaml 2>/dev/null || echo 'Network config not found'"
+
+# Package list for reconnaissance tools
+recon_packages:
+  - lshw
+  - smartmontools
+  - dmidecode
+  - pciutils
+  - usbutils
+  - mdadm
+  - parted

@@ -1,0 +1,63 @@
+---
+# Ansible Bootstrap Playbook
+# Bootstraps Ubuntu 24.04 LTS hosts for Ansible management
+
+- name: Bootstrap hosts for Ansible management
+  hosts: "{{ target_hosts | default('all') }}"
+  become: true
+  become_user: root
+  gather_facts: true
+
+  pre_tasks:
+    - name: Validate operating system
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Ubuntu"
+          - ansible_distribution_version == "24.04"
+        fail_msg: "This playbook requires Ubuntu 24.04 LTS. Current: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+        success_msg: "Operating system validated: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      changed_when: false
+
+  roles:
+    - role: ansible_bootstrap
+      # ansible_user_public_key must be provided via:
+      # 1. group_vars/all.yml
+      # 2. host_vars/hostname.yml
+      # 3. --extra-vars on command line
+      # 4. inventory variables
+
+- name: Verify bootstrap results
+  hosts: "{{ target_hosts | default('all') }}"
+  gather_facts: false
+
+  tasks:
+    - name: Display bootstrap summary
+      ansible.builtin.debug:
+        msg:
+          - "Host bootstrap completed successfully"
+          - "Ansible user: ansible"
+          - "SSH port: {{ ansible_bootstrap_ssh_port | default(22) }}"
+          - "Firewall: UFW (active)"
+          - "SSH hardening: Applied"
+          - ""
+          - "Next steps:"
+          - "1. Test connection: ansible {{ inventory_hostname }} -m ping -u ansible"
+          - "2. Update inventory to use ansible user"
+          - "3. Remove any root SSH keys if no longer needed"
+
+    - name: Test ansible user connectivity
+      ansible.builtin.ping:
+      vars:
+        ansible_user: ansible
+      register: ping_test
+      ignore_errors: true
+      changed_when: false
+
+    - name: Report connectivity test result
+      ansible.builtin.debug:
+        msg: "Ansible user connectivity test: {{ 'PASSED' if ping_test is success else 'FAILED - Manual verification required' }}"

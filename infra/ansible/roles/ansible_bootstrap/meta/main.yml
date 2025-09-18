@@ -1,0 +1,57 @@
+---
+# meta file for ansible_bootstrap role
+
+galaxy_info:
+  author: evedata
+  description: Bootstrap role for Ubuntu 24.04 LTS hosts with ansible user, nftables firewall, and SSH hardening
+  company: evedata
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - noble # Ubuntu 24.04 LTS
+
+  galaxy_tags:
+    - bootstrap
+    - security
+    - nftables
+    - ssh
+    - ubuntu
+    - system
+
+dependencies: []
+
+collections:
+  - ansible.builtin
+  - ansible.posix
+
+argument_specs:
+  main:
+    short_description: Bootstrap Ubuntu 24.04 LTS host for Ansible management
+    description: |
+      This role bootstraps a fresh Ubuntu 24.04 LTS installation by:
+      - Creating an ansible management user with passwordless sudo
+      - Setting up SSH key authentication
+      - Configuring a minimal nftables firewall
+      - Hardening SSH configuration
+    options:
+      ansible_bootstrap_user_public_key:
+        description: SSH public key for the ansible management user
+        type: str
+        required: true
+      ansible_bootstrap_ssh_port:
+        description: SSH port number
+        type: int
+        default: 22
+        required: false
+      ansible_bootstrap_ssh_rate_limit_count:
+        description: Number of new SSH connections allowed per time period
+        type: int
+        default: 10
+        required: false
+      ansible_bootstrap_ssh_rate_limit_time:
+        description: Time period for SSH rate limiting
+        type: str
+        default: "1m"
+        required: false

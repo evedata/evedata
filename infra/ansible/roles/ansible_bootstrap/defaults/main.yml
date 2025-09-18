@@ -1,0 +1,13 @@
+---
+# defaults file for ansible_bootstrap role
+
+# SSH configuration
+ansible_bootstrap_ssh_port: 22
+
+# nftables rate limiting for SSH
+# Number of new SSH connections allowed per time period
+ansible_bootstrap_ssh_rate_limit_count: 10
+# Time period for rate limiting (e.g., '1m', '30s', '1h')
+ansible_bootstrap_ssh_rate_limit_time: "1m"
+# Note: ansible_bootstrap_user_public_key is a required variable that must be provided
+# when using this role. It should contain the SSH public key for the ansible user.
