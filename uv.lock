@@ -1353,6 +1353,7 @@ dependencies = [
     { name = "ansible" },
     { name = "evedata-utils" },
     { name = "fastapi", extra = ["all"] },
+    { name = "httpx" },
 ]
 
 [package.dev-dependencies]
@@ -1368,6 +1369,7 @@ requires-dist = [
     { name = "ansible", specifier = ">=12.0.0" },
     { name = "evedata-utils", editable = "platform/utils" },
     { name = "fastapi", extras = ["all"], specifier = ">=0.115.5" },
+    { name = "httpx", specifier = ">=0.28.1" },
 ]
 
 [package.metadata.requires-dev]

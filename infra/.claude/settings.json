@@ -67,6 +67,7 @@
       "Bash(yamllint:*)",
       "Bash(yq:*)",
 
+      "WebFetch(domain:developers.cloudflare.com)",
       "WebFetch(domain:docs.ansible.com)",
 
       "WebSearch"

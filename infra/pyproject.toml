@@ -10,7 +10,12 @@ readme = "README.md"
 authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.13"
-dependencies = ["ansible>=12.0.0", "evedata-utils", "fastapi[all]>=0.115.5"]
+dependencies = [
+  "ansible>=12.0.0",
+  "evedata-utils",
+  "fastapi[all]>=0.115.5",
+  "httpx>=0.28.1",
+]
 
 [dependency-groups]
 dev = ["ansible-lint>=25.9.0", "pyright>=1.1.403", "ruff>=0.12.4", "yamllint>=1.37.1"]
@@ -22,13 +27,25 @@ infra = "evedata_infra.admin:commands"
 infra = "evedata_infra.admin:endpoints"
 
 [tool.pyright]
-venvPath = "."
+strict = [
+  "infra/ansible/libraries",
+  "infra/ansible/module_utils",
+  "infra/ansible/plugins",
+  "infra/src",
+]
+venvPath = ".."
 venv = ".venv"
-exclude = ["**/.*", "**/__pycache__", "**/node_modules", "**/experiments"]
+exclude = [
+  "**/.*",
+  "**/__pycache__",
+  "**/node_modules",
+  "**/experiments",
+  "ansible/collections/ansible_collections",
+]
 
 [tool.ruff]
 target-version = "py313"
-extend-exclude = ["tmp"]
+extend-exclude = ["ansible/collections/ansible_collections", "tmp"]
 line-length = 88
 
 [tool.ruff.format]
@@ -110,6 +127,7 @@ classmethod-decorators = [
 "**/__main__.py" = ["D100"]
 "**/tests/**" = ["D", "PLR2004", "S101"]
 "*.ipynb" = ["T20"]
+"ansible/plugins/**" = ["D100", "EXE001", "UP009"]
 
 [tool.uv]
 package = false

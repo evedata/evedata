@@ -1,0 +1,69 @@
+---
+# Test playbook for the cloudflare_ips lookup plugin
+# This playbook demonstrates various ways to use the cloudflare_ips lookup plugin
+#
+# Usage:
+#   export CLOUDFLARE_ACCOUNT_ID="your_account_id"
+#   export CLOUDFLARE_API_TOKEN="your_api_token"
+#   ansible-playbook playbooks/test_cloudflare_ips_lookup.yml
+
+- name: Test Cloudflare IPs Lookup Plugin
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Retrieve all Cloudflare IP addresses
+      ansible.builtin.set_fact:
+        all_cloudflare_ips: "{{ lookup('cloudflare_ips', wantlist=True) }}"
+
+    - name: Display all Cloudflare IPs
+      ansible.builtin.debug:
+        msg: "Total Cloudflare IP ranges: {{ all_cloudflare_ips | length }}"
+        verbosity: 0
+
+    - name: Retrieve only IPv4 addresses
+      ansible.builtin.set_fact:
+        cloudflare_ipv4: "{{ lookup('cloudflare_ips', ip_version='ipv4', wantlist=True) }}"
+
+    - name: Display IPv4 addresses
+      ansible.builtin.debug:
+        var: cloudflare_ipv4
+        verbosity: 1
+
+    - name: Count IPv4 ranges
+      ansible.builtin.debug:
+        msg: "Number of IPv4 CIDR blocks: {{ cloudflare_ipv4 | length }}"
+
+    - name: Retrieve only IPv6 addresses
+      ansible.builtin.set_fact:
+        cloudflare_ipv6: "{{ lookup('cloudflare_ips', ip_version='ipv6', wantlist=True) }}"
+
+    - name: Display IPv6 addresses
+      ansible.builtin.debug:
+        var: cloudflare_ipv6
+        verbosity: 1
+
+    - name: Count IPv6 ranges
+      ansible.builtin.debug:
+        msg: "Number of IPv6 CIDR blocks: {{ cloudflare_ipv6 | length }}"
+
+    - name: Example - Generate UFW rules for Cloudflare IPv4
+      ansible.builtin.debug:
+        msg: "ufw allow from {{ item }} to any port 443 proto tcp comment 'Cloudflare'"
+      loop: "{{ cloudflare_ipv4[:3] }}"  # Show first 3 for demo
+      when: cloudflare_ipv4 is defined and cloudflare_ipv4 | length > 0
+
+    - name: Example - Create nginx allow list configuration
+      ansible.builtin.set_fact:
+        nginx_cloudflare_config: |
+          # Cloudflare IP ranges - auto-generated
+          {% for ip in cloudflare_ipv4 %}
+          allow {{ ip }};
+          {% endfor %}
+          {% for ip in cloudflare_ipv6 %}
+          allow {{ ip }};
+          {% endfor %}
+          deny all;
+
+    - name: Display sample nginx configuration
+      ansible.builtin.debug:
+        msg: "{{ nginx_cloudflare_config.split('\n')[:10] }}"  # Show first 10 lines
