@@ -5,6 +5,7 @@ import dlt
 if TYPE_CHECKING:
     from dlt.pipeline.pipeline import Pipeline
     from dlt.pipeline.progress import TCollectorArg
+
     from evedata_platform_core import Configuration
 
 

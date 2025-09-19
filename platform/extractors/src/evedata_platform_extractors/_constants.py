@@ -10,8 +10,6 @@ SDE_TRANQUILITY_URL = (
 
 SUPPORTED_DESTINATIONS = ["duckdb"]
 
-USER_AGENT = "EVEData/1.0 (admin@evedata.io; +https://github.com/evedata)"
-
 MARKET_REGION_IDS = [
     10000054,  # Aridia
     10000069,  # Black Rise

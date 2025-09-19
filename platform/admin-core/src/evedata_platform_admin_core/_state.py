@@ -1,5 +1,6 @@
-from evedata_platform_core import Configuration
 from rich.console import Console
+
+from evedata_platform_core import Configuration
 
 
 class AdminState:

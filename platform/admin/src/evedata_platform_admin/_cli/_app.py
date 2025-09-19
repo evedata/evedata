@@ -1,10 +1,10 @@
 from importlib import metadata
 
 import typer
-from evedata_platform_admin_core import AdminState
 from typer import Typer
 
 from evedata_platform_admin._api import cli as api_cli
+from evedata_platform_admin_core import AdminState
 
 from . import _commands as commands
 

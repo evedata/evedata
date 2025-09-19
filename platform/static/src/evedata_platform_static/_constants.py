@@ -7,5 +7,3 @@ SDE_CHECKSUM_URL = (
 SDE_TRANQUILITY_URL = (
     "https://eve-static-data-export.s3-eu-west-1.amazonaws.com/tranquility/sde.zip"
 )
-
-USER_AGENT = "EVEData/1.0 (admin@evedata.io; +https://github.com/evedata)"

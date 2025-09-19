@@ -137,6 +137,15 @@ pydocstyle = { convention = "google" }
 combine-as-imports = true
 extra-standard-library = ["typing_extensions"]
 forced-separate = ["tests"]
+section-order = [
+  "future",
+  "standard-library",
+  "third-party",
+  "platform",
+  "first-party",
+  "local-folder",
+]
+sections = { platform = ["evedata_platform_*"] }
 
 [tool.ruff.lint.flake8-type-checking]
 quote-annotations = true

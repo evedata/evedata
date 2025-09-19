@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Any
 import dlt
 import hishel
 import httpx
-from evedata_platform_utils.datetime import http_date_to_datetime
 from tenacity import (
     retry,
     retry_if_exception_type,
@@ -14,8 +13,10 @@ from tenacity import (
     wait_exponential_jitter,
 )
 
-from evedata_platform_extractors._constants import MARKET_REGION_IDS, USER_AGENT
+from evedata_platform_core import EVEDATA_USER_AGENT
+from evedata_platform_extractors._constants import MARKET_REGION_IDS
 from evedata_platform_extractors._exceptions import ESIErrorLimitReachedError
+from evedata_platform_utils.datetime import http_date_to_datetime
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
@@ -45,7 +46,7 @@ async def get_esi_public_market_orders_resource(
 
     cache_storage = hishel.AsyncFileStorage(base_path=cache_path)
     async with hishel.AsyncCacheClient(
-        headers={"User-Agent": USER_AGENT}, storage=cache_storage
+        headers={"User-Agent": EVEDATA_USER_AGENT}, storage=cache_storage
     ) as client:
         for region_id in MARKET_REGION_IDS:
             path = f"/markets/{region_id}/orders/"

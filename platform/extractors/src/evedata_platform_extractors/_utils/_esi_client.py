@@ -5,7 +5,6 @@ from typing import Any
 
 import hishel
 import httpx
-from evedata_platform_utils.datetime import http_date_to_datetime
 from tenacity import (
     retry,
     retry_if_exception_type,
@@ -13,8 +12,9 @@ from tenacity import (
     wait_exponential_jitter,
 )
 
-from evedata_platform_extractors._constants import USER_AGENT
+from evedata_platform_core import EVEDATA_USER_AGENT
 from evedata_platform_extractors._exceptions import ESIErrorLimitReachedError
+from evedata_platform_utils.datetime import http_date_to_datetime
 
 _RETRIABLE_EXCEPTIONS = httpx.RequestError
 
@@ -26,7 +26,7 @@ class ESIClient:
         http_client: httpx.Client | None = None,
         cache_storage: hishel.BaseStorage | None = None,
     ) -> None:
-        self._user_agent = user_agent or USER_AGENT
+        self._user_agent = user_agent or EVEDATA_USER_AGENT
 
         if not http_client:
             cache_storage = cache_storage or hishel.FileStorage(
@@ -99,7 +99,7 @@ class AsyncESIClient:
         http_client: httpx.AsyncClient | None = None,
         cache_storage: hishel.AsyncBaseStorage | None = None,
     ) -> None:
-        self._user_agent = user_agent or USER_AGENT
+        self._user_agent = user_agent or EVEDATA_USER_AGENT
 
         if not http_client:
             cache_storage = cache_storage or hishel.AsyncFileStorage(

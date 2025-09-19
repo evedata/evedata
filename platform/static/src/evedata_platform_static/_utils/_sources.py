@@ -1,12 +1,11 @@
 from functools import cache, lru_cache
 from typing import TYPE_CHECKING, Any
 
-from evedata_platform_utils.yaml import load_yaml_file
-
 from evedata_platform_static._utils import (
     load_json_with_normalized_id_keys,
     load_yaml_with_normalized_id_keys,
 )
+from evedata_platform_utils.yaml import load_yaml_file
 
 if TYPE_CHECKING:
     from collections.abc import Generator
