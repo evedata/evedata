@@ -3,7 +3,7 @@ requires = ["uv_build>=0.8.3,<0.9.0"]
 build-backend = "uv_build"
 
 [project]
-name = "evedata-static"
+name = "evedata-platform-static"
 version = "0.1.0"
 description = ""
 readme = "README.md"
@@ -11,10 +11,10 @@ authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.13"
 dependencies = [
-  "evedata-admin-core",
-  "evedata-core",
-  "evedata-rest-core",
-  "evedata-utils",
+  "evedata-platform-admin-core",
+  "evedata-platform-core",
+  "evedata-platform-rest-core",
+  "evedata-platform-utils",
 
   "alive-progress>=3.3.0",
   "dlt[duckdb,filesystem,parquet,postgres,sqlalchemy]>=1.15.0",
@@ -51,13 +51,13 @@ dev = [
 ]
 
 [project.entry-points."evedata.admin.commands"]
-static = "evedata_static.admin:commands"
+static = "evedata_platform_static.admin:commands"
 
 [project.entry-points."evedata.admin.endpoints"]
-static = "evedata_static.admin:endpoints"
+static = "evedata_platform_static.admin:endpoints"
 
 [project.entry-points."evedata.rest.endpoints"]
-static = "evedata_static.rest:endpoints"
+static = "evedata_platform_static.rest:endpoints"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
@@ -81,7 +81,7 @@ addopts = [
   "--tb",
   "short",
   "--cov",
-  "evedata_static",
+  "evedata_platform_static",
   "--cov-branch",
   "--cov-report",
   "term-missing",
@@ -186,7 +186,7 @@ exclude = [
 ]
 
 [tool.uv.sources]
-evedata-admin-core = { workspace = true }
-evedata-core = { workspace = true }
-evedata-rest-core = { workspace = true }
-evedata-utils = { workspace = true }
+evedata-platform-admin-core = { workspace = true }
+evedata-platform-core = { workspace = true }
+evedata-platform-rest-core = { workspace = true }
+evedata-platform-utils = { workspace = true }

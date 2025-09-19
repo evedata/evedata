@@ -3,7 +3,7 @@ requires = ["uv_build>=0.8.3,<0.9.0"]
 build-backend = "uv_build"
 
 [project]
-name = "evedata-admin"
+name = "evedata-platform-admin"
 version = "0.1.0"
 description = "Administration API and CLI for EVEData"
 readme = "README.md"
@@ -11,9 +11,9 @@ authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 requires-python = ">=3.13"
 classifiers = ["Private :: Do Not Upload"]
 dependencies = [
-  "evedata-admin-core",
-  "evedata-core",
-  "evedata-utils",
+  "evedata-platform-admin-core",
+  "evedata-platform-core",
+  "evedata-platform-utils",
   "fastapi[all]>=0.115.5",
   "rich>=14.1.0",
   "structlog>=25.4.0",
@@ -36,7 +36,7 @@ dev = [
 ]
 
 [project.scripts]
-evedatactl = "evedata_admin._cli:main"
+evedatactl = "evedata_platform_admin._cli:main"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
@@ -60,7 +60,7 @@ addopts = [
   "--tb",
   "short",
   "--cov",
-  "evedata",
+  "evedata_platform_admin",
   "--cov-branch",
   "--cov-report",
   "term-missing",
@@ -156,6 +156,6 @@ classmethod-decorators = [
 "*.ipynb" = ["T20"]
 
 [tool.uv.sources]
-evedata-admin-core = { workspace = true }
-evedata-core = { workspace = true }
-evedata-utils = { workspace = true }
+evedata-platform-admin-core = { workspace = true }
+evedata-platform-core = { workspace = true }
+evedata-platform-utils = { workspace = true }

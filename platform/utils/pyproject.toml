@@ -3,7 +3,7 @@ requires = ["uv_build>=0.8.3,<0.9.0"]
 build-backend = "uv_build"
 
 [project]
-name = "evedata-utils"
+name = "evedata-platform-utils"
 version = "0.1.0"
 description = ""
 readme = "README.md"
@@ -44,7 +44,7 @@ addopts = [
   "--tb",
   "short",
   "--cov",
-  "evedata",
+  "evedata_platform_utils",
   "--cov-branch",
   "--cov-report",
   "term-missing",

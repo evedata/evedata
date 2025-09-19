@@ -6,7 +6,7 @@ import pytest
 if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
-from evedata_static._utils._normalize_id_keys import (
+from evedata_platform_static._utils._normalize_id_keys import (
     NormalizationError,
     _is_int,  # pyright: ignore[reportPrivateUsage]
     _is_int_like_key,  # pyright: ignore[reportPrivateUsage]
@@ -550,7 +550,7 @@ class TestNormalizationError:
 
 class TestRecursionAndMocking:
     def test_recursive_calls_tracked(self, mocker: "MockerFixture"):
-        import evedata_static._utils._normalize_id_keys as module  # noqa: PLC0415
+        import evedata_platform_static._utils._normalize_id_keys as module  # noqa: PLC0415
 
         spy = mocker.spy(module, "normalize_id_keys")
         data = {"key1": {"nested": "value"}, "key2": [{"item": 1}]}
@@ -573,7 +573,7 @@ class TestRecursionAndMocking:
 
     def test_int_keys_dict_values_error_handling(self, mocker: "MockerFixture"):
         # Tests cast failure when normalize returns non-dict for dict value
-        import evedata_static._utils._normalize_id_keys as module  # noqa: PLC0415
+        import evedata_platform_static._utils._normalize_id_keys as module  # noqa: PLC0415
 
         data = {1: {"nested": "value"}}
         original_normalize = module.normalize_id_keys
@@ -591,7 +591,7 @@ class TestRecursionAndMocking:
             module.normalize_id_keys(data)
 
     def test_string_keys_dict_values_error_handling(self, mocker: "MockerFixture"):
-        import evedata_static._utils._normalize_id_keys as module  # noqa: PLC0415
+        import evedata_platform_static._utils._normalize_id_keys as module  # noqa: PLC0415
 
         data = {"key1": {"nested": "value"}}
         original_normalize = module.normalize_id_keys

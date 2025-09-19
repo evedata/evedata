@@ -3,7 +3,7 @@ requires = ["uv_build>=0.8.3,<0.9.0"]
 build-backend = "uv_build"
 
 [project]
-name = "evedata-rest"
+name = "evedata-platform-rest"
 version = "0.0.0"
 description = ""
 readme = "README.md"
@@ -11,10 +11,10 @@ authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.13"
 dependencies = [
-  "evedata-admin-core",
-  "evedata-core",
-  "evedata-rest-core",
-  "evedata-utils",
+  "evedata-platform-admin-core",
+  "evedata-platform-core",
+  "evedata-platform-rest-core",
+  "evedata-platform-utils",
   "fastapi[all]>=0.115.5",
   "uvicorn>=0.22.0",
 ]
@@ -31,10 +31,10 @@ dev = [
 ]
 
 [project.entry-points."evedata.admin.commands"]
-rest-api = "evedata_rest.admin:commands"
+rest-api = "evedata_platform_rest.admin:commands"
 
 [project.entry-points."evedata.admin.endpoints"]
-rest-api = "evedata_rest.admin:endpoints"
+rest-api = "evedata_platform_rest.admin:endpoints"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
@@ -58,7 +58,7 @@ addopts = [
   "--tb",
   "short",
   "--cov",
-  "evedata_rest",
+  "evedata_platform_rest",
   "--cov-branch",
   "--cov-report",
   "term-missing",
@@ -154,7 +154,7 @@ classmethod-decorators = [
 "*.ipynb" = ["T20"]
 
 [tool.uv.sources]
-evedata-admin-core = { workspace = true }
-evedata-core = { workspace = true }
-evedata-rest-core = { workspace = true }
-evedata-utils = { workspace = true }
+evedata-platform-admin-core = { workspace = true }
+evedata-platform-core = { workspace = true }
+evedata-platform-rest-core = { workspace = true }
+evedata-platform-utils = { workspace = true }
