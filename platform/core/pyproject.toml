@@ -10,7 +10,9 @@ readme = "README.md"
 authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "boto3>=1.40.15,<1.40.19",
+]
 
 [dependency-groups]
 dev = [
@@ -21,6 +23,7 @@ dev = [
   "pytest-mock>=3.14.1",
   "pytest-xdist>=3.8.0",
   "ruff>=0.12.9",
+  "types-boto3[boto3,s3]>=1.40.15,<1.40.19",
 ]
 
 [tool.commitizen]
@@ -50,7 +53,7 @@ addopts = [
   "--cov-report",
   "term-missing",
 ]
-env = { "EVEDATA_ENV" = "test" }
+env = { "EVEDATA_PLATFORM_ENV" = "test" }
 filterwarnings = ["error"]
 testpaths = ["tests"]
 xfail_strict = true

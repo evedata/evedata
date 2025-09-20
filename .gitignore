@@ -278,3 +278,7 @@ dbt_internal_packages/
 dbt_packages/
 /cache
 .user.yml
+
+/etc
+/run
+/var

@@ -19,7 +19,6 @@ from ._resources import (
 )
 
 if TYPE_CHECKING:
-    import datetime
     from pathlib import Path
 
     from evedata_platform_extractors._types import ResourceConfig
@@ -73,7 +72,7 @@ _RESOURCE_NAMES: dict[str, str] = {
 
 
 @dlt.source
-def sde(path: "Path", version: "datetime.date") -> Any:
+def sde(path: "Path", version: str) -> Any:
     """A DLT source for the EVE Online Static Data Export (SDE)."""
     files: list[Path] = []
     files.extend(path.glob("fsd/*.yaml"))

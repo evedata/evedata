@@ -1,0 +1,1 @@
+"""Provides platform-aware utilities."""

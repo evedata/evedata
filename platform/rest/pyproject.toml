@@ -63,7 +63,7 @@ addopts = [
   "--cov-report",
   "term-missing",
 ]
-env = { "EVEDATA_ENV" = "test" }
+env = { "EVEDATA_PLATFORM_ENV" = "test" }
 filterwarnings = ["error"]
 testpaths = ["tests"]
 xfail_strict = true

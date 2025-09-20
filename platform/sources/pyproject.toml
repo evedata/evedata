@@ -3,7 +3,7 @@ requires = ["uv_build>=0.8.3,<0.9.0"]
 build-backend = "uv_build"
 
 [project]
-name = "evedata-platform-transformations"
+name = "evedata-platform-sources"
 version = "0.1.0"
 description = ""
 readme = "README.md"
@@ -13,39 +13,34 @@ requires-python = ">=3.13"
 dependencies = [
   "evedata-platform-admin-core",
   "evedata-platform-core",
+  "evedata-platform-rest-core",
   "evedata-platform-utils",
+  "fastapi[all]>=0.115.5",
   "rich>=14.1.0",
   "typer>=0.16.1",
-  "dbt-core>=1.10.11",
-  "dbt-duckdb>=1.9.4",
-  "dbt-postgres>=1.9.1",
-  "dbt-sqlite>=1.10.0",
-  "dbt-timescaledb>=1.8.0b2",
 ]
 
 [dependency-groups]
 dev = [
   "pyright>=1.1.404",
+  "pytest>=8.4.1",
   "pytest-cov>=6.2.1",
   "pytest-env>=1.1.5",
   "pytest-mock>=3.14.1",
   "pytest-xdist>=3.8.0",
-  "pytest>=8.4.1",
-  "python-lsp-ruff>=2.2.2",
-  "python-lsp-server>=1.13.0",
   "respx>=0.22.0",
   "ruff>=0.12.9",
-  "shandy-sqlfmt[jinjafmt]>=0.27.0",
-  "sqlfluff-templater-dbt>=3.4.2",
   "sqlfluff>=3.4.2",
-  "yamllint>=1.37.1",
 ]
 
 [project.entry-points."evedata.admin.commands"]
-transformations = "evedata_platform_transformations.admin:commands"
+sources = "evedata_platform_sources.admin:commands"
 
 [project.entry-points."evedata.admin.endpoints"]
-transformations = "evedata_platform_transformations.admin:endpoints"
+sources = "evedata_platform_sources.admin:endpoints"
+
+[project.entry-points."evedata.rest.endpoints"]
+sources = "evedata_platform_sources.rest:endpoints"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
@@ -60,7 +55,7 @@ changelog_merge_prerelease = true
 
 [tool.pyright]
 strict = ["src", "tests"]
-venvPath = "../.."
+venvPath = "."
 venv = ".venv"
 exclude = ["**/.*", "**/__pycache__", "**/node_modules"]
 
@@ -69,7 +64,7 @@ addopts = [
   "--tb",
   "short",
   "--cov",
-  "evedata_platform_transformations",
+  "evedata_platform_sources",
   "--cov-branch",
   "--cov-report",
   "term-missing",
@@ -173,16 +168,8 @@ classmethod-decorators = [
 "**/tests/**" = ["D", "PLR2004", "S101"]
 "*.ipynb" = ["T20"]
 
-[tool.sqlfmt]
-exclude = [
-  "dbt_internal_packages/**/*",
-  "dbt_packages/**/*",
-  "snapshots/**/*",
-  "target/**/*",
-  "tmp/**/*",
-]
-
 [tool.uv.sources]
 evedata-platform-admin-core = { workspace = true }
 evedata-platform-core = { workspace = true }
+evedata-platform-rest-core = { workspace = true }
 evedata-platform-utils = { workspace = true }

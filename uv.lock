@@ -22,6 +22,7 @@ members = [
     "evedata-platform-extractors",
     "evedata-platform-rest",
     "evedata-platform-rest-core",
+    "evedata-platform-sources",
     "evedata-platform-static",
     "evedata-platform-transformations",
     "evedata-platform-utils",
@@ -366,6 +367,20 @@ wheels = [
 ]
 
 [[package]]
+name = "boto3"
+version = "1.40.18"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "botocore" },
+    { name = "jmespath" },
+    { name = "s3transfer" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/36/35/a30dc21ca6582358e0ce963f38e85d42ea619f12e7be4101a834c21d749d/boto3-1.40.18.tar.gz", hash = "sha256:64301d39adecc154e3e595eaf0d4f28998ef0a5551f1d033aeac51a9e1a688e5", size = 111994, upload-time = "2025-08-26T19:21:38.61Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ad/b5/3fc1802eb24aef135c3ba69fff2a9bfcc6a7a8258fb396706b1a6a44de36/boto3-1.40.18-py3-none-any.whl", hash = "sha256:daa776ba1251a7458c9d6c7627873d0c2460c8e8272d35759065580e9193700a", size = 140076, upload-time = "2025-08-26T19:21:36.484Z" },
+]
+
+[[package]]
 name = "botocore"
 version = "1.40.18"
 source = { registry = "https://pypi.org/simple" }
@@ -377,6 +392,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/6a/91/2e745382793fa7d30810a7d5ca3e05f6817b6db07601ca5aaab12720caf9/botocore-1.40.18.tar.gz", hash = "sha256:afd69bdadd8c55cc89d69de0799829e555193a352d87867f746e19020271cc0f", size = 14375007, upload-time = "2025-08-26T19:21:24.996Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1a/f5/bd57bf21fdcc4e500cc406ed2c296e626ddd160f0fee2a4932256e5d62d8/botocore-1.40.18-py3-none-any.whl", hash = "sha256:57025c46ca00cf8cec25de07a759521bfbfb3036a0f69b272654a354615dc45f", size = 14039935, upload-time = "2025-08-26T19:21:19.085Z" },
+]
+
+[[package]]
+name = "botocore-stubs"
+version = "1.40.33"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "types-awscrt" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ae/94/16f8e1f41feaa38f1350aa5a4c60c5724b6c8524ca0e6c28523bf5070e74/botocore_stubs-1.40.33.tar.gz", hash = "sha256:89c51ae0b28d9d79fde8c497cf908ddf872ce027d2737d4d4ba473fde9cdaa82", size = 42742, upload-time = "2025-09-17T20:25:56.388Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/af/7b/6d8fe12a955b16094460e89ea7c4e063f131f4b3bd461b96bcd625d0c79e/botocore_stubs-1.40.33-py3-none-any.whl", hash = "sha256:ad21fee32cbdc7ad4730f29baf88424c7086bf88a745f8e43660ca3e9a7e5f89", size = 66843, upload-time = "2025-09-17T20:25:54.052Z" },
 ]
 
 [[package]]
@@ -999,6 +1026,18 @@ wheels = [
 ]
 
 [[package]]
+name = "deprecated"
+version = "1.2.18"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "wrapt" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/98/97/06afe62762c9a8a86af0cfb7bfdab22a43ad17138b07af5b1a58442690a2/deprecated-1.2.18.tar.gz", hash = "sha256:422b6f6d859da6f2ef57857761bfb392480502a64c3028ca9bbe86085d72115d", size = 2928744, upload-time = "2025-01-27T10:46:25.7Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6e/c6/ac0b6c1e2d138f1002bcf799d330bd6d85084fece321e662a14223794041/Deprecated-1.2.18-py2.py3-none-any.whl", hash = "sha256:bd5011788200372a32418f888e326a09ff80d0214bd961147cfed01b5c018eec", size = 9998, upload-time = "2025-01-27T10:46:09.186Z" },
+]
+
+[[package]]
 name = "diff-cover"
 version = "9.6.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1163,7 +1202,7 @@ requires-dist = [
 [[package]]
 name = "evedata-infra"
 version = "0.1.0"
-source = { virtual = "infra" }
+source = { editable = "infra" }
 dependencies = [
     { name = "ansible" },
     { name = "evedata-platform-utils" },
@@ -1209,6 +1248,7 @@ dependencies = [
     { name = "evedata-platform-extractors" },
     { name = "evedata-platform-rest" },
     { name = "evedata-platform-rest-core" },
+    { name = "evedata-platform-sources" },
     { name = "evedata-platform-static" },
     { name = "evedata-platform-transformations" },
     { name = "evedata-platform-utils" },
@@ -1232,7 +1272,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "evedata-docs", virtual = "docs" },
-    { name = "evedata-infra", virtual = "infra" },
+    { name = "evedata-infra", editable = "infra" },
     { name = "evedata-platform-admin", editable = "platform/admin" },
     { name = "evedata-platform-admin-core", editable = "platform/admin-core" },
     { name = "evedata-platform-core", editable = "platform/core" },
@@ -1240,6 +1280,7 @@ requires-dist = [
     { name = "evedata-platform-extractors", editable = "platform/extractors" },
     { name = "evedata-platform-rest", editable = "platform/rest" },
     { name = "evedata-platform-rest-core", editable = "platform/rest-core" },
+    { name = "evedata-platform-sources", editable = "platform/sources" },
     { name = "evedata-platform-static", editable = "platform/static" },
     { name = "evedata-platform-transformations", editable = "platform/transformations" },
     { name = "evedata-platform-utils", editable = "platform/utils" },
@@ -1370,6 +1411,9 @@ dev = [
 name = "evedata-platform-core"
 version = "0.1.0"
 source = { editable = "platform/core" }
+dependencies = [
+    { name = "boto3" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -1380,9 +1424,11 @@ dev = [
     { name = "pytest-mock" },
     { name = "pytest-xdist" },
     { name = "ruff" },
+    { name = "types-boto3", extra = ["boto3", "s3"] },
 ]
 
 [package.metadata]
+requires-dist = [{ name = "boto3", specifier = ">=1.40.15,<1.40.19" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1393,6 +1439,7 @@ dev = [
     { name = "pytest-mock", specifier = ">=3.14.1" },
     { name = "pytest-xdist", specifier = ">=3.8.0" },
     { name = "ruff", specifier = ">=0.12.9" },
+    { name = "types-boto3", extras = ["boto3", "s3"], specifier = ">=1.40.15,<1.40.19" },
 ]
 
 [[package]]
@@ -1457,6 +1504,7 @@ dependencies = [
     { name = "evedata-platform-admin-core" },
     { name = "evedata-platform-core" },
     { name = "evedata-platform-rest-core" },
+    { name = "evedata-platform-sources" },
     { name = "evedata-platform-utils" },
     { name = "fastapi", extra = ["all"] },
     { name = "hishel" },
@@ -1497,6 +1545,7 @@ requires-dist = [
     { name = "evedata-platform-admin-core", editable = "platform/admin-core" },
     { name = "evedata-platform-core", editable = "platform/core" },
     { name = "evedata-platform-rest-core", editable = "platform/rest-core" },
+    { name = "evedata-platform-sources", editable = "platform/sources" },
     { name = "evedata-platform-utils", editable = "platform/utils" },
     { name = "fastapi", extras = ["all"], specifier = ">=0.115.5" },
     { name = "hishel", specifier = ">=0.1.3" },
@@ -1613,6 +1662,57 @@ dev = [
     { name = "pytest-mock", specifier = ">=3.14.1" },
     { name = "pytest-xdist", specifier = ">=3.8.0" },
     { name = "ruff", specifier = ">=0.12.9" },
+]
+
+[[package]]
+name = "evedata-platform-sources"
+version = "0.1.0"
+source = { editable = "platform/sources" }
+dependencies = [
+    { name = "evedata-platform-admin-core" },
+    { name = "evedata-platform-core" },
+    { name = "evedata-platform-rest-core" },
+    { name = "evedata-platform-utils" },
+    { name = "fastapi", extra = ["all"] },
+    { name = "rich" },
+    { name = "typer" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pyright" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "pytest-env" },
+    { name = "pytest-mock" },
+    { name = "pytest-xdist" },
+    { name = "respx" },
+    { name = "ruff" },
+    { name = "sqlfluff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "evedata-platform-admin-core", editable = "platform/admin-core" },
+    { name = "evedata-platform-core", editable = "platform/core" },
+    { name = "evedata-platform-rest-core", editable = "platform/rest-core" },
+    { name = "evedata-platform-utils", editable = "platform/utils" },
+    { name = "fastapi", extras = ["all"], specifier = ">=0.115.5" },
+    { name = "rich", specifier = ">=14.1.0" },
+    { name = "typer", specifier = ">=0.16.1" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pyright", specifier = ">=1.1.404" },
+    { name = "pytest", specifier = ">=8.4.1" },
+    { name = "pytest-cov", specifier = ">=6.2.1" },
+    { name = "pytest-env", specifier = ">=1.1.5" },
+    { name = "pytest-mock", specifier = ">=3.14.1" },
+    { name = "pytest-xdist", specifier = ">=3.8.0" },
+    { name = "respx", specifier = ">=0.22.0" },
+    { name = "ruff", specifier = ">=0.12.9" },
+    { name = "sqlfluff", specifier = ">=3.4.2" },
 ]
 
 [[package]]
@@ -1770,10 +1870,14 @@ name = "evedata-platform-utils"
 version = "0.1.0"
 source = { editable = "platform/utils" }
 dependencies = [
+    { name = "hishel" },
+    { name = "limits" },
     { name = "orjson" },
+    { name = "pendulum" },
     { name = "pyyaml" },
     { name = "rich" },
     { name = "structlog" },
+    { name = "tenacity" },
 ]
 
 [package.dev-dependencies]
@@ -1789,10 +1893,14 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "hishel", specifier = ">=0.1.3" },
+    { name = "limits", specifier = ">=5.5.0" },
     { name = "orjson", specifier = ">=3.11.2" },
+    { name = "pendulum", specifier = ">=3.1.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "rich", specifier = ">=14.1.0" },
     { name = "structlog", specifier = ">=25.4.0" },
+    { name = "tenacity", specifier = ">=9.1.2" },
 ]
 
 [package.metadata.requires-dev]
@@ -2293,6 +2401,20 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/ed/6e/48a05e2f7f62a616d675cfee182643f2dd8023bf7429aa326f4bebd629c8/leather-0.4.0.tar.gz", hash = "sha256:f964bec2086f3153a6c16e707f20cb718f811f57af116075f4c0f4805c608b95", size = 43877, upload-time = "2024-02-23T22:03:36.657Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a1/30/9ec597c962c5249ebd5c580386e4b5f2884cd943af42634291ee3b406415/leather-0.4.0-py2.py3-none-any.whl", hash = "sha256:18290bc93749ae39039af5e31e871fcfad74d26c4c3ea28ea4f681f4571b3a2b", size = 30256, upload-time = "2024-02-23T22:03:34.75Z" },
+]
+
+[[package]]
+name = "limits"
+version = "5.5.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "deprecated" },
+    { name = "packaging" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/76/17/7a2e9378c8b8bd4efe3573fd18d2793ad2a37051af5ccce94550a4e5d62d/limits-5.5.0.tar.gz", hash = "sha256:ee269fedb078a904608b264424d9ef4ab10555acc8d090b6fc1db70e913327ea", size = 95514, upload-time = "2025-08-05T18:23:54.771Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/bf/68/ee314018c28da75ece5a639898b4745bd0687c0487fc465811f0c4b9cd44/limits-5.5.0-py3-none-any.whl", hash = "sha256:57217d01ffa5114f7e233d1f5e5bdc6fe60c9b24ade387bf4d5e83c5cf929bae", size = 60948, upload-time = "2025-08-05T18:23:53.335Z" },
 ]
 
 [[package]]
@@ -3718,6 +3840,18 @@ wheels = [
 ]
 
 [[package]]
+name = "s3transfer"
+version = "0.13.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "botocore" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6d/05/d52bf1e65044b4e5e27d4e63e8d1579dbdec54fce685908ae09bc3720030/s3transfer-0.13.1.tar.gz", hash = "sha256:c3fdba22ba1bd367922f27ec8032d6a1cf5f10c934fb5d68cf60fd5a23d936cf", size = 150589, upload-time = "2025-07-18T19:22:42.31Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6d/4f/d073e09df851cfa251ef7840007d04db3293a0482ce607d2b993926089be/s3transfer-0.13.1-py3-none-any.whl", hash = "sha256:a981aa7429be23fe6dfc13e80e4020057cbab622b08c0315288758d67cabc724", size = 85308, upload-time = "2025-07-18T19:22:40.947Z" },
+]
+
+[[package]]
 name = "selectolax"
 version = "0.3.29"
 source = { registry = "https://pypi.org/simple" }
@@ -4054,6 +4188,54 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/92/e8/2a73ccf9874ec4c7638f172efc8972ceab13a0e3480b389d6ed822f7a822/typer-0.17.4.tar.gz", hash = "sha256:b77dc07d849312fd2bb5e7f20a7af8985c7ec360c45b051ed5412f64d8dc1580", size = 103734, upload-time = "2025-09-05T18:14:40.746Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/93/72/6b3e70d32e89a5cbb6a4513726c1ae8762165b027af569289e19ec08edd8/typer-0.17.4-py3-none-any.whl", hash = "sha256:015534a6edaa450e7007eba705d5c18c3349dcea50a6ad79a5ed530967575824", size = 46643, upload-time = "2025-09-05T18:14:39.166Z" },
+]
+
+[[package]]
+name = "types-awscrt"
+version = "0.27.6"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/56/ce/5d84526a39f44c420ce61b16654193f8437d74b54f21597ea2ac65d89954/types_awscrt-0.27.6.tar.gz", hash = "sha256:9d3f1865a93b8b2c32f137514ac88cb048b5bc438739945ba19d972698995bfb", size = 16937, upload-time = "2025-08-13T01:54:54.659Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ac/af/e3d20e3e81d235b3964846adf46a334645a8a9b25a0d3d472743eb079552/types_awscrt-0.27.6-py3-none-any.whl", hash = "sha256:18aced46da00a57f02eb97637a32e5894dc5aa3dc6a905ba3e5ed85b9f3c526b", size = 39626, upload-time = "2025-08-13T01:54:53.454Z" },
+]
+
+[[package]]
+name = "types-boto3"
+version = "1.40.18"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "botocore-stubs" },
+    { name = "types-s3transfer" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b1/27/994a9505bb8b3ab69563321548012f3c9e34456a816973e26d1fcbbdd885/types_boto3-1.40.18.tar.gz", hash = "sha256:d986991c12723cb23d63612c180204dfa4d0de1d0ec1cdea9779c2932e48c4eb", size = 101822, upload-time = "2025-08-26T19:31:42.116Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c8/91/3c6643ab0159df2d4d20d4b8ad509d4743f66952581bb6794edf1c840d7c/types_boto3-1.40.18-py3-none-any.whl", hash = "sha256:9b11c2a68e45ad99c17ad02eef279bc72adb54f1378e57a5a6190db93a8aecc6", size = 69907, upload-time = "2025-08-26T19:31:32.953Z" },
+]
+
+[package.optional-dependencies]
+boto3 = [
+    { name = "boto3" },
+]
+s3 = [
+    { name = "types-boto3-s3" },
+]
+
+[[package]]
+name = "types-boto3-s3"
+version = "1.40.26"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0e/e9/477767710737b73b88e292f6cad90fd2eee7012b7e358ebf63e31183f94e/types_boto3_s3-1.40.26.tar.gz", hash = "sha256:eb2f21608ffb202e185b8befe57deb2557a7459ab48d9c1210cbf61a4b91126e", size = 75592, upload-time = "2025-09-08T20:11:43.407Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/11/0f/c0871c0d81893432e4131421e9466bda4c898c9291453136c0255164c662/types_boto3_s3-1.40.26-py3-none-any.whl", hash = "sha256:a4a907f5faaed21856e8343155e983a5affa6889d3f2b827d7fb078e7391b0c0", size = 82573, upload-time = "2025-09-08T20:11:42.076Z" },
+]
+
+[[package]]
+name = "types-s3transfer"
+version = "0.13.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a5/c5/23946fac96c9dd5815ec97afd1c8ad6d22efa76c04a79a4823f2f67692a5/types_s3transfer-0.13.1.tar.gz", hash = "sha256:ce488d79fdd7d3b9d39071939121eca814ec65de3aa36bdce1f9189c0a61cc80", size = 14181, upload-time = "2025-08-31T16:57:06.93Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8e/dc/b3f9b5c93eed6ffe768f4972661250584d5e4f248b548029026964373bcd/types_s3transfer-0.13.1-py3-none-any.whl", hash = "sha256:4ff730e464a3fd3785b5541f0f555c1bd02ad408cf82b6b7a95429f6b0d26b4a", size = 19617, upload-time = "2025-08-31T16:57:05.73Z" },
 ]
 
 [[package]]

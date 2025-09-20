@@ -11,15 +11,16 @@ authors = [{ name = "Corvin Vale", email = "corvin@valeant.space" }]
 classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.13"
 dependencies = [
+  "evedata-docs",
+  "evedata-infra",
   "evedata-platform-admin",
   "evedata-platform-admin-core",
   "evedata-platform-core",
   "evedata-platform-datasets",
-  "evedata-docs",
   "evedata-platform-extractors",
-  "evedata-infra",
   "evedata-platform-rest",
   "evedata-platform-rest-core",
+  "evedata-platform-sources",
   "evedata-platform-static",
   "evedata-platform-transformations",
   "evedata-platform-utils",
@@ -72,6 +73,8 @@ strict = [
   "platform/rest/tests",
   "platform/rest-core/src",
   "platform/rest-core/tests",
+  "platform/sources/src",
+  "platform/sources/tests",
   "platform/static/src",
   "platform/static/tests",
   "platform/transformations/src",
@@ -88,7 +91,7 @@ exclude = ["**/.*", "**/__pycache__", "**/node_modules", "**/experiments"]
 addopts = ["--tb", "short", "-n", "auto"]
 asyncio_mode = "auto"
 consider_namespace_packages = true
-env = { "EVEDATA_ENV" = "test" }
+env = { "EVEDATA_PLATFORM_ENV" = "test" }
 filterwarnings = ["error"]
 testpaths = ["tests"]
 xfail_strict = true
@@ -209,18 +212,19 @@ package = false
 required-version = ">=0.8.0,<0.9"
 
 [tool.uv.sources]
+evedata-docs = { workspace = true }
+evedata-infra = { workspace = true }
 evedata-platform-admin = { workspace = true }
 evedata-platform-admin-core = { workspace = true }
 evedata-platform-core = { workspace = true }
 evedata-platform-datasets = { workspace = true }
-evedata-docs = { workspace = true }
 evedata-platform-extractors = { workspace = true }
-evedata-infra = { workspace = true }
 evedata-platform-rest = { workspace = true }
 evedata-platform-rest-core = { workspace = true }
+evedata-platform-sources = { workspace = true }
 evedata-platform-static = { workspace = true }
-evedata-platform-utils = { workspace = true }
 evedata-platform-transformations = { workspace = true }
+evedata-platform-utils = { workspace = true }
 
 [tool.uv.workspace]
 members = [
@@ -233,7 +237,8 @@ members = [
   "platform/extractors",
   "platform/rest",
   "platform/rest-core",
+  "platform/sources",
   "platform/static",
-  "platform/utils",
   "platform/transformations",
+  "platform/utils",
 ]

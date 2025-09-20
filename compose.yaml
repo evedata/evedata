@@ -17,89 +17,20 @@ services:
       timeout: 5s
       retries: 5
 
-  postgres-static:
-    image: postgres:16-alpine
-    container_name: evedata-postgres-static
+  ducklake:
+    image: postgres:17
+    container_name: evedata-ducklake
     environment:
-      POSTGRES_DB: evedata_static
+      POSTGRES_DB: ducklake
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
       - "5433:5432"
     volumes:
-      - postgres-static-data:/var/lib/postgresql/data
+      - ducklake-data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  mysql-static:
-    image: mysql:8.4
-    container_name: evedata-mysql-static
-    environment:
-      MYSQL_DATABASE: evedata_static
-      MYSQL_ROOT_PASSWORD: mysql
-      MYSQL_USER: mysql
-      MYSQL_PASSWORD: mysql
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql-static-data:/var/lib/mysql
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  mariadb-static:
-    image: mariadb:11.4
-    container_name: evedata-mariadb-static
-    environment:
-      MARIADB_DATABASE: evedata_static
-      MARIADB_ROOT_PASSWORD: mariadb
-      MARIADB_USER: mariadb
-      MARIADB_PASSWORD: mariadb
-    ports:
-      - "3307:3306"
-    volumes:
-      - mariadb-static-data:/var/lib/mysql
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  sqlserver-static:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: evedata-sqlserver-static
-    environment:
-      ACCEPT_EULA: Y
-      SA_PASSWORD: SqlServer2022!
-      MSSQL_PID: Developer
-    ports:
-      - "1433:1433"
-    volumes:
-      - sqlserver-static-data:/var/opt/mssql
-    restart: unless-stopped
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "/opt/mssql-tools18/bin/sqlcmd",
-          "-S",
-          "localhost",
-          "-U",
-          "sa",
-          "-P",
-          "SqlServer2022!",
-          "-Q",
-          "SELECT 1",
-          "-C",
-        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -116,7 +47,7 @@ services:
       - MINIO_BROWSER_REDIRECT_URL=https://localhost:9002
       - MINIO_PROMETHEUS_AUTH_TYPE=public
     volumes:
-      - ./data/minio:/data
+      - ./var/lib/minio:/data
     command: server /data --console-address ":9002"
     restart: unless-stopped
     healthcheck:
@@ -126,12 +57,9 @@ services:
       retries: 3
 
 volumes:
+  ducklake-data:
   postgres-data:
-  postgres-static-data:
-  mysql-static-data:
-  mariadb-static-data:
   minio-data:
-  sqlserver-static-data:
 
 networks:
   default:

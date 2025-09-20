@@ -21,7 +21,7 @@ def public_market_orders_cmd(*, ctx: typer.Context) -> None:
 
     state: AdminState = ctx.obj
     config = state.config
-    source = esi_public_market_orders(config.cache_path / "http")
+    source = esi_public_market_orders(config.http_cache_dir)
 
     public_market_orders_pipeline(config=config).run(
         source, loader_file_format="parquet"

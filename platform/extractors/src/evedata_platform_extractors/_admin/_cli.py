@@ -27,7 +27,7 @@ def callback(ctx: typer.Context) -> None:
 
     state: AdminState = ctx.obj
     config = state.config
-    data_path = config.data_path
+    data_path = config.data_dir
 
     dlt_dir = data_path / "dlt"
     dlt_dir.mkdir(parents=True, exist_ok=True)

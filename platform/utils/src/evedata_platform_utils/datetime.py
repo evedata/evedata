@@ -1,7 +1,22 @@
 """Datetime utility functions."""
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from email.utils import parsedate_to_datetime
+
+
+def http_date_to_date(date_str: str | None) -> date | None:
+    """Convert HTTP date header to date object in UTC.
+
+    Args:
+        date_str: HTTP date string (e.g., "Mon, 23 Jun 2025 12:34:56 GMT")
+
+    Returns:
+        date object in UTC or None if date_str is None or invalid
+    """
+    dt = http_date_to_datetime(date_str)
+    if dt:
+        return dt.date()
+    return None
 
 
 def http_date_to_datetime(date_str: str | None) -> datetime | None:
