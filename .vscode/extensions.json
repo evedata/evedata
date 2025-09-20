@@ -9,8 +9,7 @@
     "matthewpi.caddyfile-support",
     "streetsidesoftware.code-spell-checker",
     "dbtlabsinc.dbt",
-    "editorconfig.editorconfig",
-    "ms-pyright.pyright"
+    "editorconfig.editorconfig"
   ],
   "unwantedRecommendations": []
 }
