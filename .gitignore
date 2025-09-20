@@ -282,3 +282,4 @@ dbt_packages/
 /etc
 /run
 /var
+.vscode/mcp.json
