@@ -38,6 +38,13 @@ lint-markdown: ## Lint Markdown files
 lint-python: ## Lint Python files
 	uv run ruff check .
 
+.PHONY: sync
+sync: sync-python ## Sync all dependencies
+
+.PHONY: sync-python
+sync-python: ## Sync Python dependencies
+	uv sync --all-packages --all-groups --all-extras
+
 .PHONY: types
 types: types-python ## Check types for all files
 
