@@ -39,7 +39,7 @@ repos:
   - hooks:
       - additional_dependencies:
           - tomli
-        exclude: .*uv.lock|.*pnpm-lock.yaml|.*.d.ts
+        exclude: .*uv.lock|.*pnpm-lock.yaml|.*.d.ts|.*Gemfile.lock
         id: codespell
     repo: https://github.com/codespell-project/codespell
     rev: v2.4.1

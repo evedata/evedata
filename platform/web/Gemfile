@@ -1,0 +1,51 @@
+source "https://rubygems.org"
+
+gem "rails", "~> 8.0.2", ">= 8.0.2.1"
+
+gem "alba", "~> 3.9"
+gem "bcrypt", "~> 3.1.7"
+gem "jbuilder"
+gem "js_from_routes", "~> 4.0"
+gem "omniauth", "~> 2.1"
+gem "omniauth-oauth2", "~> 1.8"
+gem "omniauth-rails_csrf_protection", "~> 1.0"
+gem "pg", "~> 1.1"
+gem "propshaft", "~> 1.2"
+gem "puma", ">= 5.0"
+gem "solid_cable"
+gem "solid_cache"
+gem "solid_queue"
+gem "turbo-rails"
+gem "typelizer", "~> 0.5.1"
+gem "view_component", "~> 4.0"
+gem "view_component-contrib", "~> 0.2.5"
+gem "vite_rails", "~> 3.0"
+
+gem "bootsnap", require: false
+gem "kamal", require: false
+gem "thruster", require: false
+
+group :development, :test do
+  gem "brakeman", require: false
+  gem "debug", require: "debug/prelude"
+end
+
+group :development do
+  gem "foreman", "~> 0.90.0"
+  gem "lookbook", "~> 2.3"
+  gem "rubocop-rspec", "~> 3.7"
+  gem "standard", "~> 1.51"
+  gem "standard-rails", "~> 1.4"
+  gem "web-console"
+end
+
+group :test do
+  gem "capybara"
+  gem "rspec-rails", "~> 8.0"
+  gem "factory_bot_rails", "~> 6.5"
+  gem "faker", "~> 3.5"
+  gem "fuubar", "~> 2.5"
+  gem "test-prof", "~> 1.4"
+  gem "cuprite", "~> 0.17"
+  gem "site_prism", "~> 5.1"
+end

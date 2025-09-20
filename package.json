@@ -1,7 +1,9 @@
 {
   "private": true,
   "workspaces": [
-    "packages/*"
+    "infra",
+    "docs",
+    "platform/*"
   ],
   "scripts": {
     "fix": "markdownlint-cli2 \"**/*.md\" --fix",
@@ -20,13 +22,9 @@
   "devDependencies": {
     "wrangler": "^4.28.1"
   },
-  "packageManager": "pnpm@10.15.0",
+  "packageManager": "pnpm@10.17.0",
   "engines": {
     "node": ">=22.14.0",
-    "pnpm": "^10.13.1"
-  },
-  "volta": {
-    "node": ">=22.14.0",
-    "pnpm": "^10.13.1"
+    "pnpm": "^10.17.0"
   }
 }
