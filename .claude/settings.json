@@ -51,12 +51,53 @@
       "Bash(yq:*)",
 
       "WebFetch(domain:127.0.0.1)",
+      "WebFetch(domain:localhost)",
+
+      "WebFetch(domain:eveonline.com)",
+      "WebFetch(domain:developers.eveonline.com)",
+      "WebFetch(domain:forums.eveonline.com)",
+      "WebFetch(domain:esi.evetech.net)",
+      "WebFetch(domain:wiki.eveuniversity.org)",
+
       "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:docs.getdbt.com)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:localhost)",
 
-      "WebSearch(**)"
+      "WebFetch(domain:docs.python.org)",
+      "WebFetch(domain:docs.pydantic.dev)",
+      "WebFetch(domain:fastapi.tiangolo.com)",
+      "WebFetch(domain:docs.sqlalchemy.org)",
+      "WebFetch(domain:boto3.amazonaws.com)",
+      "WebFetch(domain:dlthub.com)",
+      "WebFetch(domain:ibis-project.org)",
+      "WebFetch(domain:duckdb.org)",
+      "WebFetch(domain:www.postgresql.org)",
+      "WebFetch(domain:typer.tiangolo.com)",
+      "WebFetch(domain:docs.pytest.org)",
+      "WebFetch(domain:www.python-httpx.org)",
+      "WebFetch(domain:microsoft.github.io)",
+      "WebFetch(domain:docs.astral.sh)",
+
+      "WebFetch(domain:guides.rubyonrails.org)",
+      "WebFetch(domain:api.rubyonrails.org)",
+      "WebFetch(domain:turbo.hotwired.dev)",
+      "WebFetch(domain:stimulus.hotwired.dev)",
+      "WebFetch(domain:viewcomponent.org)",
+      "WebFetch(domain:rspec.info)",
+      "WebFetch(domain:rubydoc.info)",
+
+      "WebFetch(domain:vite.dev)",
+      "WebFetch(domain:vite-ruby.netlify.app)",
+      "WebFetch(domain:tailwindcss.com)",
+      "WebFetch(domain:www.typescriptlang.org)",
+      "WebFetch(domain:eslint.org)",
+      "WebFetch(domain:prettier.io)",
+      "WebFetch(domain:nodejs.org)",
+      "WebFetch(domain:pnpm.io)",
+
+      "WebFetch(domain:developers.cloudflare.com)",
+      "WebFetch(domain:squidfunk.github.io)",
+      "WebFetch(domain:www.mkdocs.org)"
     ],
     "deny": [],
     "ask": []
