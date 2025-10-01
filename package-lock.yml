@@ -1,5 +1,5 @@
 packages:
-  - local: platform/transformations
+  - local: platform/transform
     name: evedata
   - name: dbt_artifacts
     package: brooklyn-data/dbt_artifacts

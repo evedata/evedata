@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     # --mount=type=bind,source=platform/rest/pyproject.toml,target=platform/rest/pyproject.toml \
     # --mount=type=bind,source=platform/rest-core/pyproject.toml,target=platform/rest-core/pyproject.toml \
     # --mount=type=bind,source=platform/static/pyproject.toml,target=platform/static/pyproject.toml \
-    # --mount=type=bind,source=platform/transformations/pyproject.toml,target=platform/transformations/pyproject.toml \
+    # --mount=type=bind,source=platform/transform/pyproject.toml,target=platform/transform/pyproject.toml \
     # --mount=type=bind,source=platform/utils/pyproject.toml,target=platform/utils/pyproject.toml \
     uv sync --frozen --no-install-workspace --no-dev
 COPY . /evedata

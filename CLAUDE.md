@@ -12,10 +12,10 @@
   - @platform/admin-core/ (evedata-platform-admin-core): Shared library for platform components that implement administration CLI commands, REST API endpoints, and maintenance tasks
   - @platform/core/ (evedata-platform-core): Shared library for all platform components with configuration, logging, metrics, and other utilities
   - @platform/datasets (evedata-platform-datasets): User-facing REST API for serving EVEData datasets
-  - @platform/extractors (evedata-platform-extractors): DLT pipelines for raw data extraction (e.g. market orders, static data)
+  - @platform/extract (evedata-platform-extract): DLT pipelines for raw data extraction (e.g. market orders, static data)
   - @platform/rest (evedata-platform-rest): User-facing REST API
   - @platform/rest-core (evedata-platform-rest-core): Shared library for platform components that implement user-facing REST API endpoints
-  - @platform/transformations (evedata-platform-transformations): DBT project for data transformations
+  - @platform/transform (evedata-platform-transform): DBT project for data transform
   - @platform/utils (evedata-platform-utils): Shared library with utilities
   - @platform/web: User-facing web application (Ruby on Rails)
 

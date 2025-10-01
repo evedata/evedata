@@ -45,4 +45,4 @@ Makefile
 
 !/docs/pyproject.toml
 !/infra/pyproject.toml
-!/platform/transformations/tests/
+!/platform/transform/tests/

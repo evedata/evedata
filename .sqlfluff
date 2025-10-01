@@ -8,7 +8,7 @@ exclude_rules = layout.indent, layout.cte_bracket, layout.keyword_newline, layou
 
 [sqlfluff:templater:dbt]
 profiles_dir = .
-project_dir = platform/transformations
+project_dir = platform/transform
 
 [sqlfluff:indentation]
 tab_space_size = 4

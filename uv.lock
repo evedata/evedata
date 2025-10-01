@@ -19,12 +19,12 @@ members = [
     "evedata-platform-admin-core",
     "evedata-platform-core",
     "evedata-platform-datasets",
-    "evedata-platform-extractors",
+    "evedata-platform-extract",
     "evedata-platform-rest",
     "evedata-platform-rest-core",
     "evedata-platform-sources",
     "evedata-platform-static",
-    "evedata-platform-transformations",
+    "evedata-platform-transform",
     "evedata-platform-utils",
 ]
 
@@ -1306,12 +1306,12 @@ dependencies = [
     { name = "evedata-platform-admin-core" },
     { name = "evedata-platform-core" },
     { name = "evedata-platform-datasets" },
-    { name = "evedata-platform-extractors" },
+    { name = "evedata-platform-extract" },
     { name = "evedata-platform-rest" },
     { name = "evedata-platform-rest-core" },
     { name = "evedata-platform-sources" },
     { name = "evedata-platform-static" },
-    { name = "evedata-platform-transformations" },
+    { name = "evedata-platform-transform" },
     { name = "evedata-platform-utils" },
 ]
 
@@ -1338,12 +1338,12 @@ requires-dist = [
     { name = "evedata-platform-admin-core", editable = "platform/admin-core" },
     { name = "evedata-platform-core", editable = "platform/core" },
     { name = "evedata-platform-datasets", editable = "platform/datasets" },
-    { name = "evedata-platform-extractors", editable = "platform/extractors" },
+    { name = "evedata-platform-extract", editable = "platform/extract" },
     { name = "evedata-platform-rest", editable = "platform/rest" },
     { name = "evedata-platform-rest-core", editable = "platform/rest-core" },
     { name = "evedata-platform-sources", editable = "platform/sources" },
     { name = "evedata-platform-static", editable = "platform/static" },
-    { name = "evedata-platform-transformations", editable = "platform/transformations" },
+    { name = "evedata-platform-transform", editable = "platform/transform" },
     { name = "evedata-platform-utils", editable = "platform/utils" },
 ]
 
@@ -1555,9 +1555,9 @@ dev = [
 ]
 
 [[package]]
-name = "evedata-platform-extractors"
+name = "evedata-platform-extract"
 version = "0.1.0"
-source = { editable = "platform/extractors" }
+source = { editable = "platform/extract" }
 dependencies = [
     { name = "adbc-driver-postgresql" },
     { name = "aiohttp", extra = ["speedups"] },
@@ -1864,9 +1864,9 @@ dev = [
 ]
 
 [[package]]
-name = "evedata-platform-transformations"
+name = "evedata-platform-transform"
 version = "0.1.0"
-source = { editable = "platform/transformations" }
+source = { editable = "platform/transform" }
 dependencies = [
     { name = "dbt-core" },
     { name = "dbt-duckdb" },
