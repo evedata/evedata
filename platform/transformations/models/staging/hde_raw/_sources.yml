@@ -8,7 +8,7 @@ sources:
         warn_after: { count: 30, period: day }
         error_after: { count: 60, period: day }
       loaded_at_field: _dlt_load_id
-    database: evedata
+    database: lake
     schema: hde_raw
     tables:
       - name: accounting_entry_types

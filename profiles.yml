@@ -2,11 +2,37 @@ evedata:
   target: dev
   outputs:
     dev:
-      type: timescaledb
-      host: localhost
-      user: postgres
-      password: postgres
-      port: 5432
-      dbname: evedata
-      schema: evedata
-      threads: 16
+      type: duckdb
+      path: "{{ env_var('EVEDATA_PLATFORM_TRANSFORMATIONS_DATABASE_PATH') }}"
+      extensions:
+        - aws
+        - https
+        - httpfs
+        - ducklake
+        - parquet
+        - postgres
+      attach:
+        - path: "ducklake:postgres:user={{ env_var('EVEDATA_PLATFORM_CATALOG_USER') }} password={{ env_var('EVEDATA_PLATFORM_CATALOG_PASSWORD') }} host={{ env_var('EVEDATA_PLATFORM_CATALOG_HOST') }} port={{ env_var('EVEDATA_PLATFORM_CATALOG_PORT') }} dbname={{ env_var('EVEDATA_PLATFORM_CATALOG_DATABASE') }}"
+          alias: lake
+          options:
+            data_path: "s3://{{ env_var('EVEDATA_PLATFORM_LAKE_BUCKET') }}"
+            metadata_schema: "{{ env_var('EVEDATA_PLATFORM_CATALOG_SCHEMA') }}"
+      secrets:
+        - type: postgres
+        - type: s3
+          endpoint: "{{ env_var('EVEDATA_PLATFORM_R2_ENDPOINT') }}"
+          region: "{{ env_var('EVEDATA_PLATFORM_R2_REGION') }}"
+          key_id: "{{ env_var('EVEDATA_PLATFORM_R2_ACCESS_KEY_ID') }}"
+          secret: "{{ env_var('EVEDATA_PLATFORM_R2_SECRET_ACCESS_KEY') }}"
+          use_ssl: false
+          url_style: path
+
+    # dev:
+    #   type: timescaledb
+    #   host: localhost
+    #   user: postgres
+    #   password: postgres
+    #   port: 5432
+    #   dbname: evedata
+    #   schema: evedata
+    #   threads: 16

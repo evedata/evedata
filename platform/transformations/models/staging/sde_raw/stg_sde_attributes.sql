@@ -22,6 +22,7 @@ with
             display_name_id__ru::text as display_name_ru,
             display_name_id__zh::text as display_name_zh,
             name::text as internal_name,
+            sde_version::text as sde_version,
             tooltip_description_id__de::text as tooltip_description_de,
             tooltip_description_id__en::text as tooltip_description_en,
             tooltip_description_id__es::text as tooltip_description_es,

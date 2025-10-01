@@ -7,11 +7,11 @@ help: ## Show this help message
 
 .PHONY: build
 dbt-build: ## Build all transformations
-	uv run dbt build
+	uv run dbt build --exclude package:dbt_project_evaluator
 
 .PHONY: compile
 dbt-compile: ## Compile all transformations
-	uv run dbt compile
+	uv run dbt compile --exclude package:dbt_project_evaluator
 
 .PHONY: dbt-deps
 dbt-deps: ## Install dbt dependencies
@@ -19,11 +19,11 @@ dbt-deps: ## Install dbt dependencies
 
 .PHONY: dbt-run
 dbt-run: ## Run all transformations
-	uv run dbt run
+	uv run dbt run --exclude package:dbt_project_evaluator
 
 .PHONY: dbt-snapshot
 dbt-snapshot: ## Snapshot all transformations
-	uv run dbt snapshot
+	uv run dbt snapshot --exclude package:dbt_project_evaluator
 
 .PHONY: fix
 fix: fix-python fix-sql ## Fix all files

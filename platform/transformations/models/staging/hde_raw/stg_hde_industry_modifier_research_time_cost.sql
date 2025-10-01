@@ -10,7 +10,7 @@ with
             -- -------- IDs
             _dlt_id::text as industry_modifier_research_time_cost_uuid,
             _dlt_parent_id::text as industry_modifier_source_uuid,
-            attribute_id::bigint as attribute_id
+            dogma_attribute_id::bigint as attribute_id
 
         from source
     )

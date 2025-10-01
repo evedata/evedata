@@ -11,7 +11,8 @@ with
 
             -- -------- Text
             flag_name::text as name,
-            flag_text::text as description
+            flag_text::text as description,
+            sde_version::text as sde_version
 
         from source
     )

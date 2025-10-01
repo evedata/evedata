@@ -11,6 +11,7 @@ with
 
             -- -------- Text
             mutually_exclusive_group::text as mutually_exclusive_group,
+            sde_version::text as sde_version,
 
             -- -------- Numerics
             fuel_hourly_upkeep::bigint as fuel_hourly_upkeep,

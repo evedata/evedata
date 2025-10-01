@@ -5,7 +5,11 @@ with
         select
 
             -- -------- IDs
-            _dlt_id::text as type_dogma_uuid, id::bigint as type_id
+            _dlt_id::text as type_dogma_uuid,
+            id::bigint as type_id,
+
+            -- -------- Text
+            sde_version::text as sde_version
 
         from source
     )

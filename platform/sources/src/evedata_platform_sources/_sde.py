@@ -39,7 +39,7 @@ def current_archived_sde_version(config: "Configuration") -> str | None:
     all_versions = [
         k
         for k in sorted(
-            r2_list_keys(client, config.r2_sources_bucket, ARCHIVE_PREFIX), reverse=True
+            r2_list_keys(client, config.sources_bucket, ARCHIVE_PREFIX), reverse=True
         )
         if k.endswith(".zip")
     ]
@@ -99,7 +99,7 @@ def archive_current_sde_version(
             raise RuntimeError(msg)
 
         r2 = r2_client_from_config(config)
-        bucket = config.r2_sources_bucket
+        bucket = config.sources_bucket
 
         try:
             r2_upload(r2, bucket, f"{ARCHIVE_PREFIX}/{stem}.zip", zip_path)
@@ -141,9 +141,9 @@ def download_archived_sde(
     checksums_path = output_dir / "sde.checksums"
     zip_path = output_dir / "sde.zip"
     try:
-        r2_download(r2, config.r2_sources_bucket, f"{archive_prefix}.zip", zip_path)
+        r2_download(r2, config.sources_bucket, f"{archive_prefix}.zip", zip_path)
         r2_download(
-            r2, config.r2_sources_bucket, f"{archive_prefix}.checksums", checksums_path
+            r2, config.sources_bucket, f"{archive_prefix}.checksums", checksums_path
         )
     except r2.exceptions.ClientError as e:
         msg = f"Failed to download SDE version {version} from R2: {e}"

@@ -7,7 +7,6 @@ with
             -- -------- IDs
             _dlt_id::text as moon_uuid,
             _dlt_parent_id::text as planet_uuid,
-            _dlt_root_id::text as system_uuid,
             id::bigint as moon_id,
             planet_attributes__height_map1::bigint as height_map_1_id,
             planet_attributes__height_map2::bigint as height_map_2_id,
@@ -25,8 +24,8 @@ with
             statistics__eccentricity::decimal as statistics_eccentricity,
             statistics__escape_velocity::decimal as statistics_escape_velocity,
             statistics__life::decimal as statistics_life,
-            statistics__mass_dust::decimal as statistics_mass_dust,
-            statistics__mass_gas::decimal as statistics_mass_gas,
+            statistics__mass_dust::double as statistics_mass_dust,
+            statistics__mass_gas::double as statistics_mass_gas,
             statistics__orbit_period::decimal as statistics_orbit_period,
             statistics__orbit_radius::decimal as statistics_orbit_radius,
             statistics__pressure::decimal as statistics_pressure,

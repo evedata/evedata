@@ -12,6 +12,7 @@ with
             -- -------- Text
             internal_name::text as internal_name,
             skin_description::text as description,
+            sde_version::text as sde_version,
 
             -- -------- Booleans
             allow_ccp_devs::boolean as allows_ccp_devs,

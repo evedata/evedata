@@ -17,7 +17,7 @@ with
             moons.position_z
         from moons
         inner join planets on moons.planet_uuid = planets.planet_uuid
-        inner join systems on moons.system_uuid = systems.system_uuid
+        inner join systems on planets.system_uuid = systems.system_uuid
         left join names on moons.moon_id = names.item_id
     )
 

@@ -11,6 +11,7 @@ with
             -- -------- Text
             description::text as description,
             display_name::text as display_name,
+            hde_version::text as hde_version,
             name::text as name
 
         from source

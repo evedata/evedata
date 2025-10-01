@@ -17,7 +17,7 @@ with
             asteroid_belts.position_z
         from asteroid_belts
         inner join planets on asteroid_belts.planet_uuid = planets.planet_uuid
-        inner join systems on asteroid_belts.system_uuid = systems.system_uuid
+        inner join systems on planets.system_uuid = systems.system_uuid
         left join names on asteroid_belts.asteroid_belt_id = names.item_id
     )
 

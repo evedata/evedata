@@ -12,6 +12,7 @@ with
             custommaterial1::text as custom_material_1,
             custommaterial2::text as custom_material_2,
             description::text as description,
+            hde_version::text as hde_version,
             material1::text as material_1,
             material2::text as material_2,
             material3::text as material_3,

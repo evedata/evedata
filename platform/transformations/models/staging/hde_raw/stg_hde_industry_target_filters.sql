@@ -9,6 +9,7 @@ with
             id::bigint as industry_target_filter_id,
 
             -- -------- Text
+            hde_version::text as hde_version,
             name::text as name
 
         from source

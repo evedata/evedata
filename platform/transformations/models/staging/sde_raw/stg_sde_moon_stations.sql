@@ -10,7 +10,6 @@ with
             -- -------- IDs
             _dlt_id::text as station_uuid,
             _dlt_parent_id::text as moon_uuid,
-            _dlt_root_id::text as system_uuid,
             id::bigint as station_id,
             graphic_id::bigint as graphic_id,
             operation_id::bigint as operation_id,

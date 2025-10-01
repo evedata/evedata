@@ -1,6 +1,11 @@
 import tempfile
 from pathlib import Path
 
+from dlt.common.configuration.specs.aws_credentials import AwsCredentials
+from dlt.common.storages.configuration import FilesystemConfiguration
+from dlt.destinations.impl.ducklake.configuration import (
+    DuckLakeCredentials,
+)
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -75,33 +80,51 @@ class Configuration(BaseSettings):
     postgres_password: str
     postgres_database: str = "evedata"
 
-    ducklake_host: str
-    ducklake_port: int = 5433
-    ducklake_user: str
-    ducklake_password: str
-    ducklake_database: str = "ducklake"
-
     r2_endpoint_url: str = Field(
         default_factory=lambda data: f"https://{data['cloudflare_account_id']}.r2.cloudflarestorage.com"
     )
     r2_region: str = "weur"
     r2_access_key_id: str
     r2_secret_access_key: str
-    r2_datasets_bucket: str = Field(
+
+    catalog_host: str
+    catalog_port: int = 5433
+    catalog_user: str
+    catalog_password: str
+    catalog_database: str = "ducklake"
+    catalog_schema: str = "ducklake"
+
+    lake_bucket: str = Field(
         default_factory=lambda data: _r2_bucket_name(
-            "datasets", data["env"], data["r2_region"]
+            "lake", data["env"], data["lake_region"]
         )
     )
-    r2_lake_bucket: str = Field(
+
+    sources_bucket: str = Field(
         default_factory=lambda data: _r2_bucket_name(
-            "lake", data["env"], data["r2_region"]
+            "sources", data["env"], data["sources_region"]
         )
     )
-    r2_sources_bucket: str = Field(
-        default_factory=lambda data: _r2_bucket_name(
-            "sources", data["env"], data["r2_region"]
+
+    def catalog_credentials(self) -> "DuckLakeCredentials":
+        return DuckLakeCredentials(
+            catalog_name=self.catalog_schema,
+            catalog=f"postgres://{self.catalog_user}:{self.catalog_password}@{self.catalog_host}:{self.catalog_port}/{self.catalog_database}",
+            storage=self.lake_storage(),
         )
-    )
+
+    def lake_storage(self) -> "FilesystemConfiguration":
+        storage_credentials = AwsCredentials(
+            aws_access_key_id=self.r2_access_key_id,
+            aws_secret_access_key=self.r2_secret_access_key,
+            region_name=self.r2_region,
+            endpoint_url=self.r2_endpoint_url,
+            s3_url_style="path",
+        )
+        return FilesystemConfiguration(
+            bucket_url=f"s3://{self.lake_bucket}",
+            credentials=storage_credentials,
+        )
 
 
 _config = Configuration()  # pyright: ignore[reportCallIssue]

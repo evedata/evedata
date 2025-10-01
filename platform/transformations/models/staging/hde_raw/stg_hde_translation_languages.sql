@@ -7,7 +7,8 @@ with
             _dlt_id::text as translation_language_uuid,
 
             -- -------- Text
-            value::text as code
+            value::text as code,
+            hde_version::text as hde_version
 
         from source
     )

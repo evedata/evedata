@@ -4,22 +4,22 @@ from typing import TYPE_CHECKING, Annotated
 import typer
 from typer import Typer
 
-from evedata_platform_sources._sde import (
-    archive_current_sde_version,
-    current_archived_sde_version,
-    current_ccp_sde_version,
-    stage_archived_sde,
+from evedata_platform_sources._hde import (
+    archive_current_hde_version,
+    current_archived_hde_version,
+    current_hoboleaks_hde_version,
+    stage_archived_hde,
 )
 
 if TYPE_CHECKING:
     from evedata_platform_admin_core import AdminState
 
-cmd = Typer(name="sde")
+cmd = Typer(name="hde")
 
 
 @cmd.callback()
 def callback():
-    """Manage Static Data Export (SDE) archives."""
+    """Manage Hoboleaks Data Export (HDE) archives."""
 
 
 @cmd.command(name="archive")
@@ -28,22 +28,21 @@ def archive_cmd(
     ctx: typer.Context,
     force: Annotated[bool, typer.Option(help="Overwrite existing archive")] = False,
 ) -> None:
-    """Archive the current SDE version."""
+    """Archive the current HDE version."""
     state: AdminState = ctx.obj
     config = state.config
     err = state.err
 
-    current_ccp_version = current_ccp_sde_version()
-    current_archive_version = current_archived_sde_version(config)
-
-    if current_ccp_version == current_archive_version and not force:
+    current_hoboleaks_version = current_hoboleaks_hde_version()
+    current_archive_version = current_archived_hde_version(config)
+    if current_hoboleaks_version == current_archive_version and not force:
         err.print(
-            f"SDE version {current_ccp_version} is already archived. "
+            f"HDE version {current_hoboleaks_version} is already archived. "
             "Use --force to re-archive."
         )
         raise typer.Exit(2)
 
-    archive_current_sde_version(config, overwrite=force)
+    archive_current_hde_version(config, overwrite=force)
 
 
 @cmd.command(name="stage")
@@ -64,25 +63,25 @@ def stage_cmd(
     ] = None,
     version: Annotated[
         str | None,
-        typer.Option(help="SDE version to stage. Defaults to latest archived."),
+        typer.Option(help="HDE version to stage. Defaults to latest archived."),
     ] = None,
     force: Annotated[
         bool, typer.Option(help="Overwrite existing staged version")
     ] = False,
 ) -> None:
-    """Stage an archived SDE version by downloading and extracting it."""
+    """Stage an archived HDE version by downloading and extracting it."""
     state: AdminState = ctx.obj
     config = state.config
     err = state.err
     out = state.out
 
     if version is None:
-        version = current_archived_sde_version(config)
+        version = current_archived_hde_version(config)
         if version is None:
-            err.print("No archived SDE versions found.")
+            err.print("No archived HDE versions found.")
             raise typer.Exit(1)
 
-    output_dir = output_dir or config.sde_staging_dir / version
+    output_dir = output_dir or config.hde_staging_dir / version
 
-    out.print(f"Staging SDE version {version} to {output_dir}")
-    stage_archived_sde(config, output_dir, version, overwrite=force)
+    out.print(f"Staging HDE version {version} to {output_dir}")
+    stage_archived_hde(config, output_dir, version, overwrite=force)

@@ -21193,6 +21193,7 @@ Ordnance
 Ordor
 Ordt
 Orduin
+ore
 ORE
 Orecier
 Orecque
@@ -25829,6 +25830,7 @@ TDE4
 TDJ
 TDP
 Te
+TE
 TE1T
 Tean
 Tear

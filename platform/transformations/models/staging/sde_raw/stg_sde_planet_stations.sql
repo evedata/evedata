@@ -9,7 +9,6 @@ with
             -- -------- IDs
             _dlt_id::text as planet_station_uuid,
             _dlt_parent_id::text as planet_uuid,
-            _dlt_root_id::text as system_uuid,
             id::bigint as station_id,
             graphic_id::bigint as graphic_id,
             owner_id::bigint as npc_corporation_id,

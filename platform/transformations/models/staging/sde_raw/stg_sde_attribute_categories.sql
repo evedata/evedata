@@ -10,7 +10,8 @@ with
 
             -- -------- Text
             description::text as description,
-            name::text as name
+            name::text as name,
+            sde_version::text as sde_version
 
         from source
     )

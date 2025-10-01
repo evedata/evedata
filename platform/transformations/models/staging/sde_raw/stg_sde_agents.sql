@@ -12,6 +12,9 @@ with
             corporation_id::bigint as npc_corporation_id,
             location_id::bigint as station_id,
 
+            -- -------- Text
+            sde_version::text as sde_version,
+
             -- -------- Numerics
             level::smallint as level,
 

@@ -8,6 +8,9 @@ with
             _dlt_id::text as blueprint_uuid,
             blueprint_type_id::bigint as type_id,
 
+            -- -------- Text
+            hde_version::text as hde_version,
+
             -- -------- Numerics
             activities__copying__time::bigint as copying_duration_seconds,
             activities__manufacturing__time::bigint as manufacturing_duration_seconds,

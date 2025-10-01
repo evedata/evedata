@@ -92,7 +92,7 @@ def sde(path: "Path", version: str) -> Any:
             get_yaml_resource(file, path, resource_config, names),
             name=name,
             parallelized=True,
-            write_disposition="replace",
+            write_disposition="append",
         ).apply_hints(**hints)
         resource = before_load(resource, resource_config)
         resource = resource.add_map(lambda r: r | {"sde_version": version})
@@ -108,7 +108,7 @@ def sde(path: "Path", version: str) -> Any:
             ),
             name=name,
             parallelized=True,
-            write_disposition="replace",
+            write_disposition="append",
         ).apply_hints(**hints)
         resource = before_load(resource, resource_config)
         resource = resource.add_map(lambda r: r | {"sde_version": version})

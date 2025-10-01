@@ -10,7 +10,10 @@ with
             dungeon_id::bigint as dungeon_id,
             solar_system_id::bigint as system_id,
             spawn_point_id::bigint as spawn_point_id,
-            type_id::bigint as ship_type_id
+            type_id::bigint as ship_type_id,
+
+            -- -------- Text
+            sde_version::text as sde_version
 
         from source
     )

@@ -9,6 +9,7 @@ with
             skin_material_id::bigint as skin_material_id,
 
             -- -------- Text
+            hde_version::text as hde_version,
             internal_name::text as internal_name,
             skin_description::text as skin_description,
 

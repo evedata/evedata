@@ -40,6 +40,7 @@ with
             display_name_id__zh::text as display_name_zh,
             effect_name::text as internal_name,
             guid::text as guid,
+            sde_version::text as sde_version,
             sfx_name::text as sfx_name,
 
             -- -------- Numerics

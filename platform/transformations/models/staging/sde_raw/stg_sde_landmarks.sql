@@ -10,7 +10,10 @@ with
             icon_id::bigint as icon_id,
             description_id::bigint as description_id,
             landmark_name_id::bigint as landmark_name_id,
-            location_id::bigint as system_id
+            location_id::bigint as system_id,
+
+            -- -------- Text
+            sde_version::text as sde_version
 
         from source
     )

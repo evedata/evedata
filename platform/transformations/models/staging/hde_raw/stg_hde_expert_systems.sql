@@ -9,14 +9,11 @@ with
             id::bigint as expert_system_id,
 
             -- -------- Text
+            hde_version::text as hde_version,
             internal_name::text as internal_name,
 
             -- -------- Numerics
             duration_days::bigint as duration_days,
-
-            -- -------- Booleans
-            _dlt_valid_from::date as valid_from,
-            _dlt_valid_to::date as valid_to,
 
             -- --------- Timestamps
             case

@@ -26,7 +26,8 @@ with
             ja__description::text as description_ja,
             ko__description::text as description_ko,
             ru__description::text as description_ru,
-            zh__description::text as description_zh
+            zh__description::text as description_zh,
+            hde_version::text as hde_version
 
         from source
     )

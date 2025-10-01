@@ -9,7 +9,8 @@ with
 
             -- -------- Text
             key::text as code,
-            value::text as name
+            value::text as name,
+            sde_version::text as sde_version
 
         from source
     )

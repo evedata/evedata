@@ -12,6 +12,9 @@ with
             type_id::bigint as type_id,
             owner_id::bigint as parent_item_id,
 
+            -- -------- Text
+            sde_version::text as sde_version,
+
             -- -------- Numerics
             quantity::bigint as quantity
 

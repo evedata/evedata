@@ -9,6 +9,7 @@ with
             id::bigint as clone_state_id,
 
             -- -------- Text
+            hde_version::text as hde_version,
             internal_description::text as internal_description
 
         from source

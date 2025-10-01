@@ -38,12 +38,13 @@ with
             name__ko::text as name_ko,
             name__ru::text as name_ru,
             name__zh::text as name_zh,
+            sde_version::text as sde_version,
             sof_faction_name::text as sof_faction_name,
 
             -- -------- Numerics
             base_price::decimal as base_price,
             capacity::decimal as capacity,
-            mass::decimal as mass,
+            mass::double as mass,
             portion_size::bigint as portion_size,
             radius::decimal as radius,
             volume::decimal as volume,

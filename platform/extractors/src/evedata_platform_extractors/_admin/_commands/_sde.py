@@ -1,7 +1,6 @@
 import shutil
 from typing import TYPE_CHECKING, Annotated
 
-import duckdb
 import typer
 from typer import Typer
 
@@ -54,40 +53,8 @@ def sde_cmd(
         exclude=exclude.split(",") if exclude else None,
     )
 
-    db_path = config.sde_staging_dir / f"sde-{version}-staging.duckdb"
-    db = duckdb.connect(db_path)  # pyright: ignore[reportUnknownMemberType]
-
-    static_data_pipeline("sde", "sde_raw", db).run(source, loader_file_format="parquet")
-
-    db.install_extension("postgres")
-    db.execute(f"""
-        CREATE SECRET(
-            TYPE postgres,
-            HOST '{config.ducklake_host}',
-            PORT {config.ducklake_port},
-            USER '{config.ducklake_user}',
-            PASSWORD '{config.ducklake_password}',
-            DATABASE '{config.ducklake_database}'
-        );
-    """)
-    db.install_extension("httpfs")
-    db.load_extension("httpfs")
-    db.execute(f"""
-        CREATE SECRET(
-            TYPE s3,
-            ENDPOINT '{config.r2_endpoint_url}',
-            KEY_ID '{config.r2_access_key_id}',
-            SECRET '{config.r2_secret_access_key}',
-            REGION '{config.r2_region}',
-            URL_STYLE 'path'
-        );
-    """)
-    db.install_extension("ducklake")
-    db.execute(f"""
-        ATTACH
-            'ducklake:postgres:host={config.ducklake_host} port={config.ducklake_port} dbname={config.ducklake_database}'
-        AS lake (DATA_PATH 's3://{config.r2_lake_bucket}');
-    """)  # noqa: E501
-    db.execute("COPY FROM DATABASE sde_raw TO DATABASE lake;")
+    static_data_pipeline("sde", "sde_raw", config.catalog_credentials()).run(
+        source, loader_file_format="parquet"
+    )
 
     shutil.rmtree(sde_dir, ignore_errors=True)

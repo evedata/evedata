@@ -11,6 +11,7 @@ with
             -- -------- Text
             description::text as description,
             icon_file::text as icon_file,
+            sde_version::text as sde_version,
 
             -- -------- Booleans
             obsolete::boolean as is_obsolete

@@ -12,16 +12,19 @@ with
             region_id::bigint as region_id,
             wormhole_class_id::bigint as wormhole_class_id,
 
+            -- -------- Text
+            sde_version::text as sde_version,
+
             -- -------- Numerics
-            center__x::decimal as center_x,
-            center__y::decimal as center_y,
-            center__z::decimal as center_z,
-            max__x::decimal as maximum_x,
-            max__y::decimal as maximum_y,
-            max__z::decimal as maximum_z,
-            min__x::decimal as minimum_x,
-            min__y::decimal as minimum_y,
-            min__z::decimal as minimum_z,
+            center__x::double as center_x,
+            center__y::double as center_y,
+            center__z::double as center_z,
+            max__x::double as maximum_x,
+            max__y::double as maximum_y,
+            max__z::double as maximum_z,
+            min__x::double as minimum_x,
+            min__y::double as minimum_y,
+            min__z::double as minimum_z,
             radius::decimal as radius
 
         from source

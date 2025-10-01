@@ -10,6 +10,7 @@ with
 
             -- -------- Text
             rule_set_name::text as name,
+            sde_version::text as sde_version,
 
             -- -------- Numerics
             maximum_pilots_match::bigint as maximum_pilots_match,

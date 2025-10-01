@@ -1,3 +1,5 @@
+{{ config(materialized="table") }}
+
 with
     effects as (
         select
@@ -19,6 +21,7 @@ with
             display_name_en as display_name,
             internal_name,
             guid,
+            sde_version,
             sfx_name,
 
             -- -------- Numerics
@@ -35,8 +38,25 @@ with
             is_published
 
         from {{ ref("stg_sde_effects") }}
-        where valid_to is null
+    ),
+
+    effects_scd2 as (
+        select
+            *,
+            sde_version as from_sde_version,
+            lead(sde_version) over w as to_sde_version
+        from effects
+        window w as (partition by effect_id order by sde_version)
+    ),
+
+    final as (
+        select
+            *,
+            {{ dbt_utils.generate_surrogate_key(["effect_id", "from_sde_version"]) }}
+            as effect_sk,
+            coalesce(to_sde_version is null, false) as is_current
+        from effects_scd2
     )
 
 select *
-from effects
+from final

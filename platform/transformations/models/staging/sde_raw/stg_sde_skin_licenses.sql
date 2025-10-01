@@ -9,6 +9,9 @@ with
             license_type_id::bigint as type_id,
             skin_id::bigint as skin_id,
 
+            -- -------- Text
+            sde_version::text as sde_version,
+
             -- -------- Numerics
             duration::bigint as duration,
 

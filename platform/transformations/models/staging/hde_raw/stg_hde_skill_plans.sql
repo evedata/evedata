@@ -26,6 +26,7 @@ with
 
             -- -------- Text
             description::text as description,
+            hde_version::text as hde_version,
             internal_name::text as internal_name,
             name::text as name
 

@@ -10,6 +10,7 @@ with
 
             -- -------- Text
             description::text as description,
+            hde_version::text as hde_version,
             name::text as name,
 
             -- -------- Numerics

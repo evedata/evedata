@@ -5,7 +5,11 @@ with
         select
 
             -- -------- IDs
-            _dlt_id::text as industry_installation_type_uuid, type_id::bigint as type_id
+            _dlt_id::text as industry_installation_type_uuid,
+            type_id::bigint as type_id,
+
+            -- -------- Text
+            hde_version::text as hde_version
 
         from source
     )

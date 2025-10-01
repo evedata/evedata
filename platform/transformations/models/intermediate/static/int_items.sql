@@ -12,7 +12,7 @@ with
             items.location_id,
             items.parent_item_id,
             names.name,
-            unique_names.unique_name,
+            unique_names.name as unique_name,
             items.quantity,
             positions.pitch as position_pitch,
             positions.roll as position_roll,

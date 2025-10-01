@@ -15,6 +15,7 @@ with
             -- -------- Text
             character_description::text as character_description,
             description::text as description,
+            hde_version::text as hde_version,
             title::text as title
 
         from source

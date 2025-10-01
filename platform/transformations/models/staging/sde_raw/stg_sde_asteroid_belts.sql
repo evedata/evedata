@@ -9,7 +9,6 @@ with
             -- -------- IDs
             _dlt_id::text as asteroid_belt_uuid,
             _dlt_parent_id::text as planet_uuid,
-            _dlt_root_id::text as system_uuid,
             id::bigint as asteroid_belt_id,
             type_id::bigint as type_id,
             asteroid_belt_name_id::bigint as name_id,

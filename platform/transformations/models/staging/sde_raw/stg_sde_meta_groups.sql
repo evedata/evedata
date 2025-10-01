@@ -27,6 +27,7 @@ with
             name_id__ko::text as name_ko,
             name_id__ru::text as name_ru,
             name_id__zh::text as name_zh,
+            sde_version::text as sde_version,
 
             -- -------- Numerics
             color__r::decimal as color_r,

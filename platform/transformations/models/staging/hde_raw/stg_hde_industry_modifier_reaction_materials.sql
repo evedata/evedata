@@ -10,7 +10,7 @@ with
             -- -------- IDs
             _dlt_id::text as industry_modifier_reaction_material_uuid,
             _dlt_parent_id::text as industry_modifier_source_uuid,
-            attribute_id::bigint as attribute_id,
+            dogma_attribute_id::bigint as attribute_id,
             filter_id::bigint as filter_id
 
         from source

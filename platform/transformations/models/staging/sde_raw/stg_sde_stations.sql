@@ -17,14 +17,15 @@ with
 
             -- -------- Text
             station_name::text as name,
+            sde_version::text as sde_version,
 
             -- -------- Numerics
             docking_cost_per_volume::bigint as docking_cost_per_volume,
             max_ship_volume_dockable::bigint as max_dockable_volume,
             office_rental_cost::bigint as office_rental_cost,
-            x::decimal as position_x,
-            y::decimal as position_y,
-            z::decimal as position_z,
+            x::double as position_x,
+            y::double as position_y,
+            z::double as position_z,
             reprocessing_efficiency::decimal as reprocessing_efficiency,
             reprocessing_stations_take::decimal as reprocessing_stations_take,
             security::decimal as security

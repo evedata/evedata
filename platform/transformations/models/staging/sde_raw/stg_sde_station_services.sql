@@ -24,7 +24,8 @@ with
             service_name_id__ja::text as name_ja,
             service_name_id__ko::text as name_ko,
             service_name_id__ru::text as name_ru,
-            service_name_id__zh::text as name_zh
+            service_name_id__zh::text as name_zh,
+            sde_version::text as sde_version
 
         from source
     )

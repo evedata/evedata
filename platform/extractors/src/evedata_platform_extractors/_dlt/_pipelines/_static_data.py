@@ -6,7 +6,7 @@ from dlt.common.normalizers.naming import snake_case
 if TYPE_CHECKING:
     from types import ModuleType
 
-    import duckdb
+    from dlt.destinations.impl.ducklake.configuration import DuckLakeCredentials
     from dlt.pipeline.pipeline import Pipeline
     from dlt.pipeline.progress import TCollectorArg
 
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 def static_data_pipeline(
     pipeline_name: str,
     dataset_name: str,
-    db: "duckdb.DuckDBPyConnection",
+    credentials: "DuckLakeCredentials",
     *,
     naming_convention_module: "ModuleType | None" = None,
     progress: "TCollectorArg | None" = None,
@@ -23,7 +23,12 @@ def static_data_pipeline(
     naming_convention_module = naming_convention_module or snake_case
     progress = progress or "alive_progress"
 
-    destination = dlt.destinations.duckdb(db)
+    # destination = dlt.destinations.duckdb(db)
+    destination = dlt.destinations.ducklake(
+        credentials=credentials,
+        loader_parallelism_strategy="parallel",
+        naming_convention=naming_convention_module,
+    )
 
     return dlt.pipeline(
         pipeline_name=pipeline_name,

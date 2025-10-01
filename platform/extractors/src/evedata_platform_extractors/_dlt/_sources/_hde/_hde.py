@@ -9,7 +9,6 @@ from evedata_platform_extractors._utils._sources import before_load, get_json_re
 from ._resources import *  # noqa: F403  # noqa: F403
 
 if TYPE_CHECKING:
-    import datetime
     from pathlib import Path
 
     from evedata_platform_extractors._types import FileResourceConfig
@@ -71,7 +70,7 @@ _RESOURCE_NAMES: dict[str, str] = {
 
 
 @dlt.source
-def hde(path: "Path", version: "datetime.date") -> Any:
+def hde(path: "Path", version: str) -> Any:
     """A DLT source for a local HDE directory."""
     files = path.glob("*.json")
     resources: list[Any] = []
@@ -88,7 +87,7 @@ def hde(path: "Path", version: "datetime.date") -> Any:
             get_json_resource(file, path, resource_config),
             name=name,
             parallelized=True,
-            write_disposition="replace",
+            write_disposition="append",
         ).apply_hints(**hints)
         resource = before_load(resource, resource_config)
         resource = resource.add_map(lambda r: r | {"hde_version": version})

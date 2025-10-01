@@ -20,6 +20,7 @@ with
             name__ko::text as name_ko,
             name__ru::text as name_ru,
             name__zh::text as name_zh,
+            sde_version::text as sde_version,
 
             -- -------- Booleans
             anchorable::boolean as is_anchorable,

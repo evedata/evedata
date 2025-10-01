@@ -8,7 +8,6 @@ with
             _dlt_id::text as type_bonus_detail_uuid,
             _dlt_parent_id::text as type_bonus_uuid,
             _dlt_list_idx::bigint as bonus_index,
-            _dlt_root_id::text as type_uuid,
             unit_id::bigint as unit_id,
 
             -- -------- Text

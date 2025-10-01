@@ -1,7 +1,16 @@
 with
     names as (select * from {{ ref("stg_sde_item_names") }}),
-    regions as (select * from {{ ref("stg_sde_regions") }}),
+
     systems as (select * from {{ ref("stg_sde_systems") }}),
+
+    systems_scd2 as (
+        select
+            *,
+            sde_version as from_sde_version,
+            lead(sde_version) over w as to_sde_version
+        from systems
+        window w as (partition by system_id order by sde_version)
+    ),
 
     joined as (
         select
@@ -27,11 +36,22 @@ with
             systems.is_border,
             systems.is_corridor,
             systems.is_hub,
-            systems.is_international
-        from systems
-        inner join regions on systems.region_id = regions.region_id
+            systems.is_international,
+            systems.from_sde_version,
+            systems.to_sde_version
+        from systems_scd2 as systems
         left join names on systems.system_id = names.item_id
+    ),
+
+    final as (
+        select
+            *,
+
+            {{ dbt_utils.generate_surrogate_key(["system_id", "from_sde_version"]) }}
+            as system_sk,
+            coalesce(to_sde_version is null, false) as is_current
+        from joined
     )
 
 select *
-from joined
+from final

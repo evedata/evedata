@@ -9,7 +9,8 @@ with
             item_id::bigint as item_id,
 
             -- -------- Text
-            item_name::text as name
+            item_name::text as name,
+            sde_version::text as sde_version
 
         from source
     )

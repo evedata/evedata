@@ -7,7 +7,7 @@ with
             -- -------- IDs
             _dlt_id::text as buff_location_modifier_uuid,
             _dlt_parent_id::text as buff_uuid,
-            attribute_id::bigint as attribute_id
+            dogma_attribute_id::bigint as attribute_id
 
         from source
     )

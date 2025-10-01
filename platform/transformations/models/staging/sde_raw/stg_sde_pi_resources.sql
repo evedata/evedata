@@ -9,6 +9,9 @@ with
             id::bigint as celestial_id,
             reagent_type_id::bigint as reagent_type_id,
 
+            -- -------- Text
+            sde_version::text as sde_version,
+
             -- -------- Numerics
             cycle_minutes::bigint as cycle_minutes,
             harvest_silo_max::bigint as harvest_silo_max,

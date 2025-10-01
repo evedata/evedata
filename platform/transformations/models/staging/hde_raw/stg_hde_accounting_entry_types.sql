@@ -17,6 +17,7 @@ with
             entry_type_description_translated::text
             as entry_type_description_translated,
             entry_type_name_translated::text as entry_type_name_translated,
+            hde_version::text as hde_version,
             name::text as name
 
         from source

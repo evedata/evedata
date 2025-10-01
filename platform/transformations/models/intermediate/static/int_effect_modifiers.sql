@@ -18,7 +18,6 @@ with
         from {{ ref("stg_sde_effect_modifiers") }} as dem
         inner join
             {{ ref("stg_sde_effects") }} as de on dem.effect_uuid = de.effect_uuid
-        where de.valid_to is null
     )
 
 select *

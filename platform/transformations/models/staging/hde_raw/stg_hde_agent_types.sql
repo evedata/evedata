@@ -7,6 +7,9 @@ with
             -- -------- IDs
             _dlt_id::text as agent_type_uuid,
             key::smallint as agent_type_id,
+
+            -- -------- Text
+            hde_version::text as hde_version,
             value::text as name
 
         from source

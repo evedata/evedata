@@ -28,7 +28,8 @@ with
             name_id__ja::text as name_ja,
             name_id__ko::text as name_ko,
             name_id__ru::text as name_ru,
-            name_id__zh::text as name_zh
+            name_id__zh::text as name_zh,
+            sde_version::text as sde_version
 
         from source
     )

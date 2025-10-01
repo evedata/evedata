@@ -16,7 +16,8 @@ with
             activities__reaction__time::bigint as reaction_duration_seconds,
             activities__research_material__time::bigint
             as research_material_duration_seconds,
-            activities__research_time__time::bigint as research_time_duration_seconds
+            activities__research_time__time::bigint as research_time_duration_seconds,
+            sde_version::text as sde_version
 
         from source
     )

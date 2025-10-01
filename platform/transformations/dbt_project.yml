@@ -14,14 +14,20 @@ vars:
 models:
   evedata:
     intermediate:
+      +database: lake
       +materialized: view
       +schema: int
+      +tags: ["silver", "intermediate"]
     marts:
+      +database: lake
       +schema: marts
       +materialized: table
+      +tags: ["gold", "marts"]
     staging:
+      +database: lake
       +materialized: view
       +schema: stg
+      +tags: ["bronze", "staging"]
 
 dispatch:
   - macro_namespace: dbt

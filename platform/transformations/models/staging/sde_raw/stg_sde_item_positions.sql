@@ -8,6 +8,9 @@ with
             _dlt_id::text as item_position_uuid,
             item_id::bigint as item_id,
 
+            -- -------- Text
+            sde_version::text as sde_version,
+
             -- -------- Numerics
             pitch::decimal as pitch,
             roll::decimal as roll,

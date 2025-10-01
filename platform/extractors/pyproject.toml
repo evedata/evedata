@@ -18,7 +18,7 @@ dependencies = [
   "evedata-platform-utils",
 
   "alive-progress>=3.3.0",
-  "dlt[duckdb,filesystem,parquet,postgres,sqlalchemy]>=1.15.0",
+  "dlt[duckdb,ducklake,filesystem,parquet,postgres,sqlalchemy]>=1.17.0",
   "fastapi[all]>=0.115.5",
   "hishel>=0.1.3",
   "httpx>=0.28.1",

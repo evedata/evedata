@@ -26,6 +26,7 @@ with
             operation_name_id__ko::text as name_ko,
             operation_name_id__ru::text as name_ru,
             operation_name_id__zh::text as name_zh,
+            sde_version::text as sde_version,
 
             -- -------- Numerics
             border::decimal as border_cost_modifier,

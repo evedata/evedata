@@ -9,7 +9,8 @@ with
 
             -- -------- Text
             activity_name::text as name,
-            description::text as description
+            description::text as description,
+            hde_version::text as hde_version
 
         from source
     )
