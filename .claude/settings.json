@@ -1,6 +1,9 @@
 {
   "permissions": {
     "allow": [
+      "Bash(ansible-galaxy:*)",
+      "Bash(ansible-lint:*)",
+      "Bash(ansible-test:*)",
       "Bash(mkdir:*)",
       "Bash(awk:*)",
       "Bash(cal:*)",
@@ -35,6 +38,20 @@
       "Bash(sed:*)",
       "Bash(sort:*)",
       "Bash(tail:*)",
+      "Bash(tofu fmt:*)",
+      "Bash(tofu get:*)",
+      "Bash(tofu graph:*)",
+      "Bash(tofu import:*)",
+      "Bash(tofu metadata:*)",
+      "Bash(tofu modules:*)",
+      "Bash(tofu output:*)",
+      "Bash(tofu plan:*)",
+      "Bash(tofu providers:*)",
+      "Bash(tofu test:*)",
+      "Bash(tofu version:*)",
+      "Bash(tofu workspace list:*)",
+      "Bash(tofu workspace select:*)",
+      "Bash(tofu workspace show:*)",
       "Bash(top:*)",
       "Bash(tree:*)",
       "Bash(uniq:*)",
@@ -97,7 +114,16 @@
 
       "WebFetch(domain:developers.cloudflare.com)",
       "WebFetch(domain:squidfunk.github.io)",
-      "WebFetch(domain:www.mkdocs.org)"
+      "WebFetch(domain:www.mkdocs.org)",
+
+      "WebFetch(domain:docs.ansible.com)",
+      "WebFetch(domain:opentofu.org)",
+      "WebFetch(domain:search.opentofu.org)",
+      "WebFetch(domain:documentation.ubuntu.com)",
+      "WebFetch(domain:kubernetes.io)",
+      "WebFetch(domain:microk8s.io)",
+
+      "WebSearch"
     ],
     "deny": [],
     "ask": []
