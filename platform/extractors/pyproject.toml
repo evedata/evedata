@@ -16,7 +16,6 @@ dependencies = [
   "evedata-platform-rest-core",
   "evedata-platform-sources",
   "evedata-platform-utils",
-
   "alive-progress>=3.3.0",
   "dlt[duckdb,ducklake,filesystem,parquet,postgres,sqlalchemy]>=1.17.0",
   "fastapi[all]>=0.115.5",
@@ -31,6 +30,8 @@ dependencies = [
   "watchdog>=6.0.0",
   "websockets>=15.0.1",
   "adbc-driver-postgresql>=1.7.0",
+  "aiohttp[speedups]>=3.12.15",
+  "polars[async,pyarrow]>=1.33.1",
 ]
 
 [dependency-groups]
