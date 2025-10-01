@@ -345,9 +345,18 @@ if __name__ == "__main__":
             )
 
             # Regional aggregation - group by region_id and type_id
+            # Note: We include all orders except station-limited ones. This can result
+            # in "crossed markets" where buy_price > sell_price due to range
+            # limitations. For example, a buy order with range=3 at station A might
+            # offer 3.0 ISK while a region-wide sell order at station B (10+ jumps away)
+            # offers 2.0 ISK. These crossed markets represent real arbitrage
+            # opportunities and market inefficiencies, not data errors. Station-limited
+            # orders are excluded as they don't participate in the broader regional
+            # market.
+            regional_orders = lazy_orders.filter(pl.col("range") != "station")
             regional_agg = (
                 create_market_indicators_aggregation(
-                    lazy_orders, ["region_id", "type_id"]
+                    regional_orders, ["region_id", "type_id"]
                 )
                 .rename({"region_id": "location_id"})
                 .with_columns(pl.lit("region").alias("location_type"))
