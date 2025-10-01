@@ -362,16 +362,22 @@ if __name__ == "__main__":
                 .with_columns(pl.lit("region").alias("location_type"))
             )
 
-            # Hub station aggregation - group by location_id and type_id
-            hub_orders = lazy_orders.filter(
-                pl.col("location_id").is_in(_HUB_STATION_IDS)
+            # Station aggregation - group by location_id and type_id for all stations
+            station_agg = create_market_indicators_aggregation(
+                lazy_orders,
+                ["location_id", "type_id"],
+            ).with_columns(
+                [
+                    pl.lit("station").alias("location_type"),
+                    pl.col("location_id").is_in(_HUB_STATION_IDS).alias("is_hub"),
+                ]
             )
-            hub_agg = create_market_indicators_aggregation(
-                hub_orders, ["location_id", "type_id"]
-            ).with_columns(pl.lit("station").alias("location_type"))
 
-            # Combine regional and hub aggregations
-            combined_agg = pl.concat([regional_agg, hub_agg], how="vertical_relaxed")
+            # Combine regional and station aggregations
+            regional_agg = regional_agg.with_columns(pl.lit(False).alias("is_hub"))  # noqa: FBT003
+            combined_agg = pl.concat(
+                [regional_agg, station_agg], how="vertical_relaxed"
+            )
 
             # Collect aggregated data and sort
             aggregated = await combined_agg.collect_async()
@@ -391,9 +397,13 @@ if __name__ == "__main__":
             regional_count = aggregated.filter(
                 pl.col("location_type") == "region"
             ).height
-            hub_count = aggregated.filter(pl.col("location_type") == "station").height
+            station_count = aggregated.filter(
+                pl.col("location_type") == "station"
+            ).height
+            hub_count = aggregated.filter(pl.col("is_hub")).height
             rprint(f"Regional rows: {regional_count}")
-            rprint(f"Hub station rows: {hub_count}")
+            rprint(f"Station rows: {station_count}")
+            rprint(f"  - Hub stations: {hub_count}")
 
             # Also save raw orders with sorting and compression
             orders = await lazy_orders.collect_async()
