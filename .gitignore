@@ -283,3 +283,5 @@ dbt_packages/
 /run
 /var
 .vscode/mcp.json
+
+local_experiments/
