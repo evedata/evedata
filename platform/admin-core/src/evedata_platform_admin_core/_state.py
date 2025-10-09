@@ -9,7 +9,7 @@ class AdminState:
     _err: Console
 
     def __init__(self):
-        self._config = Configuration()
+        self._config = Configuration()  # pyright: ignore[reportCallIssue]
         self._out = Console()
         self._err = Console(stderr=True)
 

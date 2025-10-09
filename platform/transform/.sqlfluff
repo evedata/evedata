@@ -10,7 +10,7 @@ exclude_rules = layout.indent, layout.cte_bracket, layout.keyword_newline, layou
 profiles_dir = .
 
 [sqlfluff:indentation]
-tab_space_size = 4
+tab_space_size = 2
 
 [sqlfluff:layout:type:comma]
 spacing_before = touch

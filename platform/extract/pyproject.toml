@@ -32,6 +32,7 @@ dependencies = [
   "adbc-driver-postgresql>=1.7.0",
   "aiohttp[speedups]>=3.12.15",
   "polars[async,pyarrow]>=1.33.1",
+  "orjson>=3.11.3",
 ]
 
 [dependency-groups]
@@ -183,6 +184,7 @@ classmethod-decorators = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"**/_admin/_commands/*" = ["PLC0415"]
 "**/__main__.py" = ["D100"]
 "**/tests/**" = ["D", "PLR2004", "S101"]
 "*.ipynb" = ["T20"]

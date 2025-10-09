@@ -1,7 +1,7 @@
 """Provides DLT naming conventions."""
 
-from . import _hde as hde
+from . import _static as static
 
 __all__ = [
-    "hde",
+    "static",
 ]

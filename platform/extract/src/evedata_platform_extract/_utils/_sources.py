@@ -33,7 +33,7 @@ def process_data(
             config["rename_columns"].get(k, k): v for k, v in final_data.items()
         }
     if names and config.get("name_from_inv_names"):
-        final_data["name"] = names.get(final_data["id"], "Name Unknown")
+        final_data["name"] = names.get(final_data["_key"], "Name Unknown")
     if path:
         final_data["_dlt_resource_path"] = str(path)
     if base_path:
@@ -43,13 +43,8 @@ def process_data(
 
 def get_json_resource(
     path: "Path",
-    root_path: "Path",
-    config: "FileResourceConfig",
-    names: dict[int, str] | None = None,
 ) -> "Generator[dict[str, Any]]":
-    names = names or {}
-    for data in load_json_with_normalized_id_keys(path):
-        yield process_data(data, config, names, path.relative_to(root_path))
+    yield from load_json_with_normalized_id_keys(path)
 
 
 def get_yaml_resource(

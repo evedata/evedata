@@ -1,0 +1,58 @@
+version: 2
+
+sources:
+  - name: raw_hde
+    description: "Raw data sourced from the Hoboleaks Data Export."
+    config:
+      freshness:
+        warn_after: { count: 30, period: day }
+        error_after: { count: 60, period: day }
+      loaded_at_field: _dlt_load_id
+    database: lake
+    schema: raw_hde
+    tables:
+      - name: _dlt_loads
+      - name: _dlt_pipeline_state
+      - name: _dlt_version
+      - name: accountingentrytypes
+      - name: clonestates
+      - name: clonestates__skills
+      - name: compressibletypes
+      - name: dogmaeffectcategories
+      - name: expertsystems
+      - name: expertsystems__associated_ship_types
+      - name: expertsystems__skills_granted
+      - name: graphicmaterialsets
+      - name: industryactivities
+      - name: industryassemblylines
+      - name: industryassemblylines__details_per_category
+      - name: industryassemblylines__details_per_group
+      - name: industryassemblylines__details_per_type_list
+      - name: industryinstallationtypes
+      - name: industryinstallationtypes__assembly_lines
+      - name: industrymodifiersources
+      - name: industrymodifiersources__copying__cost
+      - name: industrymodifiersources__copying__time
+      - name: industrymodifiersources__invention__cost
+      - name: industrymodifiersources__invention__time
+      - name: industrymodifiersources__manufacturing__cost
+      - name: industrymodifiersources__manufacturing__material
+      - name: industrymodifiersources__manufacturing__time
+      - name: industrymodifiersources__reaction__material
+      - name: industrymodifiersources__reaction__time
+      - name: industrymodifiersources__research_material__cost
+      - name: industrymodifiersources__research_material__time
+      - name: industrymodifiersources__research_time__cost
+      - name: industrymodifiersources__research_time__time
+      - name: industrytargetfilters
+      - name: industrytargetfilters__category_ids
+      - name: industrytargetfilters__group_ids
+      - name: repackagedvolumes
+      - name: schoolmap
+      - name: schools
+      - name: schools__starting_stations
+      - name: skillplans
+      - name: skillplans__milestones
+      - name: skillplans__skill_requirements
+      - name: stationstandingsrestrictions
+      - name: stationstandingsrestrictions__services

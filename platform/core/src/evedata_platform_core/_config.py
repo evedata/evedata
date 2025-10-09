@@ -1,6 +1,9 @@
 import tempfile
+from functools import cached_property
 from pathlib import Path
+from typing import TYPE_CHECKING
 
+import boto3
 from dlt.common.configuration.specs.aws_credentials import AwsCredentials
 from dlt.common.storages.configuration import FilesystemConfiguration
 from dlt.destinations.impl.ducklake.configuration import (
@@ -8,6 +11,9 @@ from dlt.destinations.impl.ducklake.configuration import (
 )
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+if TYPE_CHECKING:
+    from types_boto3_s3 import S3Client as R2Client
 
 EVEDATA_ROOT = Path(__file__).parent.parent.parent.parent.parent
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -80,6 +86,8 @@ class Configuration(BaseSettings):
     postgres_password: str
     postgres_database: str = "evedata"
 
+    r2_endpoint: str
+    r2_endpoint_ssl: bool = True
     r2_endpoint_url: str = Field(
         default_factory=lambda data: f"https://{data['cloudflare_account_id']}.r2.cloudflarestorage.com"
     )
@@ -124,6 +132,16 @@ class Configuration(BaseSettings):
         return FilesystemConfiguration(
             bucket_url=f"s3://{self.lake_bucket}",
             credentials=storage_credentials,
+        )
+
+    @cached_property
+    def r2(self) -> "R2Client":
+        return boto3.client(  # pyright: ignore[reportUnknownMemberType]
+            "s3",
+            endpoint_url=self.r2_endpoint_url,
+            aws_access_key_id=self.r2_access_key_id,
+            aws_secret_access_key=self.r2_secret_access_key,
+            region_name=self.r2_region,
         )
 
 

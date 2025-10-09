@@ -80,9 +80,23 @@ def _is_int_like_key(key: Any) -> bool:
     return False
 
 
+def _is_int_like_or_default_key(key: Any) -> bool:
+    """Check if a key is an integer, integer-like string, or 'default'."""
+    if isinstance(key, int):
+        return True
+    if isinstance(key, str):
+        return _is_int(key) or key == "default"
+    return False
+
+
 def _has_all_int_like_keys(data: dict[Any, Any]) -> bool:
     """Check if all dictionary keys are integer-like."""
     return all(_is_int_like_key(k) for k in data)
+
+
+def _has_all_int_like_or_default_keys(data: dict[Any, Any]) -> bool:
+    """Check if all dictionary keys are integer-like or 'default'."""
+    return all(_is_int_like_or_default_key(k) for k in data)
 
 
 def _has_all_string_keys(data: dict[Any, Any]) -> bool:
@@ -159,7 +173,7 @@ def normalize_id_keys(
 ) -> NormalizedList | list[Any]: ...
 
 
-def normalize_id_keys(  # noqa: PLR0911
+def normalize_id_keys(  # noqa: PLR0911, PLR0912
     data: InputType,
     *,
     _depth: int = 0,
@@ -177,9 +191,9 @@ def normalize_id_keys(  # noqa: PLR0911
         2. Lists of scalars -> unchanged
         3. Lists of dicts -> each dict normalized recursively
         4. Dict with int-like keys and scalar values
-            -> list of {"id": key, "value": val}
+            -> list of {"_key": key, "value": val}
         5. Dict with int-like keys and dict values
-            -> list of {"id": key, **normalized_val}
+            -> list of {"_key": key, **normalized_val}
         6. Dict with string keys -> values normalized recursively
         7. Empty dict -> empty list
 
@@ -206,7 +220,7 @@ def normalize_id_keys(  # noqa: PLR0911
     Examples:
         Basic ID normalization:
         >>> normalize_id_keys({1: {"name": "Rifter"}, 2: {"name": "Slasher"}})
-        [{"id": 1, "name": "Rifter"}, {"id": 2, "name": "Slasher"}]
+        [{"_key": 1, "name": "Rifter"}, {"_key": 2, "name": "Slasher"}]
 
         String keys preserved:
         >>> normalize_id_keys({"ships": {"frigate": "small"}})
@@ -214,7 +228,7 @@ def normalize_id_keys(  # noqa: PLR0911
 
         ID keys with scalar values:
         >>> normalize_id_keys({1: "value1", 2: "value2"})
-        [{"id": 1, "value": "value1"}, {"id": 2, "value": "value2"}]
+        [{"_key": 1, "value": "value1"}, {"_key": 2, "value": "value2"}]
     """
     if _depth > _max_depth:
         msg = f"Maximum recursion depth ({_max_depth}) exceeded"
@@ -245,14 +259,35 @@ def normalize_id_keys(  # noqa: PLR0911
         if not data:
             return []
 
-        if _has_all_int_like_keys(data):
+        if _has_all_int_like_or_default_keys(data):
             if _all_values_are_scalars(data):
-                return [{"id": int(k), "value": v} for k, v in data.items()]
+                return [{"_key": str(k), "value": v} for k, v in data.items()]
 
             try:
                 return [
                     {
-                        "id": int(k),
+                        "_key": str(k),
+                        **cast(
+                            "dict[str, Any]",
+                            normalize_id_keys(
+                                v, _depth=_depth + 1, _max_depth=_max_depth
+                            ),
+                        ),
+                    }
+                    for k, v in data.items()
+                ]
+            except (ValueError, TypeError) as e:
+                msg = f"Failed to normalize dict values: {e}"
+                raise NormalizationError(msg, data=data, cause=e) from e
+
+        if _has_all_int_like_keys(data):
+            if _all_values_are_scalars(data):
+                return [{"_key": int(k), "value": v} for k, v in data.items()]
+
+            try:
+                return [
+                    {
+                        "_key": int(k),
                         **cast(
                             "dict[str, Any]",
                             normalize_id_keys(
@@ -291,7 +326,7 @@ def normalize_id_keys(  # noqa: PLR0911
     raise NormalizationError(msg, data=data)
 
 
-def load_json_with_normalized_id_keys(
+def load_json_with_normalized_id_keys(  # noqa: PLR0912
     path: "str | Path",
 ) -> "Generator[dict[str, Any]]":
     data = load_json_file(path)
@@ -306,12 +341,15 @@ def load_json_with_normalized_id_keys(
     elif all(isinstance(v, bool | float | int | str) for v in data.values()):
         for k, v in data.items():
             yield cast("dict[str, Any]", {"key": k, "value": v})
+    elif all(_is_int_like_or_default_key(k) for k in data):
+        for id_, item in data.items():
+            yield {"_key": str(id_), **cast("NormalizedDict", normalize_id_keys(item))}
     elif all(_is_int(k) and not isinstance(v, dict) for k, v in data.items()):
         for id_, value in data.items():
-            yield {"id": int(id_), "value": value}
+            yield {"_key": int(id_), "value": value}
     elif all(_is_int(k) for k in data):
         for id_, item in data.items():
-            yield {"id": int(id_), **cast("NormalizedDict", normalize_id_keys(item))}
+            yield {"_key": int(id_), **cast("NormalizedDict", normalize_id_keys(item))}
     else:
         yield normalize_id_keys(data)
 
@@ -340,4 +378,4 @@ def load_yaml_with_normalized_id_keys(
         yield cast("dict[str, Any]", normalize_id_keys(data))
     else:
         for id_, item in data.items():
-            yield {"id": id_, **normalize_id_keys(item)}
+            yield {"_key": id_, **normalize_id_keys(item)}

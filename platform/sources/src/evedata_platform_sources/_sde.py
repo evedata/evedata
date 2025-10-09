@@ -1,293 +1,278 @@
-"""Provides utilities for sourcing from the Static Data Export (SDE)."""
-
-import hashlib
 import shutil
 import tempfile
-import zipfile
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import httpx
 
 from evedata_platform_core.utils._r2 import (
-    r2_client_from_config,
     r2_download,
-    r2_list_keys,
+    r2_get_json_object,
+    r2_key_exists,
     r2_upload,
+    r2_upload_dir,
 )
-from evedata_platform_sources._constants import (
-    SDE_TRANQUILITY_CHECKSUMS_URL,
-    SDE_TRANQUILITY_ZIP_URL,
+from evedata_platform_sources._exceptions import (
+    SDEArchiveExistsError,
+    SDEArchiveNotFoundError,
+    SDENotArchivedError,
 )
-from evedata_platform_utils.datetime import http_date_to_date
 from evedata_platform_utils.http import download
+from evedata_platform_utils.zip import extract
 
 if TYPE_CHECKING:
-    from evedata_platform_core import Configuration
-
+    from types_boto3_s3 import S3Client as R2Client
 
 ARCHIVE_PREFIX = "ccp/sde"
+ARCHIVE_LATEST_VERSION_KEY = f"{ARCHIVE_PREFIX}/latest.json"
+ARCHIVE_DATA_FILENAME = "data.zip"
+ARCHIVE_DATA_CHANGELOG_FILENAME = "data-changelog.jsonl"
+ARCHIVE_SCHEMA_CHANGELOG_FILENAME = "schema-changelog.yaml"
+SDE_LATEST_VERSION_URL = (
+    "https://developers.eveonline.com/static-data/tranquility/latest.jsonl"
+)
+SDE_DATA_BASE_URL = (
+    "https://developers.eveonline.com/static-data/tranquility/eve-online-static-data"
+)
+SDE_DATA_CHANGELOG_URL = (
+    "https://developers.eveonline.com/static-data/tranquility/changes"
+)
+SDE_SCHEMA_CHANGELOG_URL = (
+    "https://developers.eveonline.com/static-data/tranquility/schema-changelog.yaml"
+)
 
 
-def current_archived_sde_version(config: "Configuration") -> str | None:
-    """Get the current archived SDE version.
-
-    Returns:
-        The current archived SDE version.
-    """
-    client = r2_client_from_config(config)
-    all_versions = [
-        k
-        for k in sorted(
-            r2_list_keys(client, config.sources_bucket, ARCHIVE_PREFIX), reverse=True
-        )
-        if k.endswith(".zip")
-    ]
-    if not all_versions:
-        return None
-    return all_versions[0].split("/")[-1].removeprefix("sde-").removesuffix(".zip")
-
-
-def archive_prefix_for_version(version: str) -> str:
-    """Get the R2 archive key for the given version."""
-    return f"{ARCHIVE_PREFIX}/sde-{version}"
-
-
-def archive_current_sde_version(
-    config: "Configuration", *, overwrite: bool = False
-) -> str:
-    """Archive the current SDE version to R2.
-
-    Args:
-        config: The platform configuration.
-        overwrite: If True, overwrite the existing archive if it exists.
+def latest_sde_version() -> int:
+    """Get the latest SDE version from CCP.
 
     Returns:
-        The archived SDE version.
+        The latest SDE version.
     """
-    current_ccp_version = current_ccp_sde_version()
-    current_archive_version = current_archived_sde_version(config)
-    r2 = r2_client_from_config(config)
-
-    if (
-        current_archive_version
-        and current_ccp_version == current_archive_version
-        and not overwrite
-    ):
-        return current_archive_version
-
-    with tempfile.TemporaryDirectory(
-        f"evedata-sde-archive-{current_ccp_version}"
-    ) as tmp_dir:
-        tmp_path = Path(tmp_dir)
-        stem = f"sde-{current_ccp_version}"
-
-        checksums_path = tmp_path / f"{stem}.checksums"
-        download_ccp_sde_checksums(checksums_path)
-
-        zip_path = tmp_path / f"{stem}.zip"
-        download_ccp_sde_zip(zip_path)
-
-        expected_checksum, actual_checksum, is_valid = verify_ccp_sde(
-            zip_path, checksums_path
-        )
-        if not is_valid:
-            msg = (
-                "SDE zip file does not match expected checksum. "
-                f"Expected: {expected_checksum}, Actual: {actual_checksum}"
-            )
-            raise RuntimeError(msg)
-
-        r2 = r2_client_from_config(config)
-        bucket = config.sources_bucket
-
-        try:
-            r2_upload(r2, bucket, f"{ARCHIVE_PREFIX}/{stem}.zip", zip_path)
-            r2_upload(r2, bucket, f"{ARCHIVE_PREFIX}/{stem}.checksums", checksums_path)
-        except r2.exceptions.ClientError as e:
-            msg = f"Failed to upload SDE version {current_ccp_version} to R2: {e}"
-            raise RuntimeError(msg) from e
-        else:
-            current_archive_version = current_ccp_version
-
-    return current_archive_version
-
-
-def download_archived_sde(
-    config: "Configuration",
-    output_dir: "Path | None" = None,
-    version: str | None = None,
-) -> None:
-    """Download the archived SDE zip file.
-
-    Args:
-        config: The platform configuration.
-        output_dir: Path to download to.
-        version: The version to download. If None, download the latest version.
-    """
-    if version is None:
-        version = current_archived_sde_version(config)
-        if version is None:
-            msg = "No archived SDE versions found in R2"
-            raise FileNotFoundError(msg)
-
-    archive_prefix = archive_prefix_for_version(version)
-
-    output_dir = output_dir or config.cache_dir / "sde" / version
-    output_dir = output_dir.resolve()
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    r2 = r2_client_from_config(config)
-    checksums_path = output_dir / "sde.checksums"
-    zip_path = output_dir / "sde.zip"
-    try:
-        r2_download(r2, config.sources_bucket, f"{archive_prefix}.zip", zip_path)
-        r2_download(
-            r2, config.sources_bucket, f"{archive_prefix}.checksums", checksums_path
-        )
-    except r2.exceptions.ClientError as e:
-        msg = f"Failed to download SDE version {version} from R2: {e}"
-        raise RuntimeError(msg) from e
-
-
-def stage_archived_sde(
-    config: "Configuration",
-    output_dir: "Path | None" = None,
-    version: str | None = None,
-    *,
-    overwrite: bool = False,
-) -> Path:
-    """Download and extract the archived SDE zip file.
-
-    Args:
-        config: The platform configuration.
-        output_dir: Path to extract to.
-        version: The version to download. If None, download the latest version.
-        ignore_existing: If True, do nothing if the output directory exists.
-        overwrite: If True, overwrite the output directory if it exists.
-
-    Returns:
-        The path to the extracted SDE.
-    """
-    if version is None:
-        version = current_archived_sde_version(config)
-        if version is None:
-            msg = "No archived SDE versions found in R2"
-            raise ValueError(msg)
-
-    output_dir = output_dir or config.sde_staging_dir / version
-    output_dir = output_dir.resolve()
-
-    if output_dir.exists() and not overwrite:
-        return output_dir
-
-    if output_dir.exists() and overwrite:
-        output_dir.rename(output_dir.with_suffix(".bak"))
-
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    download_dir = config.cache_dir / "sde" / version
-    download_dir.mkdir(parents=True, exist_ok=True)
-    download_archived_sde(config, download_dir, version)
-
-    zip_path = download_dir / "sde.zip"
-    try:
-        with zipfile.ZipFile(zip_path, "r", zipfile.ZIP_DEFLATED) as zf:
-            zf.extractall(output_dir)
-    except zipfile.BadZipFile as e:
-        shutil.rmtree(output_dir, ignore_errors=True)
-        output_dir.with_suffix(".bak").rename(output_dir)
-
-        msg = f"Downloaded SDE zip file is corrupted: {e}"
-        raise RuntimeError(msg) from e
-    finally:
-        shutil.rmtree(download_dir, ignore_errors=True)
-        shutil.rmtree(output_dir.with_suffix(".bak"), ignore_errors=True)
-
-    return output_dir
-
-
-def current_ccp_sde_version() -> str:
-    """Get the current SDE version date.
-
-    Returns:
-        The current SDE version.
-    """
-    resp = httpx.get(SDE_TRANQUILITY_CHECKSUMS_URL)
+    resp = httpx.get(SDE_LATEST_VERSION_URL)
     resp.raise_for_status()
+    data = resp.json()
+    return int(data["buildNumber"])
 
-    if "last-modified" not in resp.headers:
-        msg = "No Last-Modified header in SDE checksum response"
-        raise ValueError(msg)
 
-    version = http_date_to_date(resp.headers["last-modified"])
+def sde_data_changelog_url(version: int | None = None) -> str:
+    """Get the SDE changelog URL for a given version.
+
+    Args:
+        version: The version to get the URL for. If None, get the latest.
+
+    Returns:
+        The SDE changelog URL.
+    """
+    if version is None:
+        version = latest_sde_version()
+    return f"{SDE_DATA_CHANGELOG_URL}/{version}.jsonl"
+
+
+def sde_data_url(version: int | None = None) -> str:
+    """Get the SDE data URL for a given version.
+
+    Args:
+        version: The version to get the URL for. If None, get the latest.
+
+    Returns:
+        The SDE data URL.
+    """
+    if version is None:
+        version = latest_sde_version()
+    return f"{SDE_DATA_BASE_URL}-{version}-jsonl.zip"
+
+
+def download_sde(output_dir: Path, version: int | None = None) -> None:
+    """Download the SDE data, data changelog, and schema changelog.
+
+    Args:
+        output_dir: The directory to download the SDE data to.
+        version: The version to download. If None, download the latest.
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+    if version is None:
+        version = latest_sde_version()
+
+    filename_prefix = f"sde-{version}"
+    download(
+        sde_data_url(version), output_dir / f"{filename_prefix}-{ARCHIVE_DATA_FILENAME}"
+    )
+    download(
+        sde_data_changelog_url(version),
+        output_dir / f"{filename_prefix}-{ARCHIVE_DATA_CHANGELOG_FILENAME}",
+    )
+    download(
+        SDE_SCHEMA_CHANGELOG_URL,
+        output_dir / f"{filename_prefix}-{ARCHIVE_SCHEMA_CHANGELOG_FILENAME}",
+    )
+
+
+def latest_archive_version(*, bucket: str, r2: "R2Client") -> int | None:
+    """Get the latest SDE version from the lake.
+
+    Returns:
+        The latest archive version or None if no archives.
+    """
+    if r2_key_exists(bucket=bucket, key=ARCHIVE_LATEST_VERSION_KEY, r2=r2):
+        return r2_get_json_object(bucket=bucket, key=ARCHIVE_LATEST_VERSION_KEY, r2=r2)[
+            "version"
+        ]
+    return None
+
+
+def archive_exists(version: int, *, bucket: str, r2: "R2Client") -> bool:
+    """Check if an archive exists in R2.
+
+    Args:
+        version: The SDE version to check.
+        bucket: The archive bucket.
+        r2: The R2 client.
+    """
+    return r2_key_exists(
+        bucket=bucket,
+        key=f"{ARCHIVE_PREFIX}/sde-{version}-{ARCHIVE_DATA_FILENAME}",
+        r2=r2,
+    )
+
+
+def create_archive(
+    version: int | None = None,
+    *,
+    bucket: str,
+    r2: "R2Client",
+    exist_ok: bool = True,
+    force: bool = False,
+) -> int:
+    """Archive the SDE data, data changelog, and schema changelog.
+
+    Args:
+        version: The SDE version to archive.
+        bucket: The archive bucket.
+        force: Overwrite existing version.
+        r2: The R2 client.
+        exist_ok: If True, do not raise if the version is already archived.
+    """
+    version = version or latest_sde_version()
+
+    if archive_exists(version, bucket=bucket, r2=r2) and not force:
+        if exist_ok:
+            return version
+        raise SDEArchiveExistsError(version)
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        download_sde(Path(tmp_dir), version)
+        r2_upload_dir(bucket, ARCHIVE_PREFIX, Path(tmp_dir), r2=r2)
+        r2_upload(bucket, ARCHIVE_LATEST_VERSION_KEY, {"version": version}, r2=r2)
+
+    return version
+
+
+def download_archive(
+    output_dir: Path,
+    version: int | None = None,
+    *,
+    bucket: str,
+    r2: "R2Client",
+    force: bool = False,
+) -> None:
+    """Download and uncompress an archive.
+
+    Args:
+        output_dir: The directory to download to.
+        version: The SDE version to archive.
+        bucket: The archive bucket.
+        force: Overwrite existing download.
+        r2: The R2 client.
+    """
+    version = version or latest_archive_version(bucket=bucket, r2=r2)
     if not version:
-        msg = "Invalid Last-Modified header in SDE checksum response"
-        raise ValueError(msg)
+        raise SDENotArchivedError()
 
-    return version.strftime("%Y%m%d")
+    if not archive_exists(version, bucket=bucket, r2=r2):
+        raise SDEArchiveNotFoundError(version)
 
+    if output_dir.exists() and not force:
+        m = "Output directory exists: "
+        raise FileExistsError(m, output_dir)
 
-def download_ccp_sde_checksums(output_file: "Path") -> None:
-    """Download the SDE checksums from the official SDE endpoint.
-
-    Returns:
-        A dictionary mapping file names to their checksums.
-    """
-    download(SDE_TRANQUILITY_CHECKSUMS_URL, output_file)
-
-
-def parse_ccp_sde_checksums(file_path: "Path") -> dict[str, str]:
-    """Parse the SDE checksums file.
-
-    Args:
-        file_path: Path to the checksums file.
-
-    Returns:
-        A dictionary mapping file names to their checksums.
-    """
-    checksums: dict[str, str] = {}
-    lines = file_path.read_text().splitlines()
-    for line in lines:
-        md5, filename = line.strip().split()
-        checksums[filename] = md5.lower()
-    return checksums
-
-
-def download_ccp_sde_zip(output_file: "Path") -> None:
-    """Download the SDE from the official SDE endpoint."""
-    download(SDE_TRANQUILITY_ZIP_URL, output_file)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    filename_prefix = f"sde-{version}"
+    r2_download(
+        bucket,
+        f"{ARCHIVE_PREFIX}/{filename_prefix}-{ARCHIVE_DATA_FILENAME}",
+        output_dir,
+        r2,
+    )
+    r2_download(
+        bucket,
+        f"{ARCHIVE_PREFIX}/{filename_prefix}-{ARCHIVE_DATA_CHANGELOG_FILENAME}",
+        output_dir,
+        r2,
+    )
+    r2_download(
+        bucket,
+        f"{ARCHIVE_PREFIX}/{filename_prefix}-{ARCHIVE_SCHEMA_CHANGELOG_FILENAME}",
+        output_dir,
+        r2,
+    )
 
 
-def calculate_ccp_sde_checksum(file_path: "Path") -> str:
-    """Calculate the MD5 checksum of the SDE zip file.
+def stage_archive(
+    stage_dir: Path,
+    version: int | None = None,
+    *,
+    bucket: str,
+    r2: "R2Client",
+    force: bool = False,
+) -> Path:
+    """Stage an archive."""
+    if version is not None and not archive_exists(version, bucket=bucket, r2=r2):
+        raise SDEArchiveNotFoundError(version)
 
-    Args:
-        file_path (Path | str):
-            Path to the SDE zip file.
+    version = version or latest_archive_version(bucket=bucket, r2=r2)
+    if not version:
+        raise SDENotArchivedError()
 
-    Returns:
-        str: The MD5 checksum of the file.
-    """
-    md5 = hashlib.md5()  # noqa: S324
-    with zipfile.ZipFile(file_path, "r", zipfile.ZIP_DEFLATED) as zf:
-        filenames = zf.namelist()
-        for filename in filenames:
-            md5.update(zf.read(filename))
-    return md5.hexdigest().lower()
+    version_dir = stage_dir / Path(str(version))
+    if version_dir.exists() and force:
+        shutil.rmtree(version_dir)
+    elif version_dir.exists():
+        m = "Staging directory exists: "
+        raise FileExistsError(m, version_dir)
+
+    sde_dir = version_dir / "sde"
+    sde_dir.mkdir(parents=True, exist_ok=True)
+
+    download_archive(version_dir, version, bucket=bucket, r2=r2, force=force)
+    extract(version_dir / f"sde-{version}-data.zip", sde_dir)
+    return sde_dir
 
 
-def verify_ccp_sde(zip_path: "Path", checksums_path: "Path") -> tuple[str, str, bool]:
-    """Verify the SDE file against the provided checksums.
+if __name__ == "__main__":
+    from rich import print as rprint
 
-    Args:
-        zip_path: Path to the SDE zip file.
-        checksums_path: Path to the checksums file.
+    from evedata_platform_core import Configuration
+    from evedata_platform_core.utils._r2 import r2_client_from_config
 
-    Returns:
-        True if the file matches the checksum, False otherwise.
-    """
-    checksums = parse_ccp_sde_checksums(checksums_path)
-    expected = checksums.get("sde.zip", "")
-    actual = calculate_ccp_sde_checksum(zip_path)
-    return (expected, actual, expected == actual)
+    config = Configuration()  # pyright: ignore[reportCallIssue]
+    r2 = r2_client_from_config(config)
+    bucket = config.sources_bucket
+
+    rprint("Latest SDE version:", latest_sde_version())
+    archive_version = latest_archive_version(bucket=bucket, r2=r2)
+    if not archive_version:
+        rprint("No archives found, archiving latest version...")
+        archive_version = create_archive(bucket=bucket, r2=r2)
+        rprint("Archived version:", archive_version)
+    else:
+        rprint("Latest archive version:", archive_version)
+
+    rprint("Staging archive...")
+    stage_archive(
+        config.sde_staging_dir,
+        version=archive_version,
+        bucket=bucket,
+        r2=r2,
+        force=True,
+    )
+    rprint("Staged archive in:", config.sde_staging_dir / str(archive_version))

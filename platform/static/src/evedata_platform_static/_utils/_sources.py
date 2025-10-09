@@ -33,7 +33,7 @@ def process_data(
             config["rename_columns"].get(k, k): v for k, v in final_data.items()
         }
     if names and config.get("name_from_inv_names"):
-        final_data["name"] = names.get(final_data["id"], "Name Unknown")
+        final_data["name"] = names.get(final_data["_key"], "Name Unknown")
     if path:
         final_data["_dlt_resource_path"] = str(path)
     if base_path:

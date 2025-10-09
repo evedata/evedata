@@ -51,13 +51,13 @@ class TestListInputs:
         assert normalize_id_keys([]) == []
 
     def test_list_of_dicts(self):
-        input_data = [{"name": "test"}, {"id": 1}]
-        expected = [{"name": "test"}, {"id": 1}]
+        input_data = [{"name": "test"}, {"_key": 1}]
+        expected = [{"name": "test"}, {"_key": 1}]
         assert normalize_id_keys(input_data) == expected
 
     def test_list_of_dicts_with_nested_normalization(self):
         input_data = [{"key": {1: {"value": "test"}}}]
-        expected = [{"key": [{"id": 1, "value": "test"}]}]
+        expected = [{"key": [{"_key": 1, "value": "test"}]}]
         assert normalize_id_keys(input_data) == expected
 
     def test_mixed_list_with_dicts(self):
@@ -72,59 +72,59 @@ class TestIntKeyedDicts:
     def test_dict_int_keys_scalar_values(self):
         input_data: dict[int, str] = {1: "a", 2: "b", 3: "c"}
         expected = [
-            {"id": 1, "value": "a"},
-            {"id": 2, "value": "b"},
-            {"id": 3, "value": "c"},
+            {"_key": 1, "value": "a"},
+            {"_key": 2, "value": "b"},
+            {"_key": 3, "value": "c"},
         ]
         result = cast(
             "list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data))
         )
-        assert sorted(result, key=lambda x: x["id"]) == sorted(
-            expected, key=lambda x: x["id"]
+        assert sorted(result, key=lambda x: x["_key"]) == sorted(
+            expected, key=lambda x: x["_key"]
         )
 
     def test_dict_string_int_keys_scalar_values(self):
         input_data = {"1": "a", "2": "b", "3": "c"}
         expected = [
-            {"id": 1, "value": "a"},
-            {"id": 2, "value": "b"},
-            {"id": 3, "value": "c"},
+            {"_key": 1, "value": "a"},
+            {"_key": 2, "value": "b"},
+            {"_key": 3, "value": "c"},
         ]
         result = cast("list[dict[str, Any]]", normalize_id_keys(input_data))
-        assert sorted(result, key=lambda x: x["id"]) == sorted(
-            expected, key=lambda x: x["id"]
+        assert sorted(result, key=lambda x: x["_key"]) == sorted(
+            expected, key=lambda x: x["_key"]
         )
 
     def test_dict_mixed_int_string_keys_scalar_values(self):
         input_data: dict[int | str, str] = {1: "a", "2": "b", 3: "c"}
         expected = [
-            {"id": 1, "value": "a"},
-            {"id": 2, "value": "b"},
-            {"id": 3, "value": "c"},
+            {"_key": 1, "value": "a"},
+            {"_key": 2, "value": "b"},
+            {"_key": 3, "value": "c"},
         ]
         result = cast(
             "list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data))
         )
-        assert sorted(result, key=lambda x: x["id"]) == sorted(
-            expected, key=lambda x: x["id"]
+        assert sorted(result, key=lambda x: x["_key"]) == sorted(
+            expected, key=lambda x: x["_key"]
         )
 
     def test_dict_int_keys_dict_values(self):
         input_data = {1: {"name": "test1"}, 2: {"name": "test2"}}
-        expected = [{"id": 1, "name": "test1"}, {"id": 2, "name": "test2"}]
+        expected = [{"_key": 1, "name": "test1"}, {"_key": 2, "name": "test2"}]
         result = cast("list[dict[str, Any]]", normalize_id_keys(input_data))
-        assert sorted(result, key=lambda x: x["id"]) == sorted(
-            expected, key=lambda x: x["id"]
+        assert sorted(result, key=lambda x: x["_key"]) == sorted(
+            expected, key=lambda x: x["_key"]
         )
 
     def test_dict_int_keys_list_values(self):
         input_data: dict[int, list[str]] = {1: ["a", "b"], 2: ["c", "d"]}
-        expected = [{"id": 1, "value": ["a", "b"]}, {"id": 2, "value": ["c", "d"]}]
+        expected = [{"_key": 1, "value": ["a", "b"]}, {"_key": 2, "value": ["c", "d"]}]
         result = cast(
             "list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data))
         )
-        assert sorted(result, key=lambda x: x["id"]) == sorted(
-            expected, key=lambda x: x["id"]
+        assert sorted(result, key=lambda x: x["_key"]) == sorted(
+            expected, key=lambda x: x["_key"]
         )
 
     def test_dict_int_keys_with_nested_dict(self):
@@ -133,12 +133,12 @@ class TestIntKeyedDicts:
             2: {"name": "item2", "props": {"color": "blue"}},
         }
         expected = [
-            {"id": 1, "name": "item1", "props": {"color": "red"}},
-            {"id": 2, "name": "item2", "props": {"color": "blue"}},
+            {"_key": 1, "name": "item1", "props": {"color": "red"}},
+            {"_key": 2, "name": "item2", "props": {"color": "blue"}},
         ]
         result = cast("list[dict[str, Any]]", normalize_id_keys(input_data))
-        assert sorted(result, key=lambda x: cast("int", x["id"])) == sorted(
-            expected, key=lambda x: cast("int", x["id"])
+        assert sorted(result, key=lambda x: cast("int", x["_key"])) == sorted(
+            expected, key=lambda x: cast("int", x["_key"])
         )
 
 
@@ -171,15 +171,15 @@ class TestStringKeyedDicts:
     def test_dict_string_keys_with_int_like_dict_values(self):
         input_data = {"parent": {1: "value1", 2: "value2"}}
         expected = {
-            "parent": [{"id": 1, "value": "value1"}, {"id": 2, "value": "value2"}]
+            "parent": [{"_key": 1, "value": "value1"}, {"_key": 2, "value": "value2"}]
         }
         result = normalize_id_keys(input_data)
         assert isinstance(result, dict)
         if isinstance(result["parent"], list):
             result_parent: list[dict[str, Any]] = result["parent"]  # type: ignore[assignment]
             expected_parent: list[dict[str, Any]] = expected["parent"]  # type: ignore[assignment]
-            result["parent"] = sorted(result_parent, key=lambda x: x["id"])
-            expected["parent"] = sorted(expected_parent, key=lambda x: x["id"])
+            result["parent"] = sorted(result_parent, key=lambda x: x["_key"])
+            expected["parent"] = sorted(expected_parent, key=lambda x: x["_key"])
         assert result == expected
 
 
@@ -191,15 +191,15 @@ class TestNestedStructures:
         }
         # Doesn't match parentID flattening pattern
         expected = [
-            {"id": 1, "value": [{"name": "child1"}, {"name": "child2"}]},
-            {"id": 2, "value": [{"name": "child3"}]},
+            {"_key": 1, "value": [{"name": "child1"}, {"name": "child2"}]},
+            {"_key": 2, "value": [{"name": "child3"}]},
         ]
         result = cast(
             "list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data))
         )
         # Sort by id for consistent comparison
-        result_sorted = sorted(result, key=lambda x: x["id"])
-        expected_sorted = sorted(expected, key=lambda x: x["id"])
+        result_sorted = sorted(result, key=lambda x: x["_key"])
+        expected_sorted = sorted(expected, key=lambda x: x["_key"])
         assert result_sorted == expected_sorted
 
     def test_deeply_nested_structure(self):
@@ -213,20 +213,20 @@ class TestNestedStructures:
         # List values containing dicts aren't recursively normalized
         expected = [
             {
-                "id": 1,
+                "_key": 1,
                 "value": [
                     {"type": "A", "data": {10: {"value": "x"}}},
                     {"type": "B", "data": {20: {"value": "y"}}},
                 ],
             },
-            {"id": 2, "value": [{"type": "C", "data": {30: {"value": "z"}}}]},
+            {"_key": 2, "value": [{"type": "C", "data": {30: {"value": "z"}}}]},
         ]
         result = cast(
             "list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data))
         )
         # Sort for consistent comparison
-        result_sorted = sorted(result, key=lambda x: x["id"])
-        expected_sorted = sorted(expected, key=lambda x: x["id"])
+        result_sorted = sorted(result, key=lambda x: x["_key"])
+        expected_sorted = sorted(expected, key=lambda x: x["_key"])
         assert result_sorted == expected_sorted
 
     def test_complex_nested_with_mixed_types(self):
@@ -242,7 +242,7 @@ class TestNestedStructures:
         # List values with dicts aren't recursively normalized
         expected = [
             {
-                "id": 100,
+                "_key": 100,
                 "value": [
                     {
                         "name": "item1",
@@ -271,16 +271,16 @@ class TestEdgeCases:
             normalize_id_keys({"key": None})
 
         # None values in int-keyed dicts are preserved as scalars
-        assert normalize_id_keys(cast("Any", {1: None})) == [{"id": 1, "value": None}]
+        assert normalize_id_keys(cast("Any", {1: None})) == [{"_key": 1, "value": None}]
 
     def test_very_large_integers(self):
         large_int = 999999999999999
         input_data: dict[int, str] = {large_int: "value"}
-        expected = [{"id": 999999999999999, "value": "value"}]
+        expected = [{"_key": 999999999999999, "value": "value"}]
         assert normalize_id_keys(cast("Any", input_data)) == expected
 
         input_data2 = {"999999999999999": "value"}
-        expected2 = [{"id": 999999999999999, "value": "value"}]
+        expected2 = [{"_key": 999999999999999, "value": "value"}]
         assert normalize_id_keys(input_data2) == expected2
 
     def test_unicode_keys(self):
@@ -296,19 +296,19 @@ class TestEdgeCases:
     def test_negative_integer_keys(self):
         input_data: dict[int, str] = {-1: "negative", -100: "very negative"}
         expected = [
-            {"id": -1, "value": "negative"},
-            {"id": -100, "value": "very negative"},
+            {"_key": -1, "value": "negative"},
+            {"_key": -100, "value": "very negative"},
         ]
         result = cast(
             "list[dict[str, Any]]", normalize_id_keys(cast("Any", input_data))
         )
-        assert sorted(result, key=lambda x: x["id"]) == sorted(
-            expected, key=lambda x: x["id"]
+        assert sorted(result, key=lambda x: x["_key"]) == sorted(
+            expected, key=lambda x: x["_key"]
         )
 
     def test_zero_as_key(self):
         input_data: dict[int, str] = {0: "zero value"}
-        expected = [{"id": 0, "value": "zero value"}]
+        expected = [{"_key": 0, "value": "zero value"}]
         assert normalize_id_keys(cast("Any", input_data)) == expected
 
 
@@ -346,7 +346,7 @@ class TestEVEDataIntegration:
         assert len(result) == 2
 
         for item in result:
-            assert "id" in item
+            assert "_key" in item
             assert "name" in item
             assert "groupID" in item
             assert "mass" in item
@@ -371,14 +371,14 @@ class TestEVEDataIntegration:
         assert len(result) == 1
 
         blueprint = result[0]
-        assert blueprint["id"] == 681
+        assert blueprint["_key"] == 681
         assert "activities" in blueprint
         assert "manufacturing" in blueprint["activities"]
 
         materials = blueprint["activities"]["manufacturing"]["materials"]
-        expected_materials = [{"id": 34, "value": 11000}, {"id": 35, "value": 2200}]
-        assert sorted(materials, key=lambda x: x["id"]) == sorted(
-            expected_materials, key=lambda x: x["id"]
+        expected_materials = [{"_key": 34, "value": 11000}, {"_key": 35, "value": 2200}]
+        assert sorted(materials, key=lambda x: x["_key"]) == sorted(
+            expected_materials, key=lambda x: x["_key"]
         )
 
     def test_eve_market_groups_structure(self):
@@ -395,7 +395,7 @@ class TestEVEDataIntegration:
         assert len(result) == 2
 
         for group in result:
-            assert "id" in group
+            assert "_key" in group
             assert "nameID" in group
 
     def test_realistic_nested_eve_data(self):
@@ -431,7 +431,7 @@ class TestPerformance:
         # Should complete in reasonable time (< 1 second)
         assert elapsed < 1.0
         assert len(result) == 10000
-        assert all("id" in item for item in result)
+        assert all("_key" in item for item in result)
 
     def test_deep_nesting_performance(self):
         # Create deeply nested structure

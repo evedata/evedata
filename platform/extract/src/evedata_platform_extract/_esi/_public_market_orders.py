@@ -1,14 +1,19 @@
 import asyncio
-from datetime import UTC, datetime
+from datetime import (
+    UTC,
+    datetime,
+)
 from email.utils import parsedate_to_datetime
+from pathlib import Path
 
 import polars as pl
 from aiohttp import ClientSession
+from rich.console import Console
 
 from evedata_platform_core import EVEDATA_USER_AGENT
 
 _BASE_URL = "https://esi.evetech.net/markets"
-_MARKET_REGION_IDS = [
+MARKET_REGION_IDS = [
     10000054,  # Aridia
     10000069,  # Black Rise
     10000055,  # Branch
@@ -76,7 +81,7 @@ _MARKET_REGION_IDS = [
     10000006,  # Wicked Creek
     10001000,  # Yasna Zakh
 ]
-_HUB_STATION_IDS = [
+HUB_STATION_IDS = [
     60003760,  # Jita IV - Moon 4 - Caldari Navy Assembly Plant
     60008494,  # Amarr VIII (Oris) - Emperor Family Academy
     60011866,  # Dodixie IX - Moon 20 - Federation Navy Assembly Plant
@@ -124,7 +129,9 @@ async def fetch_dataframe(session: ClientSession, url: str) -> pl.DataFrame:
         return df.with_columns(pl.col("range").cast(_RANGE_ENUM))
 
 
-async def fetch_region_orders(session: ClientSession, region_id: int) -> pl.LazyFrame:
+async def fetch_region_orders(
+    session: ClientSession, region_id: int
+) -> tuple[int, pl.LazyFrame]:
     first_page: pl.LazyFrame
     last_modified: datetime | None
     total_pages: int
@@ -140,7 +147,7 @@ async def fetch_region_orders(session: ClientSession, region_id: int) -> pl.Lazy
         total_pages = int(resp.headers.get("x-pages", "1"))
 
     if total_pages == 1:
-        return first_page.with_columns(
+        return 1, first_page.with_columns(
             pl.lit(last_modified).alias("last_modified"),
             pl.lit(region_id).alias("region_id"),
         )
@@ -154,20 +161,156 @@ async def fetch_region_orders(session: ClientSession, region_id: int) -> pl.Lazy
     async for df in asyncio.as_completed(tasks):
         frames.append((await df).lazy())  # noqa: PERF401
 
-    return pl.concat(frames).with_columns(
+    return total_pages, pl.concat(frames).with_columns(
         pl.lit(last_modified).alias("last_modified"),
         pl.lit(region_id).alias("region_id"),
     )
 
 
-async def fetch_all_region_orders(session: ClientSession) -> pl.LazyFrame:
-    tasks = [
-        fetch_region_orders(session, region_id) for region_id in _MARKET_REGION_IDS
-    ]
+async def fetch_all_region_orders(session: ClientSession) -> tuple[int, pl.LazyFrame]:
+    tasks = [fetch_region_orders(session, region_id) for region_id in MARKET_REGION_IDS]
     frames: list[pl.LazyFrame] = []
-    for df in asyncio.as_completed(tasks):
-        frames.append(await df)  # noqa: PERF401
-    return pl.concat(frames).sort(["region_id", "type_id", "order_id"])
+    total_pages = 0
+    for task in asyncio.as_completed(tasks):
+        pages, df = await task
+        total_pages += pages
+        frames.append(df)
+    return total_pages, pl.concat(frames).sort(["region_id", "type_id", "order_id"])
+
+
+def create_order_depth_aggregation(
+    lazy_frame: pl.LazyFrame, group_by_cols: list[str]
+) -> pl.LazyFrame:
+    """Create full order depth aggregation for given grouping columns.
+
+    This aggregation provides complete order book depth with all price levels
+    and their cumulative volumes for full order book reconstruction.
+    """
+    # First aggregate to get volume and order count per price level
+    depth_agg = lazy_frame.group_by([*group_by_cols, "price", "is_buy_order"]).agg(
+        [
+            pl.col("volume_remain").sum().alias("volume"),
+            pl.col("order_id").count().alias("order_count"),
+            pl.col("timestamp").first().alias("timestamp"),
+        ]
+    )
+
+    # Now group by location/type and create the depth arrays
+    return (
+        depth_agg.group_by(group_by_cols)
+        .agg(
+            [
+                # Full buy side depth - all price levels with volumes
+                pl.when(pl.col("is_buy_order"))
+                .then(
+                    pl.struct(
+                        [
+                            pl.col("price").round(2),
+                            pl.col("volume"),
+                            pl.col("order_count"),
+                        ]
+                    )
+                )
+                .sort_by("price", descending=True)
+                .drop_nulls()
+                .alias("buy_depth"),
+                # Full sell side depth - all price levels with volumes
+                pl.when(~pl.col("is_buy_order"))
+                .then(
+                    pl.struct(
+                        [
+                            pl.col("price").round(2),
+                            pl.col("volume"),
+                            pl.col("order_count"),
+                        ]
+                    )
+                )
+                .sort_by("price")
+                .drop_nulls()
+                .alias("sell_depth"),
+                # Summary metrics
+                pl.col("volume")
+                .filter(pl.col("is_buy_order"))
+                .sum()
+                .alias("total_buy_volume"),
+                pl.col("volume")
+                .filter(~pl.col("is_buy_order"))
+                .sum()
+                .alias("total_sell_volume"),
+                pl.col("order_count")
+                .filter(pl.col("is_buy_order"))
+                .sum()
+                .alias("total_buy_orders"),
+                pl.col("order_count")
+                .filter(~pl.col("is_buy_order"))
+                .sum()
+                .alias("total_sell_orders"),
+                # Best prices
+                pl.col("price")
+                .filter(pl.col("is_buy_order"))
+                .max()
+                .round(2)
+                .alias("best_buy_price"),
+                pl.col("price")
+                .filter(~pl.col("is_buy_order"))
+                .min()
+                .round(2)
+                .alias("best_sell_price"),
+                # Unique price levels
+                pl.col("price")
+                .filter(pl.col("is_buy_order"))
+                .n_unique()
+                .alias("buy_price_levels"),
+                pl.col("price")
+                .filter(~pl.col("is_buy_order"))
+                .n_unique()
+                .alias("sell_price_levels"),
+                # Timestamp
+                pl.col("timestamp").first().alias("timestamp"),
+            ]
+        )
+        .with_columns(
+            [
+                # Calculate spread
+                pl.when(
+                    pl.col("best_buy_price").is_not_null()
+                    & pl.col("best_sell_price").is_not_null()
+                )
+                .then(
+                    pl.max_horizontal(
+                        pl.col("best_sell_price") - pl.col("best_buy_price"),
+                        pl.lit(0),
+                    ).round(2)
+                )
+                .otherwise(None)
+                .alias("spread"),
+                # Mid price
+                pl.when(
+                    pl.col("best_buy_price").is_not_null()
+                    & pl.col("best_sell_price").is_not_null()
+                )
+                .then(
+                    ((pl.col("best_buy_price") + pl.col("best_sell_price")) / 2).round(
+                        2
+                    )
+                )
+                .otherwise(None)
+                .alias("mid_price"),
+                # Volume imbalance
+                pl.when(
+                    (pl.col("total_buy_volume") > 0) & (pl.col("total_sell_volume") > 0)
+                )
+                .then(
+                    (
+                        pl.col("total_buy_volume")
+                        / (pl.col("total_buy_volume") + pl.col("total_sell_volume"))
+                    ).round(4)
+                )
+                .otherwise(None)
+                .alias("volume_imbalance_ratio"),
+            ]
+        )
+    )
 
 
 def create_market_indicators_aggregation(
@@ -330,91 +473,171 @@ def create_market_indicators_aggregation(
     )
 
 
+async def extract_public_market_orders(  # noqa: PLR0915
+    output_dir: str | None = None, stdout: Console | None = None
+) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame]:
+    """Extract public market orders and create aggregations.
+
+    Args:
+        output_dir: Optional output directory. If None, saves to current directory.
+        stdout: Optional Console for output. If None, creates a new Console.
+
+    Returns:
+        Tuple of (raw_orders, market_indicators, order_depth) DataFrames
+    """
+    stdout = stdout or Console()
+    timestamp = datetime.now(UTC)
+    timestamp_str = timestamp.strftime("%Y%m%d%H%M%S")
+
+    # Determine output directory
+    if output_dir:
+        out_path = Path(output_dir)
+        out_path.mkdir(parents=True, exist_ok=True)
+    else:
+        out_path = Path.cwd()
+
+    async with ClientSession(headers={"User-Agent": EVEDATA_USER_AGENT}) as session:
+        total_pages, lazy_orders = await fetch_all_region_orders(session)
+        lazy_orders = lazy_orders.with_columns(pl.lit(timestamp).alias("timestamp"))
+
+        # Regional aggregation - group by region_id and type_id
+        # Note: We include all orders except station-limited ones. This can result
+        # in "crossed markets" where buy_price > sell_price due to range
+        # limitations. For example, a buy order with range=3 at station A might
+        # offer 3.0 ISK while a region-wide sell order at station B (10+ jumps away)
+        # offers 2.0 ISK. These crossed markets represent real arbitrage
+        # opportunities and market inefficiencies, not data errors. Station-limited
+        # orders are excluded as they don't participate in the broader regional
+        # market.
+        regional_orders = lazy_orders.filter(pl.col("range") != "station")
+        regional_agg = (
+            create_market_indicators_aggregation(
+                regional_orders, ["region_id", "type_id"]
+            )
+            .rename({"region_id": "location_id"})
+            .with_columns(pl.lit("region").alias("location_type"))
+        )
+
+        # Station aggregation - group by location_id and type_id for all stations
+        station_agg = create_market_indicators_aggregation(
+            lazy_orders,
+            ["location_id", "type_id"],
+        ).with_columns(
+            [
+                pl.lit("station").alias("location_type"),
+                pl.col("location_id").is_in(HUB_STATION_IDS).alias("is_hub"),
+            ]
+        )
+
+        # Combine regional and station aggregations
+        regional_agg = regional_agg.with_columns(pl.lit(False).alias("is_hub"))  # noqa: FBT003
+        combined_agg = pl.concat([regional_agg, station_agg], how="vertical_relaxed")
+
+        # Collect aggregated data and sort
+        aggregated = await combined_agg.collect_async()
+        aggregated = aggregated.sort(["location_type", "location_id", "type_id"])
+
+        # Write market indicators with zstd compression
+        indicators_filename = out_path / f"market_indicators_5m_{timestamp_str}.parquet"
+        aggregated.write_parquet(
+            indicators_filename,
+            compression="zstd",
+            compression_level=3,
+        )
+
+        stdout.print(f"\nMarket indicators saved to: {indicators_filename}")
+        stdout.print(aggregated.describe())
+        stdout.print(f"Total aggregated rows: {len(aggregated)}")
+        regional_count = aggregated.filter(pl.col("location_type") == "region").height
+        station_count = aggregated.filter(pl.col("location_type") == "station").height
+        hub_count = aggregated.filter(pl.col("is_hub")).height
+        stdout.print(f"Regional rows: {regional_count}")
+        stdout.print(f"Station rows: {station_count}")
+        stdout.print(f"  - Hub stations: {hub_count}")
+
+        # Create order depth aggregations
+        stdout.print("\n[bold]Creating order depth aggregations...[/bold]")
+
+        # Regional depth - excluding station-only orders
+        regional_depth = (
+            create_order_depth_aggregation(regional_orders, ["region_id", "type_id"])
+            .rename({"region_id": "location_id"})
+            .with_columns(pl.lit("region").alias("location_type"))
+        )
+
+        # Station depth - all orders at each station
+        station_depth = create_order_depth_aggregation(
+            lazy_orders, ["location_id", "type_id"]
+        ).with_columns(
+            [
+                pl.lit("station").alias("location_type"),
+                pl.col("location_id").is_in(HUB_STATION_IDS).alias("is_hub"),
+            ]
+        )
+
+        # Combine depth aggregations
+        regional_depth = regional_depth.with_columns(pl.lit(False).alias("is_hub"))  # noqa: FBT003
+        combined_depth = pl.concat(
+            [regional_depth, station_depth], how="vertical_relaxed"
+        )
+
+        # Collect and sort depth data
+        depth_data = await combined_depth.collect_async()
+        depth_data = depth_data.sort(["location_type", "location_id", "type_id"])
+
+        # Write order depth data
+        depth_filename = out_path / f"market_order_depth_{timestamp_str}.parquet"
+        depth_data.write_parquet(
+            depth_filename,
+            compression="zstd",
+            compression_level=3,
+        )
+
+        stdout.print(f"\nOrder depth saved to: {depth_filename}")
+        stdout.print(f"Total depth rows: {len(depth_data)}")
+        regional_depth_count = depth_data.filter(
+            pl.col("location_type") == "region"
+        ).height
+        station_depth_count = depth_data.filter(
+            pl.col("location_type") == "station"
+        ).height
+        hub_depth_count = depth_data.filter(pl.col("is_hub")).height
+        stdout.print(f"Regional depth rows: {regional_depth_count}")
+        stdout.print(f"Station depth rows: {station_depth_count}")
+        stdout.print(f"  - Hub stations: {hub_depth_count}")
+
+        # Sample depth statistics
+        sample = depth_data.head(5)
+        if len(sample) > 0:
+            stdout.print("\n[bold]Sample order depth data:[/bold]")
+            for row in sample.iter_rows(named=True):
+                buy_depth_count = len(row["buy_depth"]) if row["buy_depth"] else 0
+                sell_depth_count = len(row["sell_depth"]) if row["sell_depth"] else 0
+                stdout.print(
+                    f"Location {row['location_id']}, Type {row['type_id']}: "
+                    f"{buy_depth_count} buy levels, {sell_depth_count} sell levels"
+                )
+
+        # Collect and save raw orders
+        orders = await lazy_orders.collect_async()
+        orders = orders.sort(["region_id", "type_id", "order_id"])
+        orders_filename = out_path / f"market_orders_{timestamp_str}.parquet"
+        orders.write_parquet(
+            orders_filename,
+            compression="zstd",
+            compression_level=3,
+        )
+        stdout.print(f"\nRaw orders saved to: {orders_filename}")
+        stdout.print(f"Total pages fetched: {total_pages}")
+        stdout.print(orders.describe())
+
+        return orders, aggregated, depth_data
+
+
 if __name__ == "__main__":
     import uvloop
-    from rich import print as rprint
 
     async def main():
-        timestamp = datetime.now(UTC)
-        # Format timestamp for filenames: YYYYMMDDHHmmss
-        timestamp_str = timestamp.strftime("%Y%m%d%H%M%S")
-
-        async with ClientSession(headers={"User-Agent": EVEDATA_USER_AGENT}) as session:
-            lazy_orders = (await fetch_all_region_orders(session)).with_columns(
-                pl.lit(timestamp).alias("timestamp")
-            )
-
-            # Regional aggregation - group by region_id and type_id
-            # Note: We include all orders except station-limited ones. This can result
-            # in "crossed markets" where buy_price > sell_price due to range
-            # limitations. For example, a buy order with range=3 at station A might
-            # offer 3.0 ISK while a region-wide sell order at station B (10+ jumps away)
-            # offers 2.0 ISK. These crossed markets represent real arbitrage
-            # opportunities and market inefficiencies, not data errors. Station-limited
-            # orders are excluded as they don't participate in the broader regional
-            # market.
-            regional_orders = lazy_orders.filter(pl.col("range") != "station")
-            regional_agg = (
-                create_market_indicators_aggregation(
-                    regional_orders, ["region_id", "type_id"]
-                )
-                .rename({"region_id": "location_id"})
-                .with_columns(pl.lit("region").alias("location_type"))
-            )
-
-            # Station aggregation - group by location_id and type_id for all stations
-            station_agg = create_market_indicators_aggregation(
-                lazy_orders,
-                ["location_id", "type_id"],
-            ).with_columns(
-                [
-                    pl.lit("station").alias("location_type"),
-                    pl.col("location_id").is_in(_HUB_STATION_IDS).alias("is_hub"),
-                ]
-            )
-
-            # Combine regional and station aggregations
-            regional_agg = regional_agg.with_columns(pl.lit(False).alias("is_hub"))  # noqa: FBT003
-            combined_agg = pl.concat(
-                [regional_agg, station_agg], how="vertical_relaxed"
-            )
-
-            # Collect aggregated data and sort
-            aggregated = await combined_agg.collect_async()
-            aggregated = aggregated.sort(["location_type", "location_id", "type_id"])
-
-            # Write with zstd compression for better compression ratio
-            indicators_filename = f"market_indicators_5m_{timestamp_str}.parquet"
-            aggregated.write_parquet(
-                indicators_filename,
-                compression="zstd",
-                compression_level=3,  # Good balance of speed and compression
-            )
-
-            rprint(f"\nMarket indicators saved to: {indicators_filename}")
-            rprint(aggregated.describe())
-            rprint(f"Total aggregated rows: {len(aggregated)}")
-            regional_count = aggregated.filter(
-                pl.col("location_type") == "region"
-            ).height
-            station_count = aggregated.filter(
-                pl.col("location_type") == "station"
-            ).height
-            hub_count = aggregated.filter(pl.col("is_hub")).height
-            rprint(f"Regional rows: {regional_count}")
-            rprint(f"Station rows: {station_count}")
-            rprint(f"  - Hub stations: {hub_count}")
-
-            # Also save raw orders with sorting and compression
-            orders = await lazy_orders.collect_async()
-            orders = orders.sort(["region_id", "type_id", "order_id"])
-            orders_filename = f"market_orders_{timestamp_str}.parquet"
-            orders.write_parquet(
-                orders_filename,
-                compression="zstd",
-                compression_level=3,
-            )
-            rprint(f"\nRaw orders saved to: {orders_filename}")
-            rprint(orders.describe())
+        await extract_public_market_orders()
 
     uvloop.run(main())

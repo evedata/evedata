@@ -14,9 +14,7 @@ cmd = Typer()
 def sde_cmd(
     *,
     ctx: typer.Context,
-    version: Annotated[
-        str | None, typer.Option(help="SDE version to extract in YYYYMMDD format.")
-    ] = None,
+    version: Annotated[int | None, typer.Option(help="SDE version to extract.")] = None,
     include: Annotated[
         str | None, typer.Option(help="Comma-separated list of resources to include.")
     ] = None,
@@ -26,26 +24,34 @@ def sde_cmd(
     ] = None,
 ) -> None:
     """Extract raw data from the SDE."""
-    from evedata_platform_extract._dlt._pipelines import (  # noqa: PLC0415
+    from evedata_platform_extract._dlt._pipelines import (
         static_data_pipeline,
     )
-    from evedata_platform_extract._dlt._sources import sde  # noqa: PLC0415
-    from evedata_platform_extract._utils._sources import (  # noqa: PLC0415
+    from evedata_platform_extract._dlt._sources._sde import sde
+    from evedata_platform_extract._utils._sources import (
         filter_resources,
     )
-    from evedata_platform_sources._sde import (  # noqa: PLC0415
-        archive_current_sde_version,
-        current_archived_sde_version,
-        stage_archived_sde,
+    from evedata_platform_sources._sde import (
+        archive_exists,
+        create_archive,
+        latest_sde_version,
+        stage_archive,
     )
 
     state: AdminState = ctx.obj
+    stdout = state.out
     config = state.config
+    r2 = config.r2
+    bucket = config.sources_bucket
 
-    version = version or current_archived_sde_version(config)
-    if not version:
-        version = archive_current_sde_version(config)
-    sde_dir = stage_archived_sde(config, version=version)
+    version = version or latest_sde_version()
+    if not archive_exists(version, bucket=bucket, r2=r2):
+        create_archive(version, bucket=bucket, r2=r2)
+
+    sde_dir = stage_archive(
+        config.sde_staging_dir, version=version, bucket=bucket, r2=r2, force=True
+    )
+    stdout.print("Staged archive in:", sde_dir)
 
     source = filter_resources(
         sde(sde_dir, version),
@@ -53,8 +59,8 @@ def sde_cmd(
         exclude=exclude.split(",") if exclude else None,
     )
 
-    static_data_pipeline("sde", "sde_raw", config.catalog_credentials()).run(
+    static_data_pipeline("raw_sde", "raw_sde", config.catalog_credentials()).run(
         source, loader_file_format="parquet"
     )
 
-    shutil.rmtree(sde_dir, ignore_errors=True)
+    shutil.rmtree(sde_dir.parent, ignore_errors=True)
