@@ -182,4 +182,4 @@ MIT
 
 ## Author Information
 
-Created by the EVEData Platform Team for managing Kubernetes dependencies on Ubuntu 24.04 LTS systems.
+Created by the EVEData Team for managing Kubernetes dependencies on Ubuntu 24.04 LTS systems.

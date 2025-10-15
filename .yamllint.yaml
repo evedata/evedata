@@ -1,4 +1,89 @@
+---
 ignore:
   - "*lock.yaml"
+  - "**/templates/*.yaml"
   - "**/node_modules"
   - ".venv"
+
+extends: default
+
+rules:
+  # Line length: Allow longer lines for Kubernetes manifests
+  line-length:
+    max: 120
+    level: warning
+
+  # Comments: Require space after comment marker
+  comments:
+    min-spaces-from-content: 1
+
+  # Indentation: 2 spaces, consistent across the file
+  indentation:
+    spaces: 2
+    indent-sequences: true
+    check-multi-line-strings: false
+
+  # Document start: Require --- at the beginning of files
+  document-start:
+    present: true
+
+  # Truthy values: Allow yes/no in addition to true/false
+  truthy:
+    allowed-values: ["true", "false", "yes", "no"]
+    check-keys: false
+
+  # Empty lines: Allow reasonable empty lines
+  empty-lines:
+    max: 2
+
+  # Brackets: Consistent spacing in brackets
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 0
+
+  # Braces: Consistent spacing in braces
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 0
+
+  # Colons: Require space after colon
+  colons:
+    max-spaces-before: 0
+    max-spaces-after: 1
+
+  # Commas: Require space after comma
+  commas:
+    max-spaces-before: 0
+    min-spaces-after: 1
+    max-spaces-after: 1
+
+  # Key duplicates: Disallow duplicate keys
+  key-duplicates: enable
+
+  # Trailing spaces: Disallow trailing spaces
+  trailing-spaces: enable
+
+  # New line at end of file: Require newline at EOF
+  new-line-at-end-of-file: enable
+
+  # Document end: Don't require ... at the end
+  document-end: disable
+
+  # Hyphens: Consistent spacing after hyphens in lists
+  hyphens:
+    max-spaces-after: 1
+
+  # Empty values: Allow empty values
+  empty-values:
+    forbid-in-block-mappings: false
+    forbid-in-flow-mappings: false
+
+  # Quoted strings: Be flexible with quotes
+  quoted-strings:
+    quote-type: any
+    required: false
+
+  # Octal values: Disallow implicit octal values
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: false

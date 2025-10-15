@@ -1,0 +1,66 @@
+---
+# Default values for bootstrap chart
+
+# ArgoCD configuration
+argocd:
+  namespace: argocd
+  project: default
+
+# Target cluster configuration
+destination:
+  server: https://kubernetes.default.svc
+
+# Global sync policy defaults
+# Individual applications can override these settings
+syncPolicy:
+  # Enable automated sync - applications will automatically sync when git changes are detected
+  automated:
+    # Enable self-healing - applications will be synced if they drift from desired state
+    selfHeal: true
+    # Enable auto-pruning - resources will be deleted if removed from git
+    prune: true
+  # Sync options applied to all applications
+  syncOptions:
+    - CreateNamespace=true # Automatically create namespaces if they don't exist
+    - PruneLast=true # Prune resources as a final step (safer for dependencies)
+  # Retry policy for failed syncs
+  retry:
+    limit: 5
+    backoff:
+      duration: 5s
+      factor: 2
+      maxDuration: 3m
+
+certManager:
+  enabled: true
+  namespace: cert-manager
+  chart:
+    repoURL: https://charts.jetstack.io
+    chart: cert-manager
+    targetRevision: v1.19.0
+  # See https://cert-manager.io/docs/installation/helm/ for all options
+  values:
+    installCRDs: true
+    namespace: cert-manager
+    prometheus:
+      enabled: true
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        memory: 128Mi
+    webhook:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          memory: 128Mi
+    cainjector:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          memory: 128Mi

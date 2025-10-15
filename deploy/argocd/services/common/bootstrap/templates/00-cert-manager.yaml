@@ -1,0 +1,59 @@
+{{- if .Values.certManager.enabled }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: {{ .Values.argocd.namespace }}
+  labels:
+    {{- include "bootstrap.labels" . | nindent 4 }}
+    app.kubernetes.io/component: certificate-management
+  annotations:
+    argocd.argoproj.io/manifest-generate-paths: .
+    argocd.argoproj.io/sync-wave: "0"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: {{ .Values.argocd.project }}
+
+  source:
+    repoURL: {{ .Values.certManager.chart.repoURL }}
+    chart: {{ .Values.certManager.chart.chart }}
+    targetRevision: {{ .Values.certManager.chart.targetRevision }}
+    helm:
+      releaseName: cert-manager
+      values: |
+        {{- toYaml .Values.certManager.values | nindent 8 }}
+
+  destination:
+    server: {{ .Values.destination.server }}
+    namespace: {{ .Values.certManager.namespace }}
+
+  {{- include "bootstrap.syncPolicy" .Values.syncPolicy | nindent 2 }}
+
+  # Ignore differences in certain fields to prevent constant drift detection
+  # This is particularly important for cert-manager CRDs and webhook configurations
+  ignoreDifferences:
+    # Ignore webhook CA bundle updates (cert-manager manages these)
+    - group: admissionregistration.k8s.io
+      kind: ValidatingWebhookConfiguration
+      name: cert-manager-webhook
+      jsonPointers:
+        - /webhooks/0/clientConfig/caBundle
+    - group: admissionregistration.k8s.io
+      kind: MutatingWebhookConfiguration
+      name: cert-manager-webhook
+      jsonPointers:
+        - /webhooks/0/clientConfig/caBundle
+    # Ignore conversion webhook CA bundle in CRDs
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      jsonPointers:
+        - /spec/conversion/webhook/clientConfig/caBundle
+
+  info:
+    - name: Documentation
+      value: https://cert-manager.io/docs/
+    - name: Repository
+      value: https://github.com/cert-manager/cert-manager
+{{- end }}

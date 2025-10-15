@@ -1,0 +1,50 @@
+---
+# Staging cluster-specific values for bootstrap chart
+# Overlay these values on top of values.yaml for the staging environment
+#
+# Usage:
+#   helm template bootstrap deploy/argocd/common/bootstrap \
+#     --values deploy/argocd/common/bootstrap/values.yaml \
+#     --values deploy/argocd/common/bootstrap/values-stg.yaml
+
+# cert-manager configuration for staging
+certManager:
+  enabled: true
+  values:
+    # Reduced resources for staging environment
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        memory: 128Mi
+
+    webhook:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          memory: 128Mi
+
+    cainjector:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          memory: 128Mi
+
+    # Disable Prometheus metrics in staging if not needed
+    prometheus:
+      enabled: false
+      servicemonitor:
+        enabled: false
+
+    # Single replica is acceptable for staging
+    # replicaCount: 1
+
+    # Staging-specific pod annotations for observability
+    podAnnotations:
+      environment: staging
+      cluster: stg

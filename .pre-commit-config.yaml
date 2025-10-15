@@ -1,3 +1,4 @@
+---
 repos:
   - hooks:
       - id: check-executables-have-shebangs
@@ -9,6 +10,7 @@ repos:
       - args:
           - --unsafe
         id: check-yaml
+        exclude: deploy\/argocd\/services\/.+\/templates
       - id: debug-statements
       - id: detect-private-key
       - id: end-of-file-fixer
@@ -36,6 +38,7 @@ repos:
     hooks:
       - id: yamllint
         args: [--strict]
+        exclude: deploy\/argocd\/services\/.+\/templates
 
   - hooks:
       - additional_dependencies:

@@ -1,0 +1,8 @@
+---
+# Horizontal services cluster-specific values for common-bootstrap chart
+# Overlay these values on top of values.yaml for the hzl environment
+#
+# Usage:
+#   helm template common-bootstrap deploy/argocd/common/bootstrap \
+#     --values deploy/argocd/common/bootstrap/values.yaml \
+#     --values deploy/argocd/common/bootstrap/values-hzl.yaml

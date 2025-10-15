@@ -3,7 +3,7 @@
 
 galaxy_info:
   role_name: kubernetes
-  author: EVEData Platform Team
+  author: EVEData Team
   description: Install Python dependencies required for kubernetes.core Ansible collection on Ubuntu 24.04 LTS
   company: EVEData
   license: MIT
@@ -11,7 +11,7 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
-        - noble  # Ubuntu 24.04 LTS
+        - noble # Ubuntu 24.04 LTS
 
   galaxy_tags:
     - kubernetes

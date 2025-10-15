@@ -3,7 +3,7 @@
 
 galaxy_info:
   role_name: tailscale
-  author: EVEData Platform Team
+  author: EVEData Team
   description: Install and configure Tailscale mesh VPN on Ubuntu 24.04 LTS systems
   company: EVEData
   license: MIT
