@@ -92,10 +92,6 @@ loki:
     write:
       replicas: 3
       affinity: {}
-
-    minio:
-      enabled: false
-
     ingester:
       affinity: {}
     distributor:
@@ -122,6 +118,8 @@ loki:
       affinity: {}
     overridesExporter:
       affinity: {}
+    minio:
+      enabled: false
 lokiConfig:
   enabled: true
   namespace: loki-config
