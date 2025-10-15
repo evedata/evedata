@@ -1,0 +1,52 @@
+---
+# tasks file for tailscale_operator role
+# Main task orchestration for Tailscale Operator deployment
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - tailscale_operator_oauth_client_id is defined
+      - tailscale_operator_oauth_client_id | length > 0
+      - tailscale_operator_oauth_client_secret is defined
+      - tailscale_operator_oauth_client_secret | length > 0
+      - tailscale_operator_hostname is defined
+      - tailscale_operator_hostname | length > 0
+      - helm_kubeconfig is defined
+      - helm_kubeconfig | length > 0
+    fail_msg: >-
+      Required variables are not defined. Please ensure tailscale_operator_oauth_client_id,
+      tailscale_operator_oauth_client_secret, tailscale_operator_hostname,
+      and helm_kubeconfig are set."
+  tags:
+    - tailscale-operator
+    - tailscale-operator-validate
+
+- name: Include namespace management tasks
+  ansible.builtin.include_tasks: namespace.yml
+  tags:
+    - tailscale-operator
+    - tailscale-operator-namespace
+
+- name: Include Helm repository configuration tasks
+  ansible.builtin.include_tasks: helm-repo.yml
+  tags:
+    - tailscale-operator
+    - tailscale-operator-helm-repo
+
+- name: Include operator installation tasks
+  ansible.builtin.include_tasks: install.yml
+  tags:
+    - tailscale-operator
+    - tailscale-operator-install
+
+- name: Include DNS configuration tasks
+  ansible.builtin.include_tasks: dns-config.yml
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns
+
+- name: Include validation tasks
+  ansible.builtin.include_tasks: validate.yml
+  tags:
+    - tailscale-operator
+    - tailscale-operator-validate

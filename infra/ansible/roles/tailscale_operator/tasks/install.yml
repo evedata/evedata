@@ -1,0 +1,106 @@
+---
+# Installation tasks for Tailscale Operator
+
+- name: Prepare Helm values for Tailscale Operator
+  ansible.builtin.set_fact:
+    tailscale_operator_helm_values:
+      oauth:
+        clientId: "{{ tailscale_operator_oauth_client_id }}"
+        clientSecret: "{{ tailscale_operator_oauth_client_secret }}"
+      operatorConfig:
+        hostname: "{{ tailscale_operator_hostname }}"
+        logging: "{{ tailscale_operator_log_level }}"
+        image:
+          tag: "{{ tailscale_operator_image_tag }}"
+          digest: "{{ tailscale_operator_image_digest }}"
+      proxyConfig:
+        image:
+          tag: "{{ tailscale_operator_proxy_image_tag }}"
+          digest: "{{ tailscale_operator_proxy_image_digest }}"
+      apiServerProxyConfig:
+        mode: "{{ tailscale_operator_api_server_proxy_mode | lower }}"
+      replicaCount: "{{ tailscale_operator_replica_count }}"
+      image:
+        pullPolicy: "{{ tailscale_operator_image_pull_policy }}"
+  no_log: true
+  tags:
+    - tailscale-operator
+    - tailscale-operator-install
+
+- name: Merge extra values with default values
+  ansible.builtin.set_fact:
+    tailscale_operator_final_values: >-
+      {{ tailscale_operator_helm_values |
+      combine(tailscale_operator_extra_values, recursive=true) }}
+  no_log: true
+  tags:
+    - tailscale-operator
+    - tailscale-operator-install
+
+- name: Deploy Tailscale Operator using Helm
+  kubernetes.core.helm:
+    name: "{{ tailscale_operator_release_name }}"
+    chart_ref: "{{ tailscale_operator_helm_repo_name }}/tailscale-operator"
+    release_namespace: "{{ tailscale_operator_namespace }}"
+    create_namespace: "{{ tailscale_operator_create_namespace }}"
+    values: "{{ tailscale_operator_final_values }}"
+    state: present
+    kubeconfig: "{{ helm_kubeconfig }}"
+    chart_version: "{{ tailscale_operator_chart_version if tailscale_operator_chart_version else omit }}"
+    wait: true
+    wait_timeout: 600s
+  become: true
+  register: tailscale_operator_helm_install_result
+  tags:
+    - tailscale-operator
+    - tailscale-operator-install
+
+- name: Display Helm deployment status
+  ansible.builtin.debug:
+    msg:
+      - "Helm release name: {{ tailscale_operator_release_name }}"
+      - "Release namespace: {{ tailscale_operator_namespace }}"
+      - "Chart version: {{ tailscale_operator_helm_install_result.chart_metadata.version | default('latest') }}"
+      - "Deployment status: {{ tailscale_operator_helm_install_result.status.status | default('unknown') }}"
+  when: tailscale_operator_helm_install_result is defined
+  tags:
+    - tailscale-operator
+    - tailscale-operator-install
+
+- name: Wait for operator deployment to be ready
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: operator
+    namespace: "{{ tailscale_operator_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_condition:
+      type: Progressing
+      status: "True"
+      reason: NewReplicaSetAvailable
+    wait_timeout: 300
+  become: true
+  register: tailscale_operator_deployment
+  tags:
+    - tailscale-operator
+    - tailscale-operator-install
+
+- name: Verify operator pods are running
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ tailscale_operator_namespace }}"
+    label_selectors:
+      - app=operator
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_condition:
+      type: Ready
+      status: "True"
+    wait_timeout: 300
+  become: true
+  register: tailscale_operator_pods
+  tags:
+    - tailscale-operator
+    - tailscale-operator-install

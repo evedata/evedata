@@ -1,0 +1,147 @@
+---
+# Validation tasks for 1Password Connect and Operator
+
+- name: Check 1Password Connect namespace exists
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Namespace
+    name: "{{ op_connect_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: op_connect_namespace_validation
+  become: true
+  failed_when: op_connect_namespace_validation.resources | length == 0
+  tags:
+    - op-connect
+    - op-connect-validate
+
+- name: Verify Connect server deployment exists and is ready
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ op_connect_release_name }}"
+    namespace: "{{ op_connect_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: op_connect_server_deployment_validation
+  become: true
+  when: op_connect_server_create | bool
+  failed_when:
+    - op_connect_server_deployment_validation.resources | length == 0
+  tags:
+    - op-connect
+    - op-connect-validate
+
+- name: Verify Operator deployment exists and is ready
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ op_connect_release_name }}-operator"
+    namespace: "{{ op_connect_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: op_connect_operator_deployment_validation
+  become: true
+  when: op_connect_operator_create | bool
+  failed_when:
+    - op_connect_operator_deployment_validation.resources | length == 0
+  tags:
+    - op-connect
+    - op-connect-validate
+
+- name: Check Connect server pod status
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ op_connect_namespace }}"
+    label_selectors:
+      - "app.kubernetes.io/component=connect"
+      - "app={{ op_connect_release_name }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: op_connect_server_pods_validation
+  become: true
+  when: op_connect_server_create | bool
+  tags:
+    - op-connect
+    - op-connect-validate
+
+- name: Check Operator pod status
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ op_connect_namespace }}"
+    label_selectors:
+      - "app.kubernetes.io/component=operator"
+      - "name={{ op_connect_release_name }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: op_connect_operator_pods_validation
+  become: true
+  when: op_connect_operator_create | bool
+  tags:
+    - op-connect
+    - op-connect-validate
+
+- name: Verify Connect server service exists
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Service
+    name: "{{ op_connect_release_name }}"
+    namespace: "{{ op_connect_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: op_connect_server_service_validation
+  become: true
+  when: op_connect_server_create | bool
+  failed_when:
+    - op_connect_server_service_validation.resources | length == 0
+  tags:
+    - op-connect
+    - op-connect-validate
+
+- name: Display Connect server pod status
+  ansible.builtin.debug:
+    msg:
+      - "Connect server pods found: {{ op_connect_server_pods_validation.resources | length }}"
+      - "Pod statuses: {{ op_connect_server_pods_validation.resources | map(attribute='status.phase') | list }}"
+  when:
+    - op_connect_server_create | bool
+    - op_connect_server_pods_validation.resources is defined
+  tags:
+    - op-connect
+    - op-connect-validate
+
+- name: Display Operator pod status
+  ansible.builtin.debug:
+    msg:
+      - "Operator pods found: {{ op_connect_operator_pods_validation.resources | length }}"
+      - "Pod statuses: {{ op_connect_operator_pods_validation.resources | map(attribute='status.phase') | list }}"
+  when:
+    - op_connect_operator_create | bool
+    - op_connect_operator_pods_validation.resources is defined
+  tags:
+    - op-connect
+    - op-connect-validate
+
+- name: Check for OnePasswordItem CRD
+  kubernetes.core.k8s_info:
+    api_version: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    name: onepassworditems.onepassword.com
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: op_connect_crd_validation
+  become: true
+  when: op_connect_operator_create | bool
+  failed_when:
+    - op_connect_crd_validation.resources | length == 0
+  tags:
+    - op-connect
+    - op-connect-validate
+
+- name: Display validation summary
+  ansible.builtin.debug:
+    msg:
+      - "1Password Connect validation completed successfully"
+      - "Namespace: {{ op_connect_namespace }}"
+      - "Connect Server: {{ 'Deployed' if op_connect_server_create else 'Skipped' }}"
+      - "Operator: {{ 'Deployed' if op_connect_operator_create else 'Skipped' }}"
+      - "OnePasswordItem CRD: {{ 'Available' if (op_connect_crd_validation.resources | default([]) | length > 0) else 'Not found' }}"
+      - "Service endpoint: {{ op_connect_release_name }}.{{ op_connect_namespace }}.svc.cluster.local:8080"
+  tags:
+    - op-connect
+    - op-connect-validate

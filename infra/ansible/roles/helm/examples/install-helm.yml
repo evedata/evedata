@@ -1,0 +1,35 @@
+---
+# Example playbook demonstrating helm role usage
+# Usage: ansible-playbook playbooks/helm.yml -e @group_vars/vault.yml -l stg
+
+- name: Install Helm on staging servers
+  hosts: stg
+  become: true
+  gather_facts: true
+
+  vars:
+    # Install latest Helm 3.13.x version
+    helm_version_spec: "=3.13.*"
+    helm_package_state: present
+
+  roles:
+    - role: helm
+      tags:
+        - helm
+
+  post_tasks:
+    - name: Verify Helm installation
+      ansible.builtin.command:
+        cmd: helm version --short
+      register: helm_check
+      changed_when: false
+      tags:
+        - helm
+        - verify
+
+    - name: Show Helm version
+      ansible.builtin.debug:
+        var: helm_check.stdout
+      tags:
+        - helm
+        - verify

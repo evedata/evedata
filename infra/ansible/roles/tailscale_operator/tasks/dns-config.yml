@@ -1,0 +1,166 @@
+---
+# DNS configuration tasks for Tailscale Operator
+# Deploys DNSConfig custom resource to enable MagicDNS in the cluster
+
+- name: Deploy Tailscale DNSConfig
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ helm_kubeconfig }}"
+    definition:
+      apiVersion: tailscale.com/v1alpha1
+      kind: DNSConfig
+      metadata:
+        name: ts-dns
+        namespace: "{{ tailscale_operator_namespace }}"
+      spec:
+        nameserver:
+          image:
+            repo: "{{ tailscale_operator_dns_nameserver_repo }}"
+            tag: "{{ tailscale_operator_dns_nameserver_tag }}"
+  become: true
+  register: tailscale_dns_config_result
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns
+
+- name: Display DNS configuration status
+  ansible.builtin.debug:
+    msg:
+      - "DNSConfig deployed: ts-dns"
+      - "Namespace: {{ tailscale_operator_namespace }}"
+      - "Nameserver image: {{ tailscale_operator_dns_nameserver_repo }}:{{ tailscale_operator_dns_nameserver_tag }}"
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns
+
+- name: Wait for DNSConfig to be ready
+  kubernetes.core.k8s_info:
+    api_version: tailscale.com/v1alpha1
+    kind: DNSConfig
+    name: ts-dns
+    namespace: "{{ tailscale_operator_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_timeout: 300
+  become: true
+  register: tailscale_dns_info
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns
+
+- name: Debug DNSConfig status structure
+  ansible.builtin.debug:
+    var: tailscale_dns_info.resources[0].status
+  when: tailscale_dns_info.resources | length > 0
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns
+
+- name: Extract Tailscale nameserver IP from DNSConfig status
+  ansible.builtin.set_fact:
+    tailscale_nameserver_ip: "{{ tailscale_dns_info.resources[0].status.nameserver.ip }}"
+  when:
+    - tailscale_dns_info.resources | length > 0
+    - tailscale_dns_info.resources[0].status.nameserver is defined
+    - tailscale_dns_info.resources[0].status.nameserver.ip is defined
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns
+
+- name: Display Tailscale nameserver IP
+  ansible.builtin.debug:
+    msg: "Tailscale nameserver IP: {{ tailscale_nameserver_ip }}"
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns
+
+- name: Get CoreDNS ConfigMap from kube-system
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: ConfigMap
+    name: coredns
+    namespace: kube-system
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: coredns_configmap
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns
+
+- name: Extract current Corefile content
+  ansible.builtin.set_fact:
+    current_corefile: "{{ coredns_configmap.resources[0].data.Corefile }}"
+  when: coredns_configmap.resources | length > 0
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns
+
+- name: Define Tailscale DNS forwarding block
+  ansible.builtin.set_fact:
+    tailscale_dns_block: |
+      ts.net:53 {
+          errors
+          cache 30
+          forward . {{ tailscale_nameserver_ip }}
+      }
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns
+
+- name: Check if ts.net block already exists in Corefile
+  ansible.builtin.set_fact:
+    ts_net_exists: "{{ current_corefile | regex_search('ts\\.net:53\\s*\\{[^}]*\\}', multiline=True) is not none }}"
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns
+
+- name: Remove existing ts.net block if present
+  ansible.builtin.set_fact:
+    updated_corefile: "{{ current_corefile | regex_replace('ts\\.net:53\\s*\\{[^}]*\\}\\n*', '', multiline=True) }}"
+  when: ts_net_exists | bool
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns
+
+- name: Use current Corefile if no ts.net block exists
+  ansible.builtin.set_fact:
+    updated_corefile: "{{ current_corefile }}"
+  when: not (ts_net_exists | bool)
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns
+
+- name: Append Tailscale DNS forwarding block to Corefile
+  ansible.builtin.set_fact:
+    final_corefile: "{{ updated_corefile.rstrip() }}\n\n{{ tailscale_dns_block }}"
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns
+
+- name: Patch CoreDNS ConfigMap with Tailscale DNS configuration
+  kubernetes.core.k8s:
+    state: patched
+    kubeconfig: "{{ helm_kubeconfig }}"
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: coredns
+        namespace: kube-system
+      data:
+        Corefile: "{{ final_corefile }}"
+  become: true
+  register: coredns_patch_result
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns
+
+- name: Display CoreDNS configuration update status
+  ansible.builtin.debug:
+    msg:
+      - "CoreDNS ConfigMap updated with Tailscale DNS forwarding"
+      - "Forwarding ts.net queries to: {{ tailscale_nameserver_ip }}"
+      - "CoreDNS pods will reload the configuration automatically"
+  tags:
+    - tailscale-operator
+    - tailscale-operator-dns

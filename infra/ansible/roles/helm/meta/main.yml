@@ -1,0 +1,23 @@
+---
+# meta file for helm role
+# Role metadata and dependencies
+
+galaxy_info:
+  author: EVEData Infrastructure Team
+  description: Install Helm package manager for Kubernetes on Ubuntu 24.04 LTS
+  company: EVEData
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - noble
+  galaxy_tags:
+    - helm
+    - kubernetes
+    - k8s
+    - ubuntu
+    - noble
+
+dependencies:
+  - kubernetes

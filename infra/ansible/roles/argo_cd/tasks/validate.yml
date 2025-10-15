@@ -1,0 +1,256 @@
+---
+# Validation tasks for ArgoCD deployment
+
+- name: Check if ArgoCD namespace exists
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Namespace
+    name: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: argo_cd_namespace_check
+  failed_when: argo_cd_namespace_check.resources | length == 0
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: Verify ArgoCD CRDs are installed
+  kubernetes.core.k8s_info:
+    api_version: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: argo_cd_crds
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: List ArgoCD CRDs
+  ansible.builtin.debug:
+    msg: >-
+      Found ArgoCD CRDs:
+      {{ argo_cd_crds.resources | selectattr('metadata.name', 'match', '.*argoproj.io')
+      | map(attribute='metadata.name') | list }}
+  when: argo_cd_crds.resources is defined
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: Check ArgoCD server deployment status
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ argo_cd_release_name }}-server"
+    namespace: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: argo_cd_server_status
+  failed_when:
+    - argo_cd_server_status.resources | length == 0
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: Check ArgoCD controller statefulset status
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: StatefulSet
+    name: "{{ argo_cd_release_name }}-application-controller"
+    namespace: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: argo_cd_controller_status
+  failed_when:
+    - argo_cd_controller_status.resources | length == 0
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: Check ArgoCD repo server deployment status
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ argo_cd_release_name }}-repo-server"
+    namespace: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: argo_cd_repo_server_status
+  failed_when:
+    - argo_cd_repo_server_status.resources | length == 0
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: Verify all ArgoCD pods are running
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ argo_cd_namespace }}"
+    label_selectors:
+      - app.kubernetes.io/instance={{ argo_cd_release_name }}
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: argo_cd_pods_status
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: Display pod status summary
+  ansible.builtin.debug:
+    msg:
+      - "Total ArgoCD pods: {{ argo_cd_pods_status.resources | length }}"
+      - >-
+        Running pods:
+        {{ argo_cd_pods_status.resources | selectattr('status.phase', 'equalto', 'Running')
+        | list | length }}
+      - "Pod details:"
+      - >-
+        {% for pod in argo_cd_pods_status.resources %}
+          - {{ pod.metadata.name }}: {{ pod.status.phase }}
+        {% endfor %}
+  when: argo_cd_pods_status.resources is defined
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: Check ArgoCD services
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Service
+    namespace: "{{ argo_cd_namespace }}"
+    label_selectors:
+      - app.kubernetes.io/instance={{ argo_cd_release_name }}
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: argo_cd_services
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: Display service endpoints
+  ansible.builtin.debug:
+    msg:
+      - "ArgoCD Services:"
+      - >-
+        {% for svc in argo_cd_services.resources %}
+          - {{ svc.metadata.name }}: {{ svc.spec.type }}
+          (Ports: {{ svc.spec.ports | map(attribute='port') | join(', ') }})
+        {% endfor %}
+  when: argo_cd_services.resources is defined
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: Verify ingress resources exist
+  kubernetes.core.k8s_info:
+    api_version: networking.k8s.io/v1
+    kind: Ingress
+    namespace: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: argo_cd_ingresses
+  when: argo_cd_ingress_enabled | bool
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: Display ingress status
+  ansible.builtin.debug:
+    msg:
+      - "ArgoCD Ingresses:"
+      - >-
+        {% for ing in argo_cd_ingresses.resources %}
+          - {{ ing.metadata.name }}:
+          {{ ing.metadata.annotations['tailscale.com/hostname'] | default('No hostname') }}
+        {% endfor %}
+  when:
+    - argo_cd_ingress_enabled | bool
+    - argo_cd_ingresses.resources is defined
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: Check if initial admin secret exists
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: argocd-initial-admin-secret
+    namespace: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: argo_cd_admin_secret_check
+  when: argo_cd_admin_enabled | bool
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: Validate admin secret exists
+  ansible.builtin.assert:
+    that:
+      - argo_cd_admin_secret_check.resources | length > 0
+    fail_msg: "Initial admin secret not found. ArgoCD may not be properly configured."
+    success_msg: "Initial admin secret exists. Admin access is configured."
+  when: argo_cd_admin_enabled | bool
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: Test ArgoCD API health endpoint
+  ansible.builtin.uri:
+    url: "http://{{ argo_cd_release_name }}-server.{{ argo_cd_namespace }}.svc.cluster.local/healthz"
+    method: GET
+    status_code: 200
+    timeout: 10
+  delegate_to: "{{ inventory_hostname }}"
+  become: true
+  register: argo_cd_api_health
+  failed_when: false
+  changed_when: false
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: Display validation summary
+  ansible.builtin.debug:
+    msg:
+      - "========================================="
+      - "ArgoCD Deployment Validation Summary:"
+      - "========================================="
+      - "Namespace: {{ 'OK' if argo_cd_namespace_check.resources | length > 0 else 'FAILED' }}"
+      - >-
+        CRDs Installed:
+        {{ 'OK' if (argo_cd_crds.resources | selectattr('metadata.name', 'match', '.*argoproj.io')
+        | list | length) > 0 else 'FAILED' }}
+      - >-
+        Server Deployment:
+        {{ 'OK' if argo_cd_server_status.resources | length > 0 else 'FAILED' }}
+      - >-
+        Controller StatefulSet:
+        {{ 'OK' if argo_cd_controller_status.resources | length > 0 else 'FAILED' }}
+      - >-
+        Repo Server Deployment:
+        {{ 'OK' if argo_cd_repo_server_status.resources | length > 0 else 'FAILED' }}
+      - >-
+        Pods Running:
+        {{ argo_cd_pods_status.resources | selectattr('status.phase', 'equalto', 'Running')
+        | list | length }}/{{ argo_cd_pods_status.resources | length }}
+      - "Services Created: {{ argo_cd_services.resources | length }}"
+      - >-
+        Ingress Configured:
+        {{ 'OK' if (argo_cd_ingresses.resources | length > 0)
+        else 'N/A' if not argo_cd_ingress_enabled else 'FAILED' }}
+      - "Admin Access: {{ 'Enabled' if argo_cd_admin_enabled else 'Disabled' }}"
+      - >-
+        API Health:
+        {{ 'OK' if argo_cd_api_health.status is defined and argo_cd_api_health.status == 200
+        else 'Not Ready' }}
+      - "========================================="
+      - ""
+      - "ArgoCD URL: https://{{ argo_cd_hostname }}.{{ tailscale_dns_name | default('<tailnet>') }}"
+      - >-
+        {% if argo_cd_grpc_ingress_enabled %}
+        ArgoCD gRPC: https://{{ argo_cd_grpc_hostname }}.{{ tailscale_dns_name | default('<tailnet>') }}
+        {% endif %}
+  tags:
+    - argo-cd
+    - argo-cd-validate

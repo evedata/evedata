@@ -1,0 +1,36 @@
+---
+# meta file for op_connect role
+# Role metadata and dependencies
+
+galaxy_info:
+  author: EVEData Infrastructure Team
+  description: Deploy and configure 1Password Connect server and Kubernetes Operator for Ubuntu 24.04 LTS
+  company: EVEData
+  license: MIT
+  min_ansible_version: "2.19"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - noble # 24.04 LTS
+  galaxy_tags:
+    - onepassword
+    - 1password
+    - connect
+    - kubernetes
+    - k8s
+    - operator
+    - secrets
+    - security
+    - microk8s
+    - helm
+    - ubuntu
+    - noble
+    - vault
+    - passwordmanager
+    - secretsmanagement
+
+dependencies: []
+
+collections:
+  - kubernetes.core
+  - ansible.builtin

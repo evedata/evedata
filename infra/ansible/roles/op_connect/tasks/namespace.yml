@@ -1,0 +1,48 @@
+---
+# Namespace management tasks for 1Password Connect and Operator
+
+- name: Ensure 1Password namespace exists
+  kubernetes.core.k8s:
+    name: "{{ op_connect_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+    kubeconfig: "{{ helm_kubeconfig }}"
+  when: op_connect_create_namespace | bool
+  become: true
+  tags:
+    - op-connect
+    - op-connect-namespace
+
+- name: Label 1Password namespace
+  kubernetes.core.k8s:
+    name: "{{ op_connect_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+    kubeconfig: "{{ helm_kubeconfig }}"
+    definition:
+      metadata:
+        labels:
+          name: "{{ op_connect_namespace }}"
+          app.kubernetes.io/name: onepassword-connect
+          app.kubernetes.io/managed-by: ansible
+          environment: "{{ inventory_hostname_short.split('-')[-2] | default('hzl') }}"
+  when: op_connect_create_namespace | bool
+  become: true
+  tags:
+    - op-connect
+    - op-connect-namespace
+
+- name: Verify namespace exists
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Namespace
+    name: "{{ op_connect_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: op_connect_namespace_check
+  become: true
+  failed_when: op_connect_namespace_check.resources | length == 0
+  tags:
+    - op-connect
+    - op-connect-namespace

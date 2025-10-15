@@ -1,0 +1,50 @@
+---
+# Helm repository configuration tasks for Tailscale Operator
+
+- name: Add Tailscale Helm repository
+  kubernetes.core.helm_repository:
+    name: "{{ tailscale_operator_helm_repo_name }}"
+    repo_url: "{{ tailscale_operator_helm_repo_url }}"
+    state: present
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  tags:
+    - tailscale-operator
+    - tailscale-operator-helm-repo
+
+- name: Update Helm repository metadata
+  ansible.builtin.command:
+    cmd: helm repo update {{ tailscale_operator_helm_repo_name }}
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  changed_when: false
+  tags:
+    - tailscale-operator
+    - tailscale-operator-helm-repo
+
+- name: Verify Tailscale Helm repository is available
+  ansible.builtin.command:
+    cmd: helm search repo {{ tailscale_operator_helm_repo_name }}/tailscale-operator --output json
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  register: tailscale_operator_helm_search_result
+  changed_when: false
+  failed_when: >-
+    tailscale_operator_helm_search_result.rc != 0 or
+    (tailscale_operator_helm_search_result.stdout | from_json | length) == 0
+  tags:
+    - tailscale-operator
+    - tailscale-operator-helm-repo
+
+- name: Display available chart versions
+  ansible.builtin.debug:
+    msg: >-
+      Available Tailscale Operator chart version:
+      {{ (tailscale_operator_helm_search_result.stdout | from_json)[0].version }}
+  when: tailscale_operator_helm_search_result is defined and tailscale_operator_helm_search_result.stdout | length > 0
+  tags:
+    - tailscale-operator
+    - tailscale-operator-helm-repo

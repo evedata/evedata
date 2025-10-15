@@ -1,0 +1,145 @@
+---
+# Restart MicroK8s services after configuration changes
+
+- name: Check if MicroK8s needs restart
+  ansible.builtin.set_fact:
+    microk8s_needs_restart: "{{ containerd_args_result.changed | default(false) or kubelet_args_result.changed | default(false) or launch_config_result.changed | default(false) }}"
+
+- name: Restart MicroK8s if configuration changed
+  block:
+    - name: Stop MicroK8s services
+      ansible.builtin.command:
+        cmd: microk8s stop
+      register: stop_result
+      retries: 3
+      delay: 5
+      until: stop_result.rc == 0
+
+    - name: Wait for services to stop
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Start MicroK8s services
+      ansible.builtin.command:
+        cmd: microk8s start
+      register: start_result
+      retries: 3
+      delay: 10
+      until: start_result.rc == 0
+
+    - name: Wait for MicroK8s to be ready
+      ansible.builtin.command:
+        cmd: microk8s status --wait-ready
+      register: status_result
+      retries: 60
+      delay: 5
+      until: status_result.rc == 0
+      changed_when: false
+
+    - name: Check kubelet status
+      ansible.builtin.command:
+        cmd: systemctl is-active snap.microk8s.daemon-kubelite
+      register: kubelet_status
+      changed_when: false
+      failed_when: false
+
+    - name: Check containerd status
+      ansible.builtin.command:
+        cmd: systemctl is-active snap.microk8s.daemon-containerd
+      register: containerd_status
+      changed_when: false
+      failed_when: false
+
+    - name: Get kubectl nodes status
+      ansible.builtin.command:
+        cmd: microk8s kubectl get nodes
+      register: nodes_status
+      changed_when: false
+      retries: 10
+      delay: 10
+      until: nodes_status.rc == 0
+
+    - name: Check for InvalidDiskCapacity events
+      ansible.builtin.command:
+        cmd: microk8s kubectl get events --field-selector reason=InvalidDiskCapacity -n default
+      register: disk_capacity_events
+      changed_when: false
+      failed_when: false
+
+    - name: Display service status
+      ansible.builtin.debug:
+        msg: |
+          MicroK8s restart completed:
+          - Kubelite service: {{ kubelet_status.stdout | default('unknown') }}
+          - Containerd service: {{ containerd_status.stdout | default('unknown') }}
+
+          Node status:
+          {{ nodes_status.stdout }}
+
+          {% if disk_capacity_events.stdout and 'No resources found' not in disk_capacity_events.stdout %}
+          WARNING: InvalidDiskCapacity events still present:
+          {{ disk_capacity_events.stdout }}
+          {% else %}
+          ✓ No InvalidDiskCapacity events found
+          {% endif %}
+
+  when: microk8s_needs_restart | bool
+
+- name: Skip restart if no changes
+  ansible.builtin.debug:
+    msg: "No configuration changes detected, skipping MicroK8s restart"
+  when: not (microk8s_needs_restart | bool)
+
+- name: Verify kubelet is not crash-looping
+  block:
+    - name: Check kubelet restart count in last 5 minutes
+      ansible.builtin.shell:
+        cmd: |
+          journalctl -u snap.microk8s.daemon-kubelite --since "5 minutes ago" | \
+          grep -c "Started Service for snap application microk8s.daemon-kubelite" || echo 0
+      register: restart_count
+      changed_when: false
+
+    - name: Check for recent invalid capacity errors
+      ansible.builtin.shell:
+        cmd: |
+          journalctl -u snap.microk8s.daemon-kubelite --since "5 minutes ago" | \
+          grep -c "invalid capacity 0 on image filesystem" || echo 0
+      register: capacity_error_count
+      changed_when: false
+
+    - name: Analyze kubelet health
+      ansible.builtin.debug:
+        msg: |
+          Kubelet health check:
+          - Restart count in last 5 minutes: {{ restart_count.stdout }}
+          - Invalid capacity errors in last 5 minutes: {{ capacity_error_count.stdout }}
+
+          {% if restart_count.stdout | int > 3 %}
+          ⚠️  WARNING: Kubelet appears to be crash-looping ({{ restart_count.stdout }} restarts)
+          {% elif capacity_error_count.stdout | int > 0 %}
+          ⚠️  WARNING: Invalid capacity errors still occurring ({{ capacity_error_count.stdout }} errors)
+          {% else %}
+          ✓ Kubelet appears to be running stable
+          {% endif %}
+
+    - name: Fail if kubelet is still crash-looping
+      ansible.builtin.fail:
+        msg: |
+          Kubelet is still crash-looping after configuration changes.
+          Please check the logs: journalctl -u snap.microk8s.daemon-kubelite -f
+
+          Potential issues:
+          1. Filesystem type incompatibility
+          2. Insufficient disk space
+          3. Corrupted containerd state
+
+          Try manual recovery:
+          1. microk8s stop
+          2. sudo rm -rf /var/snap/microk8s/common/var/lib/containerd/*
+          3. microk8s start
+      when:
+        - restart_count.stdout | int > 5
+        - capacity_error_count.stdout | int > 0
+
+  when: microk8s_needs_restart | bool

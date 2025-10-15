@@ -1,0 +1,60 @@
+---
+# Namespace management tasks for ArgoCD
+
+- name: Create ArgoCD namespace
+  kubernetes.core.k8s:
+    name: "{{ argo_cd_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: argo_cd_namespace_result
+  when: argo_cd_create_namespace | bool
+  tags:
+    - argo-cd
+    - argo-cd-namespace
+
+- name: Label ArgoCD namespace for better organization
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ argo_cd_namespace }}"
+        labels:
+          name: "{{ argo_cd_namespace }}"
+          app.kubernetes.io/name: argocd
+          app.kubernetes.io/part-of: argocd
+          app.kubernetes.io/managed-by: ansible
+          environment: "{{ ansible_hostname | regex_search('(hzl|stg|prd)') | default('dev') }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  when: argo_cd_create_namespace | bool
+  tags:
+    - argo-cd
+    - argo-cd-namespace
+
+- name: Verify namespace exists
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Namespace
+    name: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: argo_cd_namespace_info
+  failed_when: argo_cd_namespace_info.resources | length == 0
+  tags:
+    - argo-cd
+    - argo-cd-namespace
+
+- name: Display namespace status
+  ansible.builtin.debug:
+    msg:
+      - "Namespace: {{ argo_cd_namespace }}"
+      - "Status: {{ argo_cd_namespace_info.resources[0].status.phase | default('Unknown') }}"
+  when: argo_cd_namespace_info.resources is defined
+  tags:
+    - argo-cd
+    - argo-cd-namespace

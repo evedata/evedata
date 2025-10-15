@@ -1,0 +1,132 @@
+---
+# Installation tasks for ArgoCD
+
+- name: Prepare final Helm values
+  ansible.builtin.set_fact:
+    argo_cd_final_values: >-
+      {{ lookup('ansible.builtin.template', 'values.yaml.j2') | from_yaml |
+         combine(argo_cd_extra_values, recursive=true) }}
+  tags:
+    - argo-cd
+    - argo-cd-install
+
+- name: Deploy ArgoCD using Helm
+  kubernetes.core.helm:
+    name: "{{ argo_cd_release_name }}"
+    chart_ref: "{{ argo_cd_helm_repo_name }}/argo-cd"
+    release_namespace: "{{ argo_cd_namespace }}"
+    create_namespace: "{{ argo_cd_create_namespace }}"
+    values: "{{ argo_cd_final_values }}"
+    state: present
+    kubeconfig: "{{ helm_kubeconfig }}"
+    chart_version: "{{ argo_cd_chart_version if argo_cd_chart_version else omit }}"
+    wait: true
+    wait_timeout: 600s
+    atomic: true # Rollback on failure
+  become: true
+  register: argo_cd_helm_install_result
+  tags:
+    - argo-cd
+    - argo-cd-install
+
+- name: Display Helm deployment status
+  ansible.builtin.debug:
+    msg:
+      - "Helm release name: {{ argo_cd_release_name }}"
+      - "Release namespace: {{ argo_cd_namespace }}"
+      - "Chart version: {{ argo_cd_helm_install_result.chart_metadata.version | default('latest') }}"
+      - "App version: {{ argo_cd_helm_install_result.chart_metadata.app_version | default('unknown') }}"
+      - "Deployment status: {{ argo_cd_helm_install_result.status.status | default('unknown') }}"
+  when: argo_cd_helm_install_result is defined
+  tags:
+    - argo-cd
+    - argo-cd-install
+
+- name: Wait for ArgoCD server deployment to be ready
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ argo_cd_release_name }}-server"
+    namespace: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_condition:
+      type: Progressing
+      status: "True"
+      reason: NewReplicaSetAvailable
+    wait_timeout: 300
+  become: true
+  register: argo_cd_server_deployment
+  tags:
+    - argo-cd
+    - argo-cd-install
+
+- name: Wait for ArgoCD repo server deployment to be ready
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ argo_cd_release_name }}-repo-server"
+    namespace: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_condition:
+      type: Progressing
+      status: "True"
+      reason: NewReplicaSetAvailable
+    wait_timeout: 300
+  become: true
+  register: argo_cd_repo_server_deployment
+  tags:
+    - argo-cd
+    - argo-cd-install
+
+- name: Verify ArgoCD server pods are running
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ argo_cd_namespace }}"
+    label_selectors:
+      - app.kubernetes.io/name=argocd-server
+      - app.kubernetes.io/instance={{ argo_cd_release_name }}
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_condition:
+      type: Ready
+      status: "True"
+    wait_timeout: 300
+  become: true
+  register: argo_cd_server_pods
+  tags:
+    - argo-cd
+    - argo-cd-install
+
+- name: Get initial admin password secret
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: argocd-initial-admin-secret
+    namespace: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: argo_cd_admin_secret
+  when: argo_cd_admin_enabled | bool
+  tags:
+    - argo-cd
+    - argo-cd-install
+
+- name: Display initial admin password retrieval command
+  ansible.builtin.debug:
+    msg:
+      - "ArgoCD has been successfully deployed!"
+      - "To retrieve the initial admin password, run:"
+      - >-
+        kubectl -n {{ argo_cd_namespace }} get secret argocd-initial-admin-secret
+        -o jsonpath="{.data.password}" | base64 -d
+      - ""
+      - >-
+        ArgoCD will be accessible at:
+        https://{{ argo_cd_hostname }}.{{ tailscale_dns_name | default('<tailnet>') }}
+  when: argo_cd_admin_enabled | bool
+  tags:
+    - argo-cd
+    - argo-cd-install

@@ -1,0 +1,29 @@
+---
+# handlers file for tailscale_operator role
+
+- name: Restart operator deployment
+  ansible.builtin.command:
+    cmd: kubectl rollout restart deployment/operator -n {{ tailscale_operator_namespace }}
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  changed_when: true
+  listen: "restart tailscale operator"
+
+- name: Wait for operator rollout to complete
+  ansible.builtin.command:
+    cmd: kubectl rollout status deployment/operator -n {{ tailscale_operator_namespace }} --timeout=300s
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  changed_when: false
+  listen: "restart tailscale operator"
+
+- name: Update Helm repositories
+  ansible.builtin.command:
+    cmd: helm repo update
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  changed_when: true
+  listen: "update helm repos"

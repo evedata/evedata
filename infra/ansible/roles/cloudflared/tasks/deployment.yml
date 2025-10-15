@@ -1,0 +1,134 @@
+---
+# Deployment tasks for Cloudflare Tunnel
+
+- name: Create ServiceAccount for cloudflared
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ helm_kubeconfig }}"
+    definition:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: "{{ cloudflared_service_account_name }}"
+        namespace: "{{ cloudflared_namespace }}"
+        labels: "{{ cloudflared_labels }}"
+  when: cloudflared_create_service_account | bool
+  become: true
+  tags:
+    - cloudflared
+    - cloudflared-deployment
+
+- name: Create cloudflared Deployment
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ helm_kubeconfig }}"
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: "{{ cloudflared_deployment_name }}"
+        namespace: "{{ cloudflared_namespace }}"
+        labels: "{{ cloudflared_labels | combine(cloudflared_environment_labels) }}"
+      spec:
+        replicas: "{{ cloudflared_replica_count }}"
+        strategy: "{{ cloudflared_update_strategy }}"
+        selector:
+          matchLabels:
+            app: cloudflared
+        template:
+          metadata:
+            labels: "{{ cloudflared_labels | combine(cloudflared_environment_labels) }}"
+            annotations: "{{ cloudflared_pod_annotations }}"
+          spec:
+            serviceAccountName: "{{ cloudflared_service_account_name if cloudflared_create_service_account else omit }}"
+            securityContext: "{{ cloudflared_pod_security_context }}"
+            nodeSelector: "{{ cloudflared_node_selector if cloudflared_node_selector else omit }}"
+            tolerations: "{{ cloudflared_tolerations if cloudflared_tolerations else omit }}"
+            affinity: "{{ cloudflared_affinity if cloudflared_affinity else omit }}"
+            containers:
+              - name: cloudflared
+                image: "{{ cloudflared_image_repository }}:{{ cloudflared_image_tag }}"
+                imagePullPolicy: "{{ cloudflared_image_pull_policy }}"
+                args:
+                  - tunnel
+                  - --no-autoupdate
+                  - --loglevel
+                  - debug
+                  - --metrics
+                  - 0.0.0.0:2000
+                  - run
+                securityContext: "{{ cloudflared_security_context }}"
+                livenessProbe:
+                  httpGet:
+                    path: "{{ cloudflared_liveness_probe.http_get_path }}"
+                    port: "{{ cloudflared_liveness_probe.http_get_port }}"
+                  initialDelaySeconds: "{{ cloudflared_liveness_probe.initial_delay_seconds }}"
+                  periodSeconds: "{{ cloudflared_liveness_probe.period_seconds }}"
+                  failureThreshold: "{{ cloudflared_liveness_probe.failure_threshold }}"
+                readinessProbe:
+                  httpGet:
+                    path: "{{ cloudflared_liveness_probe.http_get_path }}"
+                    port: "{{ cloudflared_liveness_probe.http_get_port }}"
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources: "{{ cloudflared_resources }}"
+                ports:
+                  - name: metrics
+                    containerPort: "{{ cloudflared_metrics_port }}"
+                    protocol: TCP
+                env:
+                  - name: TUNNEL_TOKEN
+                    valueFrom:
+                      secretKeyRef:
+                        name: "{{ cloudflared_secret_name }}"
+                        key: token
+  become: true
+  register: cloudflared_deployment_result
+  tags:
+    - cloudflared
+    - cloudflared-deployment
+
+- name: Wait for deployment to be ready
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ cloudflared_deployment_name }}"
+    namespace: "{{ cloudflared_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_condition:
+      type: Progressing
+      status: "True"
+      reason: NewReplicaSetAvailable
+    wait_timeout: "{{ cloudflared_wait_timeout }}"
+  when: cloudflared_wait_for_deployment | bool
+  become: true
+  register: cloudflared_deployment_status
+  tags:
+    - cloudflared
+    - cloudflared-deployment
+
+- name: Check deployment rollout status
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ cloudflared_deployment_name }}"
+    namespace: "{{ cloudflared_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: cloudflared_deployment_final_status
+  become: true
+  tags:
+    - cloudflared
+    - cloudflared-deployment
+
+- name: Display deployment status
+  ansible.builtin.debug:
+    msg:
+      - "Deployment '{{ cloudflared_deployment_name }}' created/updated successfully"
+      - "Ready replicas: {{ cloudflared_deployment_final_status.resources[0].status.readyReplicas | default(0) }}/{{ cloudflared_replica_count }}"
+      - "Updated replicas: {{ cloudflared_deployment_final_status.resources[0].status.updatedReplicas | default(0) }}"
+      - "Available replicas: {{ cloudflared_deployment_final_status.resources[0].status.availableReplicas | default(0) }}"
+      - "Conditions: {{ cloudflared_deployment_final_status.resources[0].status.conditions | map(attribute='type') | list }}"
+  tags:
+    - cloudflared
+    - cloudflared-deployment

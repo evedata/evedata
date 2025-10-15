@@ -1,0 +1,77 @@
+---
+# tasks file for managing ArgoCD egress services for remote clusters
+# These services enable ArgoCD to connect to remote Kubernetes clusters via Tailscale
+
+- name: Validate egress services configuration
+  ansible.builtin.assert:
+    that:
+      - tailscale_dns_name is defined
+      - tailscale_dns_name | length > 0
+      - argo_cd_remote_cluster_hostnames is defined
+      - argo_cd_remote_cluster_hostnames is iterable
+    fail_msg: >-
+      Both tailscale_dns_name and argo_cd_remote_cluster_hostnames must be defined
+      to create egress services. tailscale_dns_name must not be empty.
+    success_msg: "Egress services configuration is valid"
+  when: argo_cd_remote_cluster_hostnames | length > 0
+
+- name: Display egress services configuration
+  ansible.builtin.debug:
+    msg: >-
+      Creating egress services for {{ argo_cd_remote_cluster_hostnames | length }} remote cluster(s)
+      with tailnet DNS name: {{ tailscale_dns_name }}
+  when: argo_cd_remote_cluster_hostnames | length > 0
+
+- name: Generate egress services manifest
+  ansible.builtin.template:
+    src: egress-services.yaml.j2
+    dest: /tmp/argocd-egress-services.yaml
+    mode: "0644"
+  when: argo_cd_remote_cluster_hostnames | length > 0
+  register: argo_cd_egress_services_manifest
+
+- name: Apply egress services for remote clusters
+  kubernetes.core.k8s:
+    state: present
+    src: /tmp/argocd-egress-services.yaml
+    kubeconfig: "{{ helm_kubeconfig }}"
+    namespace: "{{ argo_cd_namespace }}"
+  when:
+    - argo_cd_remote_cluster_hostnames | length > 0
+    - argo_cd_egress_services_manifest.changed or argo_cd_egress_services_manifest.skipped is not defined
+  register: argo_cd_egress_services_result
+
+- name: Wait for egress services to be ready
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Service
+    name: "{{ item }}"
+    namespace: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: argo_cd_service_status
+  until: argo_cd_service_status.resources | length > 0
+  retries: 10
+  delay: 5
+  loop: "{{ argo_cd_remote_cluster_hostnames }}"
+  when:
+    - argo_cd_remote_cluster_hostnames | length > 0
+    - argo_cd_egress_services_result is not skipped
+
+- name: Clean up temporary egress services manifest
+  ansible.builtin.file:
+    path: /tmp/argocd-egress-services.yaml
+    state: absent
+  when: argo_cd_egress_services_manifest.changed is defined
+  changed_when: false
+
+- name: Display created egress services
+  ansible.builtin.debug:
+    msg: |
+      Successfully created egress services:
+      {% for hostname in argo_cd_remote_cluster_hostnames %}
+      - Service: {{ hostname }}
+        FQDN: {{ hostname }}.{{ tailscale_dns_name }}
+      {% endfor %}
+  when:
+    - argo_cd_remote_cluster_hostnames | length > 0
+    - argo_cd_egress_services_result is not skipped

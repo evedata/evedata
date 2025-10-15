@@ -1,0 +1,137 @@
+---
+# Validation tasks for Cloudflare Tunnel deployment
+
+- name: Check cloudflared namespace exists
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Namespace
+    name: "{{ cloudflared_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: cloudflared_namespace_validation
+  become: true
+  failed_when: cloudflared_namespace_validation.resources | length == 0
+  tags:
+    - cloudflared
+    - cloudflared-validate
+
+- name: Verify OnePasswordItem exists
+  kubernetes.core.k8s_info:
+    api_version: onepassword.com/v1
+    kind: OnePasswordItem
+    name: "{{ cloudflared_secret_name }}"
+    namespace: "{{ cloudflared_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: cloudflared_onepassword_validation
+  become: true
+  failed_when: cloudflared_onepassword_validation.resources | length == 0
+  tags:
+    - cloudflared
+    - cloudflared-validate
+
+- name: Verify secret exists
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: "{{ cloudflared_secret_name }}"
+    namespace: "{{ cloudflared_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: cloudflared_secret_validation
+  become: true
+  failed_when: cloudflared_secret_validation.resources | length == 0
+  tags:
+    - cloudflared
+    - cloudflared-validate
+
+- name: Verify deployment exists and is ready
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ cloudflared_deployment_name }}"
+    namespace: "{{ cloudflared_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: cloudflared_deployment_validation
+  become: true
+  failed_when:
+    - cloudflared_deployment_validation.resources | length == 0
+  tags:
+    - cloudflared
+    - cloudflared-validate
+
+- name: Check cloudflared pod status
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ cloudflared_namespace }}"
+    label_selectors:
+      - "app=cloudflared"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: cloudflared_pods_validation
+  become: true
+  tags:
+    - cloudflared
+    - cloudflared-validate
+
+- name: Check for running pods
+  ansible.builtin.set_fact:
+    cloudflared_running_pods: "{{ cloudflared_pods_validation.resources | selectattr('status.phase', 'equalto', 'Running') | list }}"
+  tags:
+    - cloudflared
+    - cloudflared-validate
+
+- name: Display pod status
+  ansible.builtin.debug:
+    msg:
+      - "Total pods found: {{ cloudflared_pods_validation.resources | length }}"
+      - "Running pods: {{ cloudflared_running_pods | length }}"
+      - "Pod phases: {{ cloudflared_pods_validation.resources | map(attribute='status.phase') | unique | list }}"
+      - "Pod names: {{ cloudflared_pods_validation.resources | map(attribute='metadata.name') | list }}"
+  tags:
+    - cloudflared
+    - cloudflared-validate
+
+- name: Check metrics endpoint availability
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ cloudflared_namespace }}"
+    label_selectors:
+      - "app=cloudflared"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: cloudflared_metrics_check
+  become: true
+  when: cloudflared_metrics_enabled | bool
+  tags:
+    - cloudflared
+    - cloudflared-validate
+
+- name: Validate deployment health
+  ansible.builtin.assert:
+    that:
+      - cloudflared_deployment_validation.resources | length > 0
+      - cloudflared_deployment_validation.resources[0].status.replicas is defined
+      - cloudflared_deployment_validation.resources[0].status.readyReplicas is defined
+      - cloudflared_deployment_validation.resources[0].status.readyReplicas >= 1
+    fail_msg: "Deployment '{{ cloudflared_deployment_name }}' is not healthy or has no ready replicas"
+    success_msg: "Deployment '{{ cloudflared_deployment_name }}' is healthy with {{ cloudflared_deployment_validation.resources[0].status.readyReplicas }} ready replicas"
+  tags:
+    - cloudflared
+    - cloudflared-validate
+
+- name: Display validation summary
+  ansible.builtin.debug:
+    msg:
+      - "Cloudflare Tunnel validation completed successfully"
+      - "================================"
+      - "Namespace: {{ cloudflared_namespace }} ✓"
+      - "OnePasswordItem: {{ cloudflared_secret_name }} ✓"
+      - "Secret: {{ cloudflared_secret_name }} ✓"
+      - "ConfigMap: {{ cloudflared_configmap_name }} ✓"
+      - "Deployment: {{ cloudflared_deployment_name }} ✓"
+      - "Ready Replicas: {{ cloudflared_deployment_validation.resources[0].status.readyReplicas | default(0) }}/{{ cloudflared_replica_count }}"
+      - "Running Pods: {{ cloudflared_running_pods | length }}"
+      - "================================"
+      - "Metrics Endpoint: http://<pod-ip>:{{ cloudflared_metrics_port }}/metrics"
+      - "Health Check: http://<pod-ip>:{{ cloudflared_metrics_port }}/ready"
+  tags:
+    - cloudflared
+    - cloudflared-validate

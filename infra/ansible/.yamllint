@@ -37,6 +37,8 @@ rules:
     allow-non-breakable-words: true
     allow-non-breakable-inline-mappings: true
     level: warning
+  octal-values:
+    forbid-implicit-octal: true
   new-line-at-end-of-file: enable
   new-lines:
     type: unix

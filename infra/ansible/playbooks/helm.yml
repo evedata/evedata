@@ -1,0 +1,34 @@
+---
+# Playbook to install Helm package manager for Kubernetes
+# Target: Ubuntu 24.04 LTS systems
+
+- name: Install Helm on target hosts
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Verify target OS is Ubuntu 24.04
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Ubuntu"
+          - ansible_distribution_version == "24.04"
+        fail_msg: "This playbook requires Ubuntu 24.04 LTS"
+        success_msg: "Target OS verified: Ubuntu 24.04 LTS"
+      tags:
+        - always
+
+  roles:
+    - role: helm
+      tags:
+        - helm
+
+  post_tasks:
+    - name: Display Helm installation summary
+      ansible.builtin.debug:
+        msg:
+          - "Helm installation completed successfully"
+          - "Run 'helm version' to verify the installation"
+      tags:
+        - helm
+        - summary

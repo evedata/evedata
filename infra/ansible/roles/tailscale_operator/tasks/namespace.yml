@@ -1,0 +1,35 @@
+---
+# Namespace management tasks for Tailscale Operator
+
+- name: Ensure Tailscale namespace exists with labels
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ helm_kubeconfig }}"
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ tailscale_operator_namespace }}"
+        labels:
+          name: "{{ tailscale_operator_namespace }}"
+          app.kubernetes.io/name: tailscale-operator
+          app.kubernetes.io/managed-by: ansible
+          environment: "{{ inventory_hostname_short.split('-')[-2] | default('hzl') }}"
+  when: tailscale_operator_create_namespace | bool
+  become: true
+  tags:
+    - tailscale-operator
+    - tailscale-operator-namespace
+
+- name: Verify namespace exists
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Namespace
+    name: "{{ tailscale_operator_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: tailscale_operator_namespace_check
+  become: true
+  failed_when: tailscale_operator_namespace_check.resources | length == 0
+  tags:
+    - tailscale-operator
+    - tailscale-operator-namespace

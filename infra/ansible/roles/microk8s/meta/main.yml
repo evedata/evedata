@@ -1,0 +1,27 @@
+---
+galaxy_info:
+  author: EVEData Infrastructure Team
+  description: MicroK8s Non-HA installation and configuration for Ubuntu 24.04 LTS
+  company: EVEData
+  license: MIT
+  min_ansible_version: "2.19"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - noble # 24.04 LTS
+
+  galaxy_tags:
+    - kubernetes
+    - k8s
+    - microk8s
+    - container
+    - orchestration
+    - ubuntu
+    - snap
+    - cloudnative
+
+dependencies: []
+
+collections:
+  - ansible.builtin
+  - community.general

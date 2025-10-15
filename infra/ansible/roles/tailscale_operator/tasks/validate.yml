@@ -1,0 +1,163 @@
+---
+# Validation tasks for Tailscale Operator
+
+- name: Check if Helm release exists
+  ansible.builtin.command:
+    cmd: helm list -n {{ tailscale_operator_namespace }} -o json
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  register: tailscale_operator_helm_list_output
+  changed_when: false
+  tags:
+    - tailscale-operator
+    - tailscale-operator-validate
+
+- name: Verify Tailscale Operator Helm release is deployed
+  ansible.builtin.assert:
+    that:
+      - >-
+        tailscale_operator_helm_list_output.stdout | from_json |
+        selectattr('name', 'equalto', tailscale_operator_release_name) |
+        list | length > 0
+    fail_msg: >-
+      Tailscale Operator Helm release '{{ tailscale_operator_release_name }}'
+      not found in namespace '{{ tailscale_operator_namespace }}'
+    success_msg: "Tailscale Operator Helm release '{{ tailscale_operator_release_name }}' is deployed"
+  tags:
+    - tailscale-operator
+    - tailscale-operator-validate
+
+- name: Get operator deployment status
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: operator
+    namespace: "{{ tailscale_operator_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: tailscale_operator_deployment_status
+  tags:
+    - tailscale-operator
+    - tailscale-operator-validate
+
+- name: Verify operator deployment is ready
+  ansible.builtin.assert:
+    that:
+      - tailscale_operator_deployment_status.resources | length > 0
+      - tailscale_operator_deployment_status.resources[0].status.readyReplicas is defined
+      - >-
+        tailscale_operator_deployment_status.resources[0].status.readyReplicas ==
+        tailscale_operator_deployment_status.resources[0].spec.replicas
+    fail_msg: >-
+      Operator deployment is not ready.
+      Expected {{ tailscale_operator_deployment_status.resources[0].spec.replicas | default(1) }} replicas,
+      got {{ tailscale_operator_deployment_status.resources[0].status.readyReplicas | default(0) }} ready
+    success_msg: >-
+      Operator deployment is ready with
+      {{ tailscale_operator_deployment_status.resources[0].status.readyReplicas }} replica(s)
+  when: tailscale_operator_deployment_status.resources | length > 0
+  tags:
+    - tailscale-operator
+    - tailscale-operator-validate
+
+- name: Check operator pods status
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ tailscale_operator_namespace }}"
+    label_selectors:
+      - app=operator
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: tailscale_operator_pods_status
+  tags:
+    - tailscale-operator
+    - tailscale-operator-validate
+
+- name: Display operator pods status
+  ansible.builtin.debug:
+    msg:
+      - "Operator pod: {{ item.metadata.name }}"
+      - "Status: {{ item.status.phase }}"
+      - >-
+        Ready: {{ item.status.conditions |
+        selectattr('type', 'equalto', 'Ready') |
+        map(attribute='status') | first | default('Unknown') }}"
+      - "Container statuses: {{ item.status.containerStatuses | map(attribute='ready') | list }}"
+  loop: "{{ tailscale_operator_pods_status.resources }}"
+  when: tailscale_operator_pods_status.resources | length > 0
+  tags:
+    - tailscale-operator
+    - tailscale-operator-validate
+
+- name: Verify all operator pods are running
+  ansible.builtin.assert:
+    that:
+      - tailscale_operator_pods_status.resources | length > 0
+      - >-
+        tailscale_operator_pods_status.resources |
+        selectattr('status.phase', 'equalto', 'Running') | list | length ==
+        tailscale_operator_pods_status.resources | length
+    fail_msg: "Not all operator pods are in Running state"
+    success_msg: "All {{ tailscale_operator_pods_status.resources | length }} operator pod(s) are running"
+  tags:
+    - tailscale-operator
+    - tailscale-operator-validate
+
+- name: Check for operator service
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Service
+    name: operator
+    namespace: "{{ tailscale_operator_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: tailscale_operator_service
+  tags:
+    - tailscale-operator
+    - tailscale-operator-validate
+
+- name: Display operator service information
+  ansible.builtin.debug:
+    msg:
+      - "Service name: {{ tailscale_operator_service.resources[0].metadata.name }}"
+      - "Service type: {{ tailscale_operator_service.resources[0].spec.type }}"
+      - "Service ports: {{ tailscale_operator_service.resources[0].spec.ports | map(attribute='port') | list }}"
+  when: tailscale_operator_service.resources | length > 0
+  tags:
+    - tailscale-operator
+    - tailscale-operator-validate
+
+- name: Get recent operator logs for diagnostics
+  ansible.builtin.command:
+    cmd: kubectl logs -n {{ tailscale_operator_namespace }} deployment/operator --tail=20
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  register: tailscale_operator_logs
+  changed_when: false
+  failed_when: false
+  tags:
+    - tailscale-operator
+    - tailscale-operator-validate
+
+- name: Display validation summary
+  ansible.builtin.debug:
+    msg:
+      - "========================================="
+      - "Tailscale Operator Validation Summary"
+      - "========================================="
+      - "Namespace: {{ tailscale_operator_namespace }}"
+      - "Helm Release: {{ tailscale_operator_release_name }}"
+      - "Operator Hostname: {{ tailscale_operator_hostname }}"
+      - >-
+        API Server Proxy Mode:
+        {{ 'auth' if tailscale_operator_api_server_proxy_mode | bool
+        else tailscale_operator_api_server_proxy_mode }}
+      - "Deployment Status: Ready"
+      - "Running Pods: {{ tailscale_operator_pods_status.resources | length }}"
+      - "========================================="
+  tags:
+    - tailscale-operator
+    - tailscale-operator-validate

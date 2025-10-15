@@ -1,0 +1,45 @@
+---
+# Namespace management tasks for Cloudflare Tunnel
+
+- name: Ensure cloudflared namespace exists with labels
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ helm_kubeconfig }}"
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ cloudflared_namespace }}"
+        labels:
+          name: "{{ cloudflared_namespace }}"
+          "app.kubernetes.io/name": cloudflared
+          "app.kubernetes.io/managed-by": ansible
+          environment: "{{ inventory_hostname_short.split('-')[-2] | default('hzl') }}"
+  when: cloudflared_create_namespace | bool
+  become: true
+  tags:
+    - cloudflared
+    - cloudflared-namespace
+
+- name: Verify namespace exists
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Namespace
+    name: "{{ cloudflared_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  register: cloudflared_namespace_check
+  become: true
+  failed_when: cloudflared_namespace_check.resources | length == 0
+  tags:
+    - cloudflared
+    - cloudflared-namespace
+
+- name: Display namespace status
+  ansible.builtin.debug:
+    msg:
+      - "Namespace '{{ cloudflared_namespace }}' status:"
+      - "  Created: {{ cloudflared_namespace_check.resources[0].metadata.creationTimestamp }}"
+      - "  Labels: {{ cloudflared_namespace_check.resources[0].metadata.labels | default({}) }}"
+  tags:
+    - cloudflared
+    - cloudflared-namespace

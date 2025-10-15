@@ -1,0 +1,32 @@
+---
+# meta file for argo_cd role
+# Role metadata and dependencies
+
+galaxy_info:
+  role_name: argo_cd
+  author: EVEData Platform
+  description: Deploy and configure ArgoCD using Helm on Ubuntu 24.04 LTS with Tailscale ingress
+  company: EVEData
+  license: MIT
+  min_ansible_version: "2.19"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - noble # 24.04 LTS
+  galaxy_tags:
+    - argocd
+    - gitops
+    - kubernetes
+    - k8s
+    - helm
+    - tailscale
+    - cd
+    - continuousdelivery
+    - ubuntu
+
+dependencies: []
+
+# Collection dependencies are managed in requirements.yml
+collections:
+  - kubernetes.core
+  - ansible.builtin

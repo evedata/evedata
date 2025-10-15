@@ -1,0 +1,62 @@
+---
+# tasks file for argo_cd role
+# Main task orchestration for ArgoCD deployment
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - argo_cd_hostname is defined
+      - argo_cd_hostname | length > 0
+      - helm_kubeconfig is defined
+      - helm_kubeconfig | length > 0
+    fail_msg: >-
+      Required variables are not defined. Please ensure argo_cd_hostname
+      and helm_kubeconfig are set.
+  tags:
+    - argo-cd
+    - argo-cd-validate
+
+- name: Set gRPC hostname if not defined
+  ansible.builtin.set_fact:
+    argo_cd_grpc_hostname: "{{ argo_cd_hostname }}-grpc"
+  when: argo_cd_grpc_hostname is not defined
+  tags:
+    - argo-cd
+
+- name: Include namespace management tasks
+  ansible.builtin.include_tasks: namespace.yml
+  tags:
+    - argo-cd
+    - argo-cd-namespace
+
+- name: Include Helm repository configuration tasks
+  ansible.builtin.include_tasks: helm-repo.yml
+  tags:
+    - argo-cd
+    - argo-cd-helm-repo
+
+- name: Include ArgoCD installation tasks
+  ansible.builtin.include_tasks: install.yml
+  tags:
+    - argo-cd
+    - argo-cd-install
+
+- name: Include ingress configuration tasks
+  ansible.builtin.include_tasks: ingress.yml
+  when: argo_cd_ingress_enabled | bool
+  tags:
+    - argo-cd
+    - argo-cd-ingress
+
+- name: Include egress services tasks for remote clusters
+  ansible.builtin.include_tasks: egress-services.yml
+  when: argo_cd_remote_cluster_hostnames | length > 0
+  tags:
+    - argo-cd
+    - argo-cd-egress
+
+- name: Include validation tasks
+  ansible.builtin.include_tasks: validate.yml
+  tags:
+    - argo-cd
+    - argo-cd-validate

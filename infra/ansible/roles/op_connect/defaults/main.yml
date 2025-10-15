@@ -1,0 +1,75 @@
+---
+# defaults file for op_connect role
+# Default variables for 1Password Connect and Operator deployment
+
+# Helm Configuration
+# Path to kubeconfig file for Helm operations (defined in group_vars/all.yml)
+# helm_kubeconfig: /var/snap/microk8s/current/credentials/client.config
+
+# Namespace configuration
+op_connect_namespace: onepassword
+op_connect_create_namespace: true
+
+# Helm repository configuration
+op_connect_helm_repo_name: 1password
+op_connect_helm_repo_url: https://1password.github.io/connect-helm-charts
+
+# Helm release configuration
+op_connect_release_name: onepassword-connect
+op_connect_chart_version: "" # Empty string means latest version
+
+# Connect Server Configuration
+op_connect_server_create: true
+op_connect_server_replica_count: 1
+op_connect_server_version: "" # Empty string uses chart default
+op_connect_server_resources: {}
+# Example resources:
+# op_connect_server_resources:
+#   limits:
+#     cpu: "500m"
+#     memory: "512Mi"
+#   requests:
+#     cpu: "200m"
+#     memory: "256Mi"
+op_connect_server_node_selector: {}
+# Example node selector:
+# op_connect_server_node_selector:
+#   kubernetes.io/hostname: "node-1"
+
+# Operator Configuration
+op_connect_operator_create: true
+op_connect_operator_replica_count: 1
+op_connect_operator_version: "" # Empty string uses chart default
+op_connect_operator_log_level: info
+op_connect_operator_polling_interval: 600 # seconds
+op_connect_operator_auto_restart: false
+op_connect_operator_watch_namespace: [] # Empty list for all namespaces
+op_connect_operator_resources: {}
+# Example resources:
+# op_connect_operator_resources:
+#   limits:
+#     cpu: "250m"
+#     memory: "256Mi"
+#   requests:
+#     cpu: "100m"
+#     memory: "128Mi"
+
+# Advanced Configuration
+op_connect_extra_values: {}
+# Example extra values:
+# op_connect_extra_values:
+#   connect:
+#     serviceAccount:
+#       create: true
+#       name: "onepassword-connect"
+#   operator:
+#     serviceAccount:
+#       create: true
+#       name: "onepassword-operator"
+
+# Credentials Configuration
+op_connect_cleanup_credentials: true
+op_connect_credentials_upload_path: /tmp/op_connect_operator_credentials.json
+# Required variables (must be provided by user or from vault)
+# op_connect_credentials_file: ""  # Path relative to infra/ansible/playbooks/files/
+# op_connect_operator_token: ""     # Must be stored in Ansible Vault

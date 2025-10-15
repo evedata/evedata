@@ -1,0 +1,76 @@
+---
+# Verification tasks for kubernetes role
+# Ensures all dependencies are properly installed and functional
+
+- name: Verification block
+  block:
+    - name: Verify kubernetes Python library installation
+      ansible.builtin.command:
+        cmd: python3 -c "import kubernetes; print(kubernetes.__version__)"
+      register: kubernetes_version_check
+      changed_when: false
+      failed_when: kubernetes_version_check.rc != 0
+
+    - name: Display installed kubernetes library version
+      ansible.builtin.debug:
+        msg: "✓ kubernetes Python library version: {{ kubernetes_version_check.stdout }}"
+      when: kubernetes_version_check.rc == 0
+
+    - name: Verify PyYAML Python library installation
+      ansible.builtin.command:
+        cmd: python3 -c "import yaml; print(yaml.__version__)"
+      register: kubernetes_pyyaml_version_check
+      changed_when: false
+      failed_when: kubernetes_pyyaml_version_check.rc != 0
+
+    - name: Display installed PyYAML library version
+      ansible.builtin.debug:
+        msg: "✓ PyYAML library version: {{ kubernetes_pyyaml_version_check.stdout }}"
+      when: kubernetes_pyyaml_version_check.rc == 0
+
+    - name: Test kubernetes client functionality
+      ansible.builtin.command:
+        cmd: |
+          python3 -c "
+          from kubernetes import client, config
+          print('Kubernetes client is functional')
+          "
+      register: kubernetes_client_test
+      changed_when: false
+      failed_when: kubernetes_client_test.rc != 0
+
+    - name: Display functionality test result
+      ansible.builtin.debug:
+        msg: "✓ {{ kubernetes_client_test.stdout }}"
+      when: kubernetes_client_test.rc == 0
+
+    - name: Compile verification summary
+      ansible.builtin.set_fact:
+        kubernetes_deps_summary:
+          kubernetes_version: "{{ kubernetes_version_check.stdout }}"
+          pyyaml_version: "{{ kubernetes_pyyaml_version_check.stdout }}"
+          functional: true
+          verified_at: "{{ ansible_date_time.iso8601 }}"
+
+    - name: Display verification summary
+      ansible.builtin.debug:
+        msg:
+          - "=== Kubernetes Dependencies Verification Summary ==="
+          - "Kubernetes library: {{ kubernetes_deps_summary.kubernetes_version }}"
+          - "PyYAML library: {{ kubernetes_deps_summary.pyyaml_version }}"
+          - "Functional test: PASSED"
+          - "Verified at: {{ kubernetes_deps_summary.verified_at }}"
+          - "==================================================="
+
+  rescue:
+    - name: Display verification failure
+      ansible.builtin.fail:
+        msg: |
+          Kubernetes Python dependencies verification failed!
+
+          Please ensure:
+          1. The installation tasks completed successfully
+          2. Python 3 is available on the system
+          3. The pip packages were installed system-wide
+
+          Error details: {{ ansible_failed_result.msg | default('Check previous task outputs') }}

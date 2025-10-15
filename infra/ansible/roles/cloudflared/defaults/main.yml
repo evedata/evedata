@@ -1,0 +1,110 @@
+---
+# defaults file for cloudflared role
+# Default variables for Cloudflare Tunnel deployment
+
+# Kubernetes Configuration
+# Path to kubeconfig file for Kubernetes operations (defined in group_vars/all.yml)
+# helm_kubeconfig: /var/snap/microk8s/current/credentials/client.config
+
+# Namespace configuration
+cloudflared_namespace: cloudflared
+cloudflared_create_namespace: true
+
+# Deployment configuration
+cloudflared_deployment_name: cloudflared
+cloudflared_replica_count: 1
+cloudflared_image_repository: cloudflare/cloudflared
+cloudflared_image_tag: "2025.10.0"
+cloudflared_image_pull_policy: IfNotPresent
+
+# Resource limits and requests
+cloudflared_resources:
+  limits:
+    cpu: "200m"
+    memory: "256Mi"
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+
+# Liveness probe configuration
+cloudflared_liveness_probe:
+  enabled: true
+  initial_delay_seconds: 10
+  period_seconds: 10
+  failure_threshold: 1
+  http_get_path: /ready
+  http_get_port: 2000
+
+# Metrics configuration
+cloudflared_metrics_enabled: true
+cloudflared_metrics_port: 2000
+cloudflared_metrics_address: "0.0.0.0"
+
+# ConfigMap configuration
+cloudflared_configmap_name: cloudflared-config
+cloudflared_no_autoupdate: true # Disable auto-updates in Kubernetes
+
+# Secret configuration (OnePasswordItem)
+cloudflared_secret_name: cloudflared-tunnel-token
+
+# Required 1Password vault and item configuration
+# These must be provided by the user in group_vars or host_vars
+# op_connect_vault: "Infrastructure"
+
+# Labels to apply to all resources
+cloudflared_labels:
+  app: cloudflared
+  "app.kubernetes.io/name": cloudflared
+  "app.kubernetes.io/component": tunnel
+  "app.kubernetes.io/managed-by": ansible
+
+# Additional labels based on environment
+cloudflared_environment_labels: {}
+
+# Security context for the container
+cloudflared_security_context:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+
+# Pod security context
+cloudflared_pod_security_context:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+  sysctls:
+    - name: net.ipv4.ping_group_range
+      value: "65532 65532"
+
+# Service account configuration
+cloudflared_create_service_account: true
+cloudflared_service_account_name: cloudflared
+
+# Additional annotations for pods
+cloudflared_pod_annotations: {}
+
+# Node selector for pod placement
+cloudflared_node_selector: {}
+
+# Tolerations for pod scheduling
+cloudflared_tolerations: []
+
+# Affinity rules for pod scheduling
+cloudflared_affinity: {}
+
+# Update strategy for the deployment
+cloudflared_update_strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+
+# Wait for deployment to be ready
+cloudflared_wait_for_deployment: true
+cloudflared_wait_timeout: 300 # seconds

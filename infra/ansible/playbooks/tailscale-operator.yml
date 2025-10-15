@@ -1,0 +1,81 @@
+---
+# Playbook to deploy Tailscale Operator to Kubernetes clusters
+# This playbook installs and configures the Tailscale Kubernetes Operator
+# with API server proxy in auth mode for secure tailnet access
+
+- name: Deploy Tailscale Operator to Kubernetes clusters
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Verify target hosts are Ubuntu 24.04
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Ubuntu"
+          - ansible_distribution_version == "24.04"
+        fail_msg: "This playbook requires Ubuntu 24.04 LTS"
+      tags:
+        - always
+
+    - name: Display deployment information
+      ansible.builtin.debug:
+        msg:
+          - "Deploying Tailscale Operator to: {{ inventory_hostname }}"
+          - "Environment: {{ inventory_hostname_short.split('-')[-2] | default('unknown') }}"
+          - "Operator hostname will be: {{ tailscale_operator_hostname | default('not set') }}"
+      tags:
+        - always
+
+  vars:
+    # OAuth credentials from vault
+    tailscale_operator_oauth_client_id: "{{ tailscale_operator_oauth_client_id }}"
+    tailscale_operator_oauth_client_secret: "{{ tailscale_operator_oauth_client_secret }}"
+
+  roles:
+    - role: tailscale_operator
+      tags:
+        - tailscale-operator
+
+  post_tasks:
+    - name: Display post-deployment instructions
+      ansible.builtin.debug:
+        msg:
+          - "========================================="
+          - "Tailscale Operator Deployment Complete"
+          - "========================================="
+          - "Operator hostname: {{ tailscale_operator_hostname }}"
+          - "Namespace: {{ tailscale_operator_namespace }}"
+          - ""
+          - "Next steps:"
+          - "1. Configure kubectl to use the API server proxy:"
+          - >-
+            kubectl config set-cluster tailscale-cluster
+            --server=https://{{ tailscale_operator_hostname }}.<your-tailnet>.ts.net"
+          - ""
+          - "2. Configure RBAC for tailnet users/groups"
+          - ""
+          - "3. Test connection:"
+          - "   kubectl --context tailscale get nodes"
+          - "========================================="
+      tags:
+        - tailscale-operator
+      when: not ansible_check_mode
+# Example usage:
+# Deploy to all hosts:
+#   ansible-playbook playbooks/tailscale-operator.yml -e @group_vars/vault.yml
+#
+# Deploy to specific group:
+#   ansible-playbook playbooks/tailscale-operator.yml -e @group_vars/vault.yml -l hzl
+#
+# Deploy to specific host:
+#   ansible-playbook playbooks/tailscale-operator.yml -e @group_vars/vault.yml -l htz-eu-fsn-hzl-srv01
+#
+# Dry run:
+#   ansible-playbook playbooks/tailscale-operator.yml -e @group_vars/vault.yml --check
+#
+# Only validate existing deployment:
+#   ansible-playbook playbooks/tailscale-operator.yml -e @group_vars/vault.yml --tags tailscale-operator-validate
+#
+# Update Helm repository only:
+#   ansible-playbook playbooks/tailscale-operator.yml -e @group_vars/vault.yml --tags tailscale-operator-helm-repo

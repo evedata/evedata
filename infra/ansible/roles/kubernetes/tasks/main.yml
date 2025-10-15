@@ -1,0 +1,26 @@
+---
+# tasks file for kubernetes role
+# Installs Python dependencies required for kubernetes.core Ansible collection
+
+- name: Check Ubuntu version
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == "Ubuntu"
+      - ansible_distribution_version is version('24.04', '>=')
+    fail_msg: "This role requires Ubuntu 24.04 LTS or later"
+    success_msg: "Ubuntu {{ ansible_distribution_version }} detected"
+  tags:
+    - kubernetes
+    - kubernetes-preflight
+
+- name: Include installation tasks
+  ansible.builtin.include_tasks: install.yml
+  tags:
+    - kubernetes
+    - kubernetes-deps
+
+- name: Include verification tasks
+  ansible.builtin.include_tasks: verify.yml
+  tags:
+    - kubernetes
+    - kubernetes-verify

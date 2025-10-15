@@ -1,0 +1,89 @@
+---
+# Playbook to deploy 1Password Connect and Operator to Kubernetes clusters
+# This playbook installs and configures the 1Password Connect server and
+# Kubernetes Operator for secure secrets management with 1Password vaults
+
+- name: Deploy 1Password Connect and Operator to Kubernetes clusters
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Verify target hosts are Ubuntu 24.04
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Ubuntu"
+          - ansible_distribution_version == "24.04"
+        fail_msg: "This playbook requires Ubuntu 24.04 LTS"
+      tags:
+        - always
+
+    - name: Display deployment information
+      ansible.builtin.debug:
+        msg:
+          - "Deploying 1Password Connect to: {{ inventory_hostname }}"
+          - "Environment: {{ inventory_hostname_short.split('-')[-2] | default('unknown') }}"
+          - "Credentials file: {{ op_connect_credentials_file | default('not set') }}"
+          - "Namespace: {{ op_connect_namespace | default('onepassword') }}"
+      tags:
+        - always
+
+  roles:
+    - role: op_connect
+      tags:
+        - op-connect
+
+  post_tasks:
+    - name: Display post-deployment instructions
+      ansible.builtin.debug:
+        msg:
+          - "========================================="
+          - "1Password Connect Deployment Complete"
+          - "========================================="
+          - "Namespace: {{ op_connect_namespace }}"
+          - "Connect server replicas: {{ op_connect_server_replica_count }}"
+          - "Operator replicas: {{ op_connect_operator_replica_count }}"
+          - ""
+          - "Next steps:"
+          - "1. Create a OnePasswordItem resource to sync secrets:"
+          - "   kubectl apply -f - <<EOF"
+          - "   apiVersion: onepassword.com/v1"
+          - "   kind: OnePasswordItem"
+          - "   metadata:"
+          - "     name: my-secret"
+          - "     namespace: default"
+          - "   spec:"
+          - "     itemPath: 'vaults/Production/items/MySecret'"
+          - "   EOF"
+          - ""
+          - "2. Verify secret creation:"
+          - "   kubectl get secret my-secret -n default"
+          - ""
+          - "3. Use the secret in your deployments:"
+          - "   See documentation at:"
+          - "   https://developer.1password.com/docs/k8s/operator"
+          - "========================================="
+      tags:
+        - op-connect
+      when: not ansible_check_mode
+# Example usage:
+# Deploy to all hosts:
+#   ansible-playbook playbooks/op-connect.yml -e @group_vars/vault.yml
+#
+# Deploy to specific group:
+#   ansible-playbook playbooks/op-connect.yml -e @group_vars/vault.yml -l hzl
+#
+# Deploy to specific host:
+#   ansible-playbook playbooks/op-connect.yml -e @group_vars/vault.yml -l htz-eu-fsn-hzl-srv01
+#
+# Dry run:
+#   ansible-playbook playbooks/op-connect.yml -e @group_vars/vault.yml --check
+#
+# Only validate existing deployment:
+#   ansible-playbook playbooks/op-connect.yml -e @group_vars/vault.yml --tags op-connect-validate
+#
+# Update Helm repository only:
+#   ansible-playbook playbooks/op-connect.yml -e @group_vars/vault.yml --tags op-connect-helm-repo
+#
+# Skip credentials cleanup (for debugging):
+#   ansible-playbook playbooks/op-connect.yml -e @group_vars/vault.yml --skip-tags op-connect-cleanup

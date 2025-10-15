@@ -1,0 +1,77 @@
+---
+# MicroK8s Non-HA Role Default Variables
+# All variables have sensible defaults for a secure single-node deployment
+
+# Core Configuration
+microk8s_channel: "1.32/stable"
+microk8s_config_version: "0.2.0"
+microk8s_users: []  # Additional users to add to the microk8s group (beyond ANSIBLE_USER)
+microk8s_persistent_cluster_token: ""  # Optional persistent token for future cluster joins (32 chars)
+microk8s_force_recreate_localhost_kubeconfig: false  # Force recreation of localhost kubeconfig even if it exists
+
+# Kubernetes Component Arguments
+microk8s_extra_kube_apiserver_args: {}
+microk8s_extra_kubelet_args: {}
+microk8s_extra_kube_proxy_args: {}
+microk8s_extra_kube_controller_manager_args: {}
+microk8s_extra_kube_scheduler_args: {}
+microk8s_extra_kubelite_env: {}  # Environment variables for Kubernetes services (kubelite)
+
+# Networking Configuration
+microk8s_extra_sans: []  # Additional Subject Alternative Names for API server certificates
+microk8s_dns_nameservers:  # Custom upstream DNS servers for CoreDNS addon (defaults to Cloudflare DNS)
+  - "1.1.1.1"
+  - "1.0.0.1"
+microk8s_extra_cni_env: {}  # CNI configuration (IPv4/IPv6 cluster and service CIDRs)
+microk8s_extra_flanneld_args: {}  # Additional flanneld arguments
+microk8s_extra_flanneld_env: {}  # Environment variables for flanneld
+
+# Container Runtime Configuration
+microk8s_registry_mirrors: {}  # Container registry mirror configurations (containerdRegistryConfigs)
+microk8s_extra_containerd_args: {}  # Additional containerd arguments
+microk8s_extra_containerd_env: {}  # Environment variables for containerd (e.g., proxy settings)
+
+# Storage Backend Configuration
+microk8s_extra_dqlite_args: {}  # Additional k8s-dqlite arguments (when using dqlite backend)
+microk8s_extra_dqlite_env: {}  # Environment variables for k8s-dqlite
+microk8s_extra_etcd_args: {}  # Additional etcd arguments (when using etcd backend)
+microk8s_extra_etcd_env: {}  # Environment variables for etcd
+
+# MicroK8s Services Configuration
+microk8s_extra_cluster_agent_args: {}  # Additional cluster-agent arguments
+microk8s_extra_cluster_agent_env: {}  # Environment variables for cluster-agent
+microk8s_extra_apiserver_proxy_args: {}  # Additional apiserver-proxy arguments (worker nodes)
+microk8s_extra_apiserver_proxy_env: {}  # Environment variables for apiserver-proxy
+
+# Security Configuration
+microk8s_enable_cis_hardening: true  # Enable CIS hardening addon for security compliance
+microk8s_extra_fips_env: {}  # FIPS mode configuration (e.g., GOFIPS=1)
+
+# Advanced Configuration
+microk8s_extra_config_files: {}  # Additional configuration files to create in $SNAP_DATA/args/
+microk8s_addon_repositories: []  # Custom addon repositories to configure
+microk8s_enable_community_repo: true  # Enable the community addon repository
+
+# Addons Configuration
+microk8s_enable_ha_cluster: true  # Enable HA cluster addon for future scalability
+
+# Default addons configuration with CIS hardening and essential components
+microk8s_addons:
+  - name: dns
+    enabled: true
+    args: []  # Uses Cloudflare DNS (1.1.1.1, 1.0.0.1) by default via microk8s_dns_nameservers
+  - name: rbac
+    enabled: true
+    args: []
+  - name: hostpath-storage
+    enabled: true
+    args: []
+  - name: ha-cluster
+    enabled: true
+    args: []
+  - name: cis-hardening
+    enabled: true
+    args: []
+  - name: trivy
+    enabled: true
+    args: []

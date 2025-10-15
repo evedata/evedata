@@ -1,0 +1,43 @@
+---
+# Handlers for MicroK8s Non-HA role
+
+- name: Restart MicroK8s
+  ansible.builtin.systemd:
+    name: snap.microk8s.daemon-kubelite
+    state: restarted
+    daemon_reload: true
+  listen: restart microk8s
+
+- name: Stop MicroK8s
+  ansible.builtin.command:
+    cmd: microk8s stop
+  listen: stop microk8s
+  changed_when: true
+
+- name: Start MicroK8s
+  ansible.builtin.command:
+    cmd: microk8s start
+  listen: start microk8s
+  changed_when: true
+
+- name: Reload MicroK8s configuration
+  ansible.builtin.command:
+    cmd: microk8s kubectl rollout restart -n kube-system deployment/calico-kube-controllers
+  listen: reload microk8s config
+  failed_when: false  # Might fail if addon not enabled
+  changed_when: true
+
+- name: Refresh MicroK8s snap
+  community.general.snap:
+    name: microk8s
+    channel: "{{ microk8s_channel }}"
+    classic: true
+    state: present
+  listen: refresh microk8s
+
+- name: Reboot required for cgroup changes
+  ansible.builtin.debug:
+    msg: |
+      IMPORTANT: A system reboot is required for cgroup changes to take effect.
+      Please reboot the system when convenient and restart MicroK8s.
+  listen: Reboot required for cgroup changes

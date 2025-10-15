@@ -1,0 +1,113 @@
+---
+# tasks file for helm role
+# Installs Helm package manager for Kubernetes on Ubuntu 24.04 LTS
+
+- name: Install required packages for Helm repository
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gpg
+      - apt-transport-https
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+  tags:
+    - helm
+    - helm-dependencies
+
+- name: Create keyrings directory if it doesn't exist
+  ansible.builtin.file:
+    path: /usr/share/keyrings
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  become: true
+  tags:
+    - helm
+    - helm-repository
+
+- name: Download Helm GPG key
+  ansible.builtin.get_url:
+    url: "{{ helm_gpg_key_url }}"
+    dest: /tmp/helm.gpg.asc
+    mode: '0644'
+    timeout: 30
+    force: true
+  become: true
+  register: helm_gpg_download
+  tags:
+    - helm
+    - helm-repository
+
+- name: Check if Helm GPG key exists
+  ansible.builtin.stat:
+    path: /usr/share/keyrings/helm.gpg
+  register: helm_gpg_key_stat
+  become: true
+  tags:
+    - helm
+    - helm-repository
+
+- name: Dearmor Helm GPG key
+  ansible.builtin.shell:
+    cmd: gpg --dearmor < /tmp/helm.gpg.asc > /usr/share/keyrings/helm.gpg
+    creates: /usr/share/keyrings/helm.gpg
+  become: true
+  when: helm_gpg_download is changed or not helm_gpg_key_stat.stat.exists
+  changed_when: not helm_gpg_key_stat.stat.exists
+  tags:
+    - helm
+    - helm-repository
+
+- name: Set proper permissions on Helm GPG key
+  ansible.builtin.file:
+    path: /usr/share/keyrings/helm.gpg
+    mode: '0644'
+    owner: root
+    group: root
+  become: true
+  tags:
+    - helm
+    - helm-repository
+
+- name: Add Helm APT repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/helm.gpg] {{ helm_repository_url }} any main"
+    state: present
+    filename: helm-stable-debian
+    update_cache: true
+  become: true
+  tags:
+    - helm
+    - helm-repository
+
+- name: Install Helm package
+  ansible.builtin.apt:
+    name: "helm{{ helm_version_spec }}"
+    state: "{{ helm_package_state }}"
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+  tags:
+    - helm
+    - helm-install
+
+- name: Verify Helm installation
+  ansible.builtin.command:
+    cmd: helm version --short
+  register: helm_version_output
+  changed_when: false
+  failed_when: false
+  tags:
+    - helm
+    - helm-verify
+
+- name: Display Helm version
+  ansible.builtin.debug:
+    msg: "Helm installed: {{ helm_version_output.stdout | default('Unable to determine version') }}"
+  when: helm_version_output.rc == 0
+  tags:
+    - helm
+    - helm-verify

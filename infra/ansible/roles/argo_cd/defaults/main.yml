@@ -1,0 +1,131 @@
+---
+# defaults file for argo_cd role
+# Default variables for ArgoCD deployment via Helm
+
+# Helm Configuration
+# Path to kubeconfig file for Helm operations (typically defined in group_vars/all.yml)
+# helm_kubeconfig: /var/snap/microk8s/current/credentials/client.localhost.config
+
+# Namespace configuration
+argo_cd_namespace: argocd
+argo_cd_create_namespace: true
+
+# Helm repository configuration
+argo_cd_helm_repo_name: argo
+argo_cd_helm_repo_url: https://argoproj.github.io/argo-helm
+
+# Helm release configuration
+argo_cd_release_name: argocd
+argo_cd_chart_version: "" # Empty string means latest version
+
+# ArgoCD Server Configuration
+# Run ArgoCD server in insecure mode (required for Tailscale ingress)
+# TLS termination happens at Tailscale level, so insecure mode is safe within the cluster
+argo_cd_insecure: true
+
+# Enable the admin user for initial setup
+# Consider disabling in production and using SSO/OIDC instead
+argo_cd_admin_enabled: true
+
+# High Availability Configuration
+# Non-HA mode by default for cost-effective single-node deployments
+argo_cd_redis_ha_enabled: false
+argo_cd_controller_replicas: 1
+argo_cd_server_replicas: 1
+argo_cd_repo_server_replicas: 1
+argo_cd_applicationset_replicas: 1
+
+# Ingress Configuration for Tailscale
+argo_cd_ingress_enabled: true
+argo_cd_ingress_class: tailscale
+argo_cd_ingress_path_type: Prefix
+
+# gRPC Ingress Configuration
+# ArgoCD CLI requires gRPC access, exposed via separate ingress
+argo_cd_grpc_ingress_enabled: true
+# Default gRPC hostname is derived from main hostname
+# Override this if you need a different hostname
+# argo_cd_grpc_hostname: "{{ argo_cd_hostname }}-grpc"
+
+# Resource Configuration
+# Empty by default, allowing Kubernetes to manage resources
+# Override these for production deployments with specific requirements
+argo_cd_server_resources: {}
+# Example:
+#   limits:
+#     cpu: "1"
+#     memory: "1Gi"
+#   requests:
+#     cpu: "250m"
+#     memory: "512Mi"
+
+argo_cd_controller_resources: {}
+# Example:
+#   limits:
+#     cpu: "2"
+#     memory: "2Gi"
+#   requests:
+#     cpu: "500m"
+#     memory: "1Gi"
+
+argo_cd_repo_server_resources: {}
+# Example:
+#   limits:
+#     cpu: "1"
+#     memory: "1Gi"
+#   requests:
+#     cpu: "250m"
+#     memory: "256Mi"
+
+argo_cd_redis_resources: {}
+# Example:
+#   limits:
+#     cpu: "500m"
+#     memory: "256Mi"
+#   requests:
+#     cpu: "100m"
+#     memory: "128Mi"
+
+argo_cd_applicationset_resources: {}
+# Example:
+#   limits:
+#     cpu: "500m"
+#     memory: "512Mi"
+#   requests:
+#     cpu: "100m"
+#     memory: "128Mi"
+
+# Additional Configuration
+# Extra Helm values to merge with generated values
+# Useful for advanced customizations not covered by role variables
+argo_cd_extra_values: {}
+
+# Additional arguments for ArgoCD server
+# Example: ["--grpc-web", "--disable-auth"]
+argo_cd_server_extra_args: []
+
+# Additional arguments for application controller
+# Example: ["--repo-server-timeout-seconds", "300"]
+argo_cd_controller_extra_args: []
+
+# Additional environment variables for repo server
+# Example:
+# - name: CUSTOM_VAR
+#   value: "custom_value"
+argo_cd_repo_server_extra_env: []
+# 1Password Integration
+# Vault for storing ArgoCD secrets in 1Password
+op_connect_vault: "EVEData"
+
+# Remote Cluster Configuration
+# List of remote cluster hostnames to create egress services for
+# These will be combined with tailscale_dns_name to create FQDNs
+# Example: ["cluster-stg", "cluster-prd"]
+argo_cd_remote_cluster_hostnames: []
+
+# Tailnet DNS name (e.g., "example.ts.net")
+# This will be combined with cluster hostnames to create FQDNs
+# Example: cluster-stg.example.ts.net
+tailscale_dns_name: ""
+# Required variables (must be provided by user)
+# argo_cd_hostname: ""  # Hostname for ArgoCD on Tailscale network (e.g., "argocd")

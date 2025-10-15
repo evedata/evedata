@@ -1,0 +1,176 @@
+---
+# Configure users for MicroK8s access
+
+- name: Ensure microk8s group exists
+  ansible.builtin.group:
+    name: microk8s
+    state: present
+    system: true  # Make it a system group to match what snap creates
+
+- name: Add ansible user to microk8s group
+  ansible.builtin.user:
+    name: "{{ ansible_user | default(ansible_ssh_user) | default('ansible') }}"
+    groups: microk8s
+    append: true
+  register: ansible_user_result
+
+- name: Add additional users to microk8s group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: microk8s
+    append: true
+  loop: "{{ microk8s_users }}"
+  when: microk8s_users | length > 0
+  register: additional_users_result
+
+# Fix permissions on the microk8s socket which is what controls access
+- name: Fix MicroK8s socket permissions
+  ansible.builtin.file:
+    path: /var/snap/microk8s/common/run/control.socket
+    owner: root
+    group: microk8s
+    mode: "0660"
+  failed_when: false  # Socket might not exist yet
+
+- name: Set proper ownership for MicroK8s directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: root
+    group: microk8s
+    mode: "0770"
+    recurse: false
+  loop:
+    - /var/snap/microk8s/current/credentials
+    - /var/snap/microk8s/common/run
+  failed_when: false  # Directories might not exist yet
+
+# Ensure the microk8s daemon respects the group permissions
+- name: Restart MicroK8s daemon to apply group changes
+  ansible.builtin.systemd:
+    name: snap.microk8s.daemon-kubelite
+    state: restarted
+  changed_when: ansible_user_result.changed or (additional_users_result.changed | default(false))
+
+# Create localhost-friendly kubeconfig before distributing to users
+- name: Create localhost-friendly kubeconfig
+  ansible.builtin.include_tasks: kubeconfig-localhost.yml
+  tags:
+    - microk8s-kubeconfig
+    - microk8s-users
+
+# Configure root user access
+- name: Create kubectl config directory for root user
+  ansible.builtin.file:
+    path: /root/.kube
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+  tags:
+    - microk8s-users
+    - microk8s-kubeconfig
+
+- name: Copy localhost kubeconfig for root user
+  ansible.builtin.copy:
+    src: /var/snap/microk8s/current/credentials/client.localhost.config
+    dest: /root/.kube/config
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0600"
+    backup: true
+  tags:
+    - microk8s-users
+    - microk8s-kubeconfig
+
+- name: Create kubectl config directory for ansible user
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user | default(ansible_ssh_user) | default('ansible') }}/.kube"
+    state: directory
+    owner: "{{ ansible_user | default(ansible_ssh_user) | default('ansible') }}"
+    group: "{{ ansible_user | default(ansible_ssh_user) | default('ansible') }}"
+    mode: "0755"
+  tags:
+    - microk8s-users
+    - microk8s-kubeconfig
+
+- name: Copy localhost kubeconfig for ansible user
+  ansible.builtin.copy:
+    src: /var/snap/microk8s/current/credentials/client.localhost.config
+    dest: "/home/{{ ansible_user | default(ansible_ssh_user) | default('ansible') }}/.kube/config"
+    remote_src: true
+    owner: "{{ ansible_user | default(ansible_ssh_user) | default('ansible') }}"
+    group: "{{ ansible_user | default(ansible_ssh_user) | default('ansible') }}"
+    mode: "0600"
+    backup: true
+  tags:
+    - microk8s-users
+    - microk8s-kubeconfig
+
+- name: Create kubectl config directories for additional users
+  ansible.builtin.file:
+    path: "/home/{{ item }}/.kube"
+    state: directory
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: "0755"
+  loop: "{{ microk8s_users }}"
+  when: microk8s_users | length > 0
+  tags:
+    - microk8s-users
+    - microk8s-kubeconfig
+
+- name: Copy localhost kubeconfig for additional users
+  ansible.builtin.copy:
+    src: /var/snap/microk8s/current/credentials/client.localhost.config
+    dest: "/home/{{ item }}/.kube/config"
+    remote_src: true
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: "0600"
+    backup: true
+  loop: "{{ microk8s_users }}"
+  when: microk8s_users | length > 0
+  tags:
+    - microk8s-users
+    - microk8s-kubeconfig
+
+- name: Display user configuration summary
+  ansible.builtin.debug:
+    msg: |
+      User configuration complete:
+      - Ansible user '{{ ansible_user | default(ansible_ssh_user) | default("ansible") }}' added to microk8s group
+      {% if microk8s_users | length > 0 %}
+      - Additional users added to microk8s group: {{ microk8s_users | join(', ') }}
+      {% endif %}
+      - Localhost-friendly kubeconfig distributed to all users (including root)
+      - Kubeconfig uses 127.0.0.1:16443 to bypass firewall restrictions
+      - Users can now use 'kubectl' and 'microk8s' commands without sudo
+
+- name: Note about group membership
+  ansible.builtin.debug:
+    msg: |
+      IMPORTANT: Users may need to log out and back in for group membership to take effect.
+      Alternatively, they can run: newgrp microk8s
+
+# Validate that the ansible user can actually use microk8s
+- name: Validate ansible user can access MicroK8s
+  ansible.builtin.command:
+    cmd: /snap/bin/microk8s status
+  become: true
+  become_user: "{{ ansible_user | default(ansible_ssh_user) | default('ansible') }}"
+  register: microk8s_user_test
+  changed_when: false
+  failed_when: false
+
+- name: Display user access validation result
+  ansible.builtin.debug:
+    msg: |
+      Ansible user MicroK8s access test:
+      {% set user = ansible_user | default(ansible_ssh_user) | default("ansible") %}
+      {% if microk8s_user_test.rc == 0 %}
+      ✓ SUCCESS: User '{{ user }}' can access MicroK8s without sudo
+      {% else %}
+      ⚠ WARNING: User '{{ user }}' may need to log out and back in
+      Error: {{ microk8s_user_test.stderr | default('Group membership not yet active in session') }}
+      {% endif %}

@@ -1,0 +1,18 @@
+---
+# vars file for kubernetes role
+# Internal variables not meant to be overridden
+
+# Minimum required versions for compatibility
+_kubernetes_min_pip_version: "21.0"
+_kubernetes_min_python_version: "3.8"
+
+# Package names
+_kubernetes_packages:
+  - python3-pip
+
+# Python libraries with optional version constraints
+_kubernetes_python_libs:
+  - name: kubernetes
+    var: kubernetes_python_version
+  - name: PyYAML
+    var: kubernetes_pyyaml_version

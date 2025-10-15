@@ -48,3 +48,7 @@
 - Lint, fix, and format Python files: `uv run ruff check --fix <filename ...> && uv run ruff format <filename ...>`
 - Run Python scripts: `uv run python <script>`
 - Run `evedatactl` Administration CLI: `uv run evedatactl`
+
+## Project style
+
+- ALWAYS ensure an empty line at the end of files you work on

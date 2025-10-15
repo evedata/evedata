@@ -1,0 +1,63 @@
+---
+# Install tasks for kubernetes role
+# This file contains the main installation logic with error handling
+
+- name: Install Python dependencies block
+  block:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      become: true
+
+    - name: Install python3-pip package
+      ansible.builtin.apt:
+        name: python3-pip
+        state: present
+      become: true
+
+    # Note: Using --break-system-packages is necessary on Ubuntu 24.04 due to PEP 668
+    # These packages are required for Ansible kubernetes.core collection and are not
+    # available in Ubuntu's apt repositories. This is the intended approach for
+    # system administration tooling that requires Python dependencies.
+    - name: Install kubernetes Python library
+      ansible.builtin.pip:
+        name: "kubernetes{{ '==' + kubernetes_python_version if kubernetes_python_version else '' }}"
+        state: present
+        executable: pip3
+        extra_args: --break-system-packages
+      become: true
+      register: kubernetes_lib_result
+      retries: 3
+      delay: 5
+      until: kubernetes_lib_result is succeeded
+
+    - name: Install PyYAML Python library
+      ansible.builtin.pip:
+        name: "PyYAML{{ '==' + kubernetes_pyyaml_version if kubernetes_pyyaml_version else '' }}"
+        state: present
+        executable: pip3
+        extra_args: --break-system-packages
+      become: true
+      register: kubernetes_pyyaml_lib_result
+      retries: 3
+      delay: 5
+      until: kubernetes_pyyaml_lib_result is succeeded
+
+  rescue:
+    - name: Display error message
+      ansible.builtin.fail:
+        msg: |
+          Failed to install Kubernetes Python dependencies.
+          Error: {{ ansible_failed_result.msg | default('Unknown error') }}
+
+          Please check:
+          1. Internet connectivity
+          2. PyPI availability
+          3. Sufficient disk space
+          4. System permissions
+
+  always:
+    - name: Log installation attempt
+      ansible.builtin.debug:
+        msg: "Kubernetes Python dependencies installation attempted at {{ ansible_date_time.iso8601 }}"

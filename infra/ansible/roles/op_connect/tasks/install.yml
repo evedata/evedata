@@ -1,0 +1,152 @@
+---
+# Installation tasks for 1Password Connect and Operator
+
+- name: Prepare Helm values for 1Password Connect
+  ansible.builtin.set_fact:
+    op_connect_helm_values:
+      connect:
+        create: "{{ op_connect_server_create }}"
+        replicas: "{{ op_connect_server_replica_count }}"
+        image:
+          tag: "{{ op_connect_server_version if op_connect_server_version else omit }}"
+        resources: "{{ op_connect_server_resources if op_connect_server_resources else omit }}"
+        nodeSelector: "{{ op_connect_server_node_selector if op_connect_server_node_selector else omit }}"
+      operator:
+        create: "{{ op_connect_operator_create }}"
+        token:
+          value: "{{ op_connect_operator_token }}"
+        replicas: "{{ op_connect_operator_replica_count }}"
+        image:
+          tag: "{{ op_connect_operator_version if op_connect_operator_version else omit }}"
+        logLevel: "{{ op_connect_operator_log_level }}"
+        pollingInterval: "{{ op_connect_operator_polling_interval }}"
+        autoRestart: "{{ op_connect_operator_auto_restart }}"
+        watchNamespace: "{{ op_connect_operator_watch_namespace if op_connect_operator_watch_namespace else omit }}"
+  no_log: true # Contains sensitive token
+  tags:
+    - op-connect
+    - op-connect-install
+
+- name: Merge extra values with default values
+  ansible.builtin.set_fact:
+    op_connect_final_values: >-
+      {{ op_connect_helm_values | combine(op_connect_extra_values, recursive=true) }}
+  no_log: true # Contains sensitive token
+  tags:
+    - op-connect
+    - op-connect-install
+
+- name: Deploy 1Password Connect using Helm
+  kubernetes.core.helm:
+    name: "{{ op_connect_release_name }}"
+    chart_ref: "{{ op_connect_helm_repo_name }}/connect"
+    release_namespace: "{{ op_connect_namespace }}"
+    create_namespace: "{{ op_connect_create_namespace }}"
+    values: "{{ op_connect_final_values }}"
+    set_values:
+      - value: "connect.credentials={{ op_connect_credentials_upload_path }}"
+        value_type: file
+    state: present
+    kubeconfig: "{{ helm_kubeconfig }}"
+    chart_version: "{{ op_connect_chart_version if op_connect_chart_version else omit }}"
+    wait: true
+    wait_timeout: 600s
+  become: true
+  register: op_connect_helm_install_result
+  tags:
+    - op-connect
+    - op-connect-install
+
+- name: Display Helm deployment status
+  ansible.builtin.debug:
+    msg:
+      - "Helm release name: {{ op_connect_release_name }}"
+      - "Release namespace: {{ op_connect_namespace }}"
+      - "Chart version: {{ op_connect_helm_install_result.chart_metadata.version | default('latest') }}"
+      - "Deployment status: {{ op_connect_helm_install_result.status.status | default('unknown') }}"
+  when: op_connect_helm_install_result is defined
+  tags:
+    - op-connect
+    - op-connect-install
+
+- name: Wait for Connect server deployment to be ready
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ op_connect_release_name }}"
+    namespace: "{{ op_connect_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_condition:
+      type: Progressing
+      status: "True"
+      reason: NewReplicaSetAvailable
+    wait_timeout: 300
+  become: true
+  register: op_connect_server_deployment
+  when: op_connect_server_create | bool
+  tags:
+    - op-connect
+    - op-connect-install
+
+- name: Wait for Operator deployment to be ready
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ op_connect_release_name }}-operator"
+    namespace: "{{ op_connect_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_condition:
+      type: Progressing
+      status: "True"
+      reason: NewReplicaSetAvailable
+    wait_timeout: 300
+  become: true
+  register: op_connect_operator_deployment
+  when: op_connect_operator_create | bool
+  tags:
+    - op-connect
+    - op-connect-install
+
+- name: Verify Connect server pods are running
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ op_connect_namespace }}"
+    label_selectors:
+      - "app.kubernetes.io/component=connect"
+      - "app={{ op_connect_release_name }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_condition:
+      type: Ready
+      status: "True"
+    wait_timeout: 300
+  become: true
+  register: op_connect_server_pods
+  when: op_connect_server_create | bool
+  tags:
+    - op-connect
+    - op-connect-install
+
+- name: Verify Operator pods are running
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ op_connect_namespace }}"
+    label_selectors:
+      - "app.kubernetes.io/component=operator"
+      - "name={{ op_connect_release_name }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_condition:
+      type: Ready
+      status: "True"
+    wait_timeout: 300
+  become: true
+  register: op_connect_operator_pods
+  when: op_connect_operator_create | bool
+  tags:
+    - op-connect
+    - op-connect-install

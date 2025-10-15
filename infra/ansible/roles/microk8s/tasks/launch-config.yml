@@ -1,0 +1,49 @@
+---
+# Create MicroK8s launch configuration
+
+- name: Create MicroK8s common directory
+  ansible.builtin.file:
+    path: /var/snap/microk8s/common
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Generate MicroK8s launch configuration
+  ansible.builtin.template:
+    src: microk8s-launch-config.yaml.j2
+    dest: /var/snap/microk8s/common/.microk8s.yaml
+    owner: root
+    group: root
+    mode: "0644"
+    backup: true
+  register: launch_config_result
+
+- name: Display launch configuration changes
+  ansible.builtin.debug:
+    msg: >-
+      Launch configuration
+      {{ 'created' if launch_config_result.changed else 'already exists' }}
+      at /var/snap/microk8s/common/.microk8s.yaml
+
+- name: Validate launch configuration YAML syntax
+  ansible.builtin.shell:
+    cmd: |
+      python3 -c "
+      import yaml
+      import sys
+      try:
+          with open('/var/snap/microk8s/common/.microk8s.yaml', 'r') as f:
+              yaml.safe_load(f)
+          print('Launch configuration YAML is valid')
+          sys.exit(0)
+      except yaml.YAMLError as e:
+          print(f'Launch configuration YAML is invalid: {e}')
+          sys.exit(1)
+      "
+  register: yaml_validation
+  changed_when: false
+
+- name: Display YAML validation result
+  ansible.builtin.debug:
+    msg: "{{ yaml_validation.stdout }}"

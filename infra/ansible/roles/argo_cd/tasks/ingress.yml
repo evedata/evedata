@@ -1,0 +1,152 @@
+---
+# Ingress configuration tasks for ArgoCD with Tailscale
+
+- name: Create Tailscale ingress for ArgoCD UI
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: "{{ argo_cd_release_name }}-server"
+        namespace: "{{ argo_cd_namespace }}"
+        labels:
+          app.kubernetes.io/name: argocd-server
+          app.kubernetes.io/instance: "{{ argo_cd_release_name }}"
+          app.kubernetes.io/component: server
+          app.kubernetes.io/managed-by: ansible
+          app.kubernetes.io/part-of: argocd
+      spec:
+        ingressClassName: "tailscale"
+        defaultBackend:
+          service:
+            name: "{{ argo_cd_release_name }}-server"
+            port:
+              number: 80
+        tls:
+          - hosts:
+              - "{{ argo_cd_hostname }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: argo_cd_ui_ingress
+  tags:
+    - argo-cd
+    - argo-cd-ingress
+
+- name: Create Tailscale ingress for ArgoCD gRPC API
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: "{{ argo_cd_release_name }}-server-grpc"
+        namespace: "{{ argo_cd_namespace }}"
+        labels:
+          app.kubernetes.io/name: argocd-server
+          app.kubernetes.io/instance: "{{ argo_cd_release_name }}"
+          app.kubernetes.io/component: server
+          app.kubernetes.io/managed-by: ansible
+          app.kubernetes.io/part-of: argocd
+      spec:
+        ingressClassName: "tailscale"
+        defaultBackend:
+          service:
+            name: "{{ argo_cd_release_name }}-server"
+            port:
+              number: 443
+        tls:
+          - hosts:
+              - "{{ argo_cd_grpc_hostname }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+  become: true
+  register: argo_cd_grpc_ingress
+  when: argo_cd_grpc_ingress_enabled | bool
+  tags:
+    - argo-cd
+    - argo-cd-ingress
+
+- name: Wait for UI ingress to be ready
+  kubernetes.core.k8s_info:
+    api_version: networking.k8s.io/v1
+    kind: Ingress
+    name: "{{ argo_cd_release_name }}-server"
+    namespace: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_timeout: 120
+  become: true
+  register: argo_cd_ui_ingress_status
+  tags:
+    - argo-cd
+    - argo-cd-ingress
+
+- name: Wait for gRPC ingress to be ready
+  kubernetes.core.k8s_info:
+    api_version: networking.k8s.io/v1
+    kind: Ingress
+    name: "{{ argo_cd_release_name }}-server-grpc"
+    namespace: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_timeout: 120
+  become: true
+  register: argo_cd_grpc_ingress_status
+  when: argo_cd_grpc_ingress_enabled | bool
+  tags:
+    - argo-cd
+    - argo-cd-ingress
+
+- name: Display ingress configuration
+  ansible.builtin.debug:
+    msg:
+      - "ArgoCD ingress has been configured!"
+      - "UI Access: https://{{ argo_cd_hostname }}.{{ tailscale_dns_name | default('<tailnet>') }}"
+      - >-
+        gRPC Access: https://{{ argo_cd_grpc_hostname }}.{{ tailscale_dns_name | default('<tailnet>') }}
+        {{ '(enabled)' if argo_cd_grpc_ingress_enabled else '(disabled)' }}
+      - ""
+      - "Note: It may take a few minutes for the Tailscale certificates to be provisioned."
+      - "The first connection attempt might be slow while certificates are generated."
+  tags:
+    - argo-cd
+    - argo-cd-ingress
+
+- name: Verify ingress endpoints are accessible
+  ansible.builtin.uri:
+    url: "https://{{ item.hostname }}.{{ tailscale_dns_name | default('example') }}/healthz"
+    method: GET
+    status_code: [200, 301, 302, 403] # ArgoCD might redirect or require auth
+    validate_certs: false # Tailscale certs might not be in system trust store
+    timeout: 30
+  loop:
+    - hostname: "{{ argo_cd_hostname }}"
+      enabled: true
+    - hostname: "{{ argo_cd_grpc_hostname }}"
+      enabled: "{{ argo_cd_grpc_ingress_enabled }}"
+  when:
+    - item.enabled | bool
+    - tailscale_dns_name is defined
+  become: false # Run as normal user for HTTP requests
+  register: argo_cd_ingress_health_check
+  failed_when: false # Don't fail the playbook, just check
+  changed_when: false
+  tags:
+    - argo-cd
+    - argo-cd-ingress
+    - argo-cd-validate
+
+- name: Report ingress health check results
+  ansible.builtin.debug:
+    msg: >-
+      Ingress {{ item.item.hostname }} is
+      {{ 'accessible' if item.status is defined and item.status in [200, 301, 302, 403]
+      else 'not yet accessible (this is normal during initial setup)' }}
+  loop: "{{ argo_cd_ingress_health_check.results | default([]) }}"
+  when: argo_cd_ingress_health_check.results is defined
+  loop_control:
+    label: "{{ item.item.hostname | default('unknown') }}"
+  tags:
+    - argo-cd
+    - argo-cd-ingress
+    - argo-cd-validate

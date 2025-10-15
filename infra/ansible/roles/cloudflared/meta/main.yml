@@ -1,0 +1,24 @@
+---
+# meta file for cloudflared role
+galaxy_info:
+  author: EVEData Team
+  description: Ansible role to deploy Cloudflare Tunnel (cloudflared) on Kubernetes
+  company: EVEData
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - "24.04"
+  galaxy_tags:
+    - cloudflare
+    - cloudflared
+    - tunnel
+    - kubernetes
+    - k8s
+    - networking
+    - ingress
+    - security
+    - onepassword
+
+dependencies: []

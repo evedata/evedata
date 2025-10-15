@@ -1,0 +1,50 @@
+---
+# Helm repository configuration tasks for ArgoCD
+
+- name: Add ArgoCD Helm repository
+  kubernetes.core.helm_repository:
+    name: "{{ argo_cd_helm_repo_name }}"
+    url: "{{ argo_cd_helm_repo_url }}"
+    state: present
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  register: argo_cd_helm_repo_result
+  tags:
+    - argo-cd
+    - argo-cd-helm-repo
+
+- name: Update Helm repository cache
+  ansible.builtin.command:
+    cmd: helm repo update {{ argo_cd_helm_repo_name }}
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  changed_when: false
+  register: argo_cd_helm_repo_update
+  tags:
+    - argo-cd
+    - argo-cd-helm-repo
+
+- name: Search for ArgoCD chart in repository
+  ansible.builtin.command:
+    cmd: helm search repo {{ argo_cd_helm_repo_name }}/argo-cd --output json
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  changed_when: false
+  register: argo_cd_chart_search
+  tags:
+    - argo-cd
+    - argo-cd-helm-repo
+
+- name: Display available ArgoCD chart version
+  ansible.builtin.debug:
+    msg:
+      - "Repository: {{ argo_cd_helm_repo_name }}"
+      - "Available chart version: {{ (argo_cd_chart_search.stdout | from_json)[0].version | default('Not found') }}"
+      - "App version: {{ (argo_cd_chart_search.stdout | from_json)[0].app_version | default('Not found') }}"
+  when: argo_cd_chart_search.stdout | length > 0
+  tags:
+    - argo-cd
+    - argo-cd-helm-repo

@@ -1,0 +1,102 @@
+---
+# Pre-flight checks for MicroK8s installation
+
+- name: Validate Ubuntu 24.04 LTS target system
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == "Ubuntu"
+      - ansible_distribution_version is version('24.04', '==')
+    fail_msg: "This role requires Ubuntu 24.04 LTS (Noble Numbat)"
+    success_msg: "Operating system requirements validated: Ubuntu {{ ansible_distribution_version }}"
+
+- name: Check for sufficient system resources
+  block:
+    - name: Get available memory
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          free -m | awk 'NR==2{print $2}'
+        executable: /bin/bash
+      register: total_memory_mb
+      changed_when: false
+
+    - name: Get available disk space
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          df -BG / | awk 'NR==2{print $4}' | sed 's/G//'
+        executable: /bin/bash
+      register: available_disk_gb
+      changed_when: false
+
+    - name: Get CPU count
+      ansible.builtin.command:
+        cmd: nproc
+      register: cpu_count
+      changed_when: false
+
+    - name: Validate system resources
+      ansible.builtin.assert:
+        that:
+          - total_memory_mb.stdout | int >= 2048  # Minimum 2GB RAM
+          - available_disk_gb.stdout | int >= 20   # Minimum 20GB disk space
+          - cpu_count.stdout | int >= 2            # Minimum 2 CPUs
+        fail_msg: |
+          Insufficient system resources for MicroK8s:
+          - Memory: {{ total_memory_mb.stdout }}MB (minimum: 2048MB)
+          - Disk: {{ available_disk_gb.stdout }}GB (minimum: 20GB)
+          - CPUs: {{ cpu_count.stdout }} (minimum: 2)
+        success_msg: |
+          System resources validated:
+          - Memory: {{ total_memory_mb.stdout }}MB
+          - Disk: {{ available_disk_gb.stdout }}GB available
+          - CPUs: {{ cpu_count.stdout }}
+
+- name: Check if snap is installed
+  ansible.builtin.command:
+    cmd: snap version
+  register: snap_version
+  changed_when: false
+
+- name: Validate snap installation
+  ansible.builtin.assert:
+    that:
+      - snap_version.rc == 0
+    fail_msg: "Snap package manager is not installed"
+    success_msg: "Snap package manager is installed"
+
+- name: Check for existing MicroK8s installation
+  ansible.builtin.command:
+    cmd: snap list microk8s
+  register: existing_microk8s
+  failed_when: false
+  changed_when: false
+
+- name: Display existing MicroK8s version if installed
+  ansible.builtin.debug:
+    msg: >-
+      Existing MicroK8s installation found:
+      {{ existing_microk8s.stdout_lines[1].split()[1] if existing_microk8s.rc == 0 else 'None' }}
+  when: existing_microk8s.rc == 0
+
+- name: Validate persistent cluster token if provided
+  ansible.builtin.assert:
+    that:
+      - microk8s_persistent_cluster_token | length == 0 or microk8s_persistent_cluster_token | length == 32
+    fail_msg: "Persistent cluster token must be exactly 32 characters if provided"
+    success_msg: "Persistent cluster token validation passed"
+  when: microk8s_persistent_cluster_token is defined
+
+- name: Validate MicroK8s channel format
+  ansible.builtin.assert:
+    that:
+      - microk8s_channel is regex('^[0-9]+\.[0-9]+/(stable|candidate|beta|edge)$')
+    fail_msg: "Invalid MicroK8s channel format: {{ microk8s_channel }}. Expected format: X.Y/track (e.g., 1.32/stable)"
+    success_msg: "MicroK8s channel validated: {{ microk8s_channel }}"
+
+- name: Validate launch configuration version
+  ansible.builtin.assert:
+    that:
+      - microk8s_config_version in ['0.1.0', '0.2.0']
+    fail_msg: "Invalid launch configuration version: {{ microk8s_config_version }}. Supported versions: 0.1.0, 0.2.0"
+    success_msg: "Launch configuration version validated: {{ microk8s_config_version }}"

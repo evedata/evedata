@@ -1,0 +1,48 @@
+---
+# Helm repository configuration tasks for 1Password Connect
+
+- name: Add 1Password Helm repository
+  kubernetes.core.helm_repository:
+    name: "{{ op_connect_helm_repo_name }}"
+    repo_url: "{{ op_connect_helm_repo_url }}"
+    state: present
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  tags:
+    - op-connect
+    - op-connect-helm-repo
+
+- name: Update 1Password Helm repository
+  ansible.builtin.command:
+    cmd: helm repo update "{{ op_connect_helm_repo_name }}"
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  changed_when: true  # Repository metadata is always updated
+  tags:
+    - op-connect
+    - op-connect-helm-repo
+
+- name: Verify 1Password Helm repository is available
+  ansible.builtin.command:
+    cmd: helm search repo "{{ op_connect_helm_repo_name }}/connect" --output json
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  register: op_connect_helm_search
+  changed_when: false
+  failed_when:
+    - op_connect_helm_search.rc != 0
+    - '"No results found" in op_connect_helm_search.stderr'
+  tags:
+    - op-connect
+    - op-connect-helm-repo
+
+- name: Display available 1Password Connect chart versions
+  ansible.builtin.debug:
+    msg: "Available 1Password Connect chart: {{ (op_connect_helm_search.stdout | from_json)[0].name }} version {{ (op_connect_helm_search.stdout | from_json)[0].version }}"
+  when: op_connect_helm_search.stdout | from_json | length > 0
+  tags:
+    - op-connect
+    - op-connect-helm-repo

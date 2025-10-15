@@ -1,0 +1,27 @@
+---
+# Playbook to install Kubernetes Python dependencies
+# This prepares the system to use kubernetes.core Ansible collection
+
+- name: Install Kubernetes Python dependencies
+  hosts: all
+  become: true
+
+  pre_tasks:
+    - name: Display target hosts
+      ansible.builtin.debug:
+        msg: "Installing Kubernetes dependencies on {{ ansible_hostname }}"
+
+  roles:
+    - role: kubernetes
+      tags:
+        - kubernetes
+        - kubernetes-deps
+
+  post_tasks:
+    - name: Display installation complete message
+      ansible.builtin.debug:
+        msg: |
+          Kubernetes Python dependencies installed successfully!
+          The system is now ready to use kubernetes.core Ansible collection modules.
+      tags:
+        - kubernetes

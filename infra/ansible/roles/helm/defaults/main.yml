@@ -1,0 +1,16 @@
+---
+# defaults file for helm role
+# Configuration variables for Helm installation
+
+# Helm GPG key URL
+helm_gpg_key_url: "https://packages.buildkite.com/helm-linux/helm-debian/gpgkey"
+
+# Helm APT repository URL
+helm_repository_url: "https://packages.buildkite.com/helm-linux/helm-debian/any/"
+
+# Helm package state (present, latest)
+helm_package_state: present
+
+# Helm version specification (empty string for latest available)
+# Examples: "=3.13.*" for specific minor version, "=3.13.2-1" for specific version
+helm_version_spec: ""

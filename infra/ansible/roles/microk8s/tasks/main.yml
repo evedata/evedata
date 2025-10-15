@@ -1,0 +1,39 @@
+---
+# Main task orchestration for MicroK8s Non-HA role
+
+- name: Pre-flight checks
+  ansible.builtin.include_tasks: preflight.yml
+  tags:
+    - microk8s
+    - microk8s-preflight
+
+- name: Create launch configuration
+  ansible.builtin.include_tasks: launch-config.yml
+  tags:
+    - microk8s
+    - microk8s-config
+
+- name: Install MicroK8s
+  ansible.builtin.include_tasks: install.yml
+  tags:
+    - microk8s
+    - microk8s-install
+
+- name: Restart MicroK8s if needed
+  ansible.builtin.include_tasks: restart.yml
+  tags:
+    - microk8s
+    - microk8s-restart
+    - microk8s-runtime
+
+- name: Configure users
+  ansible.builtin.include_tasks: users.yml
+  tags:
+    - microk8s
+    - microk8s-users
+
+- name: Validate installation
+  ansible.builtin.include_tasks: validate.yml
+  tags:
+    - microk8s
+    - microk8s-validate

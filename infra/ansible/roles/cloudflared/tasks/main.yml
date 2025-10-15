@@ -1,0 +1,56 @@
+---
+# tasks file for cloudflared role
+# Main task orchestration for Cloudflare Tunnel deployment
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - op_connect_vault is defined
+      - op_connect_vault | length > 0
+      - cloudflared_secret_name is defined
+      - cloudflared_secret_name | length > 0
+      - helm_kubeconfig is defined
+      - helm_kubeconfig | length > 0
+    fail_msg: >-
+      Required variables are not defined. Please ensure op_connect_vault,
+      cloudflared_secret_name, and helm_kubeconfig are set.
+  tags:
+    - cloudflared
+    - cloudflared-validate
+
+- name: Include namespace management tasks
+  ansible.builtin.include_tasks: namespace.yml
+  tags:
+    - cloudflared
+    - cloudflared-namespace
+
+- name: Include OnePasswordItem secret creation tasks
+  ansible.builtin.include_tasks: secret.yml
+  tags:
+    - cloudflared
+    - cloudflared-secret
+
+- name: Include deployment creation tasks
+  ansible.builtin.include_tasks: deployment.yml
+  tags:
+    - cloudflared
+    - cloudflared-deployment
+
+- name: Include validation tasks
+  ansible.builtin.include_tasks: validate.yml
+  tags:
+    - cloudflared
+    - cloudflared-validate
+
+- name: Display deployment summary
+  ansible.builtin.debug:
+    msg:
+      - "Cloudflare Tunnel deployment completed successfully"
+      - "Namespace: {{ cloudflared_namespace }}"
+      - "Deployment: {{ cloudflared_deployment_name }}"
+      - "Replicas: {{ cloudflared_replica_count }}"
+      - "Image: {{ cloudflared_image_repository }}:{{ cloudflared_image_tag }}"
+      - "Metrics endpoint: http://{{ cloudflared_deployment_name }}.{{ cloudflared_namespace }}.svc.cluster.local:{{ cloudflared_metrics_port }}/metrics"
+  tags:
+    - cloudflared
+    - cloudflared-summary

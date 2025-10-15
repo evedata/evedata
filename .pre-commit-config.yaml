@@ -4,6 +4,7 @@ repos:
       - id: check-merge-conflict
       - id: check-symlinks
       - id: check-json
+        exclude: infra\/ansible\/playbooks\/files
       - id: check-toml
       - args:
           - --unsafe

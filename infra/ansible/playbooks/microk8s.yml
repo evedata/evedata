@@ -1,0 +1,52 @@
+---
+# Playbook to deploy MicroK8s in Non-HA mode
+# Usage:
+#   ansible-playbook playbooks/microk8s.yml -e @group_vars/vault.yml
+#   ansible-playbook playbooks/microk8s.yml -e @group_vars/vault.yml -l stg
+#   ansible-playbook playbooks/microk8s.yml -e @group_vars/vault.yml -l htz-eu-fsn-hzl-srv01
+
+- name: Deploy MicroK8s Non-HA to target hosts
+  hosts: microk8s
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Verify target hosts
+      ansible.builtin.debug:
+        msg: |
+          Deploying MicroK8s to:
+          - Hostname: {{ ansible_hostname }}
+          - OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+          - Memory: {{ ansible_memtotal_mb }}MB
+          - CPUs: {{ ansible_processor_vcpus }}
+      tags:
+        - always
+
+  roles:
+    - microk8s
+
+  post_tasks:
+    - name: Display post-installation information
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          MicroK8s Non-HA Deployment Complete
+          ========================================
+
+          Host: {{ ansible_hostname }}
+
+          To access the cluster:
+          1. SSH to the host: ssh {{ ansible_user }}@{{ ansible_host }}
+          2. Run kubectl commands: kubectl get nodes
+          3. Or use microk8s: microk8s kubectl get pods -A
+
+          Kubeconfig is available at:
+          - /home/{{ ansible_user }}/.kube/config
+
+          To join other nodes (if needed in future):
+          1. On this node: microk8s add-node
+          2. On the new node: microk8s join <token-from-add-node>
+
+          ========================================
+      tags:
+        - always

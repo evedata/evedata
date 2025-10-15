@@ -10,6 +10,7 @@ exclude_paths:
 
 skip_list:
   - yaml[line-length] # Lines can be longer than 160 chars
+  - role-name # Allow hyphens in role names for project conventions
 
 warn_list:
   - experimental # Experimental rules are opt-in

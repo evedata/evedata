@@ -1,0 +1,116 @@
+---
+# Install MicroK8s
+
+- name: Install MicroK8s snap
+  block:
+    - name: Check if MicroK8s is already installed
+      ansible.builtin.command:
+        cmd: snap list microk8s
+      register: existing_microk8s_check
+      failed_when: false
+      changed_when: false
+
+    - name: Install MicroK8s from specified channel
+      ansible.builtin.command:
+        cmd: "snap install microk8s --channel={{ microk8s_channel }} --classic"
+      register: microk8s_install_result
+      when: existing_microk8s_check.rc != 0
+      changed_when: "'microk8s' in microk8s_install_result.stdout"
+      retries: 3
+      delay: 10
+      until: microk8s_install_result.rc == 0
+
+    - name: Refresh MicroK8s if already installed
+      ansible.builtin.command:
+        cmd: "snap refresh microk8s --channel={{ microk8s_channel }}"
+      register: microk8s_refresh_result
+      when: existing_microk8s_check.rc == 0
+      changed_when: "'refreshed' in microk8s_refresh_result.stdout"
+      retries: 3
+      delay: 10
+      until: microk8s_refresh_result.rc == 0
+
+    - name: Display installation result
+      ansible.builtin.debug:
+        msg: |
+          MicroK8s installation status: {{ 'Installed' if (microk8s_install_result.changed | default(false)) else ('Refreshed' if (microk8s_refresh_result.changed | default(false)) else 'No changes needed') }}
+          Channel: {{ microk8s_channel }}
+
+    - name: Wait for MicroK8s to be ready
+      ansible.builtin.command:
+        cmd: microk8s status --wait-ready
+      register: microk8s_status
+      retries: 30
+      delay: 10
+      until: microk8s_status.rc == 0
+      changed_when: false
+
+    - name: Get MicroK8s version
+      ansible.builtin.command:
+        cmd: microk8s version
+      register: microk8s_version
+      changed_when: false
+
+    - name: Display MicroK8s version
+      ansible.builtin.debug:
+        msg: "MicroK8s version: {{ microk8s_version.stdout }}"
+
+  rescue:
+    - name: MicroK8s installation failed
+      ansible.builtin.fail:
+        msg: |
+          MicroK8s installation failed.
+          Error: {{ ansible_failed_result.msg | default('Unknown error') }}
+          Please review the error and retry.
+
+- name: Enable MicroK8s services
+  block:
+    - name: Ensure MicroK8s services are enabled
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+        daemon_reload: true
+      loop:
+        - snap.microk8s.daemon-cluster-agent
+        - snap.microk8s.daemon-containerd
+        - snap.microk8s.daemon-kubelite
+      register: service_enable_result
+      failed_when: false  # Some services might not exist depending on configuration
+
+    - name: Check MicroK8s cluster status
+      ansible.builtin.command:
+        cmd: microk8s kubectl get nodes
+      register: cluster_nodes
+      changed_when: false
+      retries: 5
+      delay: 5
+      until: cluster_nodes.rc == 0
+
+    - name: Display cluster status
+      ansible.builtin.debug:
+        msg: |
+          Cluster status:
+          {{ cluster_nodes.stdout }}
+
+  rescue:
+    - name: Service enablement warning
+      ansible.builtin.debug:
+        msg: |
+          WARNING: Some MicroK8s services could not be enabled.
+          This might be normal for certain configurations.
+          Please verify cluster status manually.
+
+- name: Configure kubectl alias
+  ansible.builtin.lineinfile:
+    path: /etc/bash.bashrc
+    line: "alias kubectl='microk8s kubectl'"
+    state: present
+    create: false
+
+- name: Configure helm alias
+  ansible.builtin.lineinfile:
+    path: /etc/bash.bashrc
+    line: "alias helm='microk8s helm'"
+    state: present
+    create: false

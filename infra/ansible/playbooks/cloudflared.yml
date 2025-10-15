@@ -1,0 +1,85 @@
+---
+# Playbook to deploy Cloudflare Tunnel to Kubernetes clusters
+# This playbook installs and configures Cloudflared with secure token
+# management via 1Password Connect Operator
+
+- name: Deploy Cloudflare Tunnel to Kubernetes clusters
+  hosts: k8s
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Verify target hosts are Ubuntu 24.04
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Ubuntu"
+          - ansible_distribution_version == "24.04"
+        fail_msg: "This playbook requires Ubuntu 24.04 LTS"
+      tags:
+        - always
+
+    - name: Display deployment information
+      ansible.builtin.debug:
+        msg:
+          - "Deploying Cloudflare Tunnel to: {{ inventory_hostname }}"
+          - "Environment: {{ inventory_hostname_short.split('-')[-2] | default('unknown') }}"
+          - "Namespace: {{ cloudflared_namespace | default('cloudflared') }}"
+          - "Replicas: {{ cloudflared_replica_count | default(1) }}"
+      tags:
+        - always
+
+  roles:
+    - role: cloudflared
+      tags:
+        - cloudflared
+
+  post_tasks:
+    - name: Display post-deployment instructions
+      ansible.builtin.debug:
+        msg:
+          - "========================================="
+          - "Cloudflare Tunnel Deployment Complete"
+          - "========================================="
+          - "Namespace: {{ cloudflared_namespace }}"
+          - "Deployment: {{ cloudflared_deployment_name }}"
+          - "Replicas: {{ cloudflared_replica_count }}"
+          - ""
+          - "Next steps:"
+          - "1. Verify the deployment is running:"
+          - "   kubectl get pods -n {{ cloudflared_namespace }}"
+          - ""
+          - "2. Check tunnel status:"
+          - "   kubectl logs -n {{ cloudflared_namespace }} -l app=cloudflared"
+          - ""
+          - "3. Verify the OnePasswordItem secret was created:"
+          - "   kubectl get onepassworditems -n {{ cloudflared_namespace }}"
+          - "   kubectl get secret {{ cloudflared_secret_name }} -n {{ cloudflared_namespace }}"
+          - ""
+          - "4. Monitor tunnel metrics (if enabled):"
+          - "   kubectl port-forward -n {{ cloudflared_namespace }} deploy/{{ cloudflared_deployment_name }} {{ cloudflared_metrics_port }}:{{ cloudflared_metrics_port }}"
+          - "   curl http://localhost:{{ cloudflared_metrics_port }}/metrics"
+          - ""
+          - "For more information, see:"
+          - "https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/"
+          - "========================================="
+      tags:
+        - cloudflared
+      when: not ansible_check_mode
+# Example usage:
+# Deploy to all hosts:
+#   ansible-playbook playbooks/cloudflared.yml -e @group_vars/vault.yml
+#
+# Deploy to specific group:
+#   ansible-playbook playbooks/cloudflared.yml -e @group_vars/vault.yml -l hzl
+#
+# Deploy to specific host:
+#   ansible-playbook playbooks/cloudflared.yml -e @group_vars/vault.yml -l htz-eu-fsn-hzl-srv01
+#
+# Dry run:
+#   ansible-playbook playbooks/cloudflared.yml -e @group_vars/vault.yml --check
+#
+# Only validate existing deployment:
+#   ansible-playbook playbooks/cloudflared.yml -e @group_vars/vault.yml --tags cloudflared-validate
+#
+# Only update deployment:
+#   ansible-playbook playbooks/cloudflared.yml -e @group_vars/vault.yml --tags cloudflared-deployment

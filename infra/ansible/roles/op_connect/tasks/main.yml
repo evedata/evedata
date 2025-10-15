@@ -1,0 +1,63 @@
+---
+# tasks file for op_connect role
+# Main task orchestration for 1Password Connect and Operator deployment
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - op_connect_credentials_file is defined
+      - op_connect_credentials_file | length > 0
+      - op_connect_operator_token is defined
+      - op_connect_operator_token | length > 0
+      - helm_kubeconfig is defined
+      - helm_kubeconfig | length > 0
+    fail_msg: >-
+      Required variables are not defined. Please ensure op_connect_credentials_file,
+      op_connect_operator_token, and helm_kubeconfig are set.
+  tags:
+    - op-connect
+    - op-connect-validate
+
+- name: Include namespace management tasks
+  ansible.builtin.include_tasks: namespace.yml
+  tags:
+    - op-connect
+    - op-connect-namespace
+
+# Use block/always pattern to ensure cleanup happens even if installation fails
+- name: Deploy 1Password Connect with cleanup
+  block:
+    - name: Include credentials upload tasks
+      ansible.builtin.include_tasks: credentials.yml
+      tags:
+        - op-connect
+        - op-connect-credentials
+
+    - name: Include Helm repository configuration tasks
+      ansible.builtin.include_tasks: helm-repo.yml
+      tags:
+        - op-connect
+        - op-connect-helm-repo
+
+    - name: Include 1Password Connect installation tasks
+      ansible.builtin.include_tasks: install.yml
+      tags:
+        - op-connect
+        - op-connect-install
+
+    - name: Include validation tasks
+      ansible.builtin.include_tasks: validate.yml
+      tags:
+        - op-connect
+        - op-connect-validate
+
+  always:
+    - name: Cleanup uploaded credentials file
+      ansible.builtin.file:
+        path: "{{ op_connect_credentials_upload_path }}"
+        state: absent
+      become: true
+      when: op_connect_cleanup_credentials | bool
+      tags:
+        - op-connect
+        - op-connect-cleanup

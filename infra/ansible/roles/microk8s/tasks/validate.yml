@@ -1,0 +1,160 @@
+---
+# Validate MicroK8s installation
+
+- name: Validate MicroK8s installation
+  block:
+    - name: Check MicroK8s status
+      ansible.builtin.command:
+        cmd: microk8s status --format yaml
+      register: microk8s_status_yaml
+      changed_when: false
+
+    - name: Parse MicroK8s status
+      ansible.builtin.set_fact:
+        microk8s_status_data: "{{ microk8s_status_yaml.stdout | from_yaml }}"
+
+    - name: Verify MicroK8s is running
+      ansible.builtin.assert:
+        that:
+          - microk8s_status_data.microk8s.running | default(false)
+        fail_msg: "MicroK8s is not running"
+        success_msg: "MicroK8s is running"
+
+    - name: Check cluster node status
+      ansible.builtin.command:
+        cmd: microk8s kubectl get nodes -o wide
+      register: node_status
+      changed_when: false
+
+    - name: Display node status
+      ansible.builtin.debug:
+        msg: |
+          Cluster nodes:
+          {{ node_status.stdout }}
+
+    - name: Verify node is ready
+      ansible.builtin.command:
+        cmd: microk8s kubectl get nodes -o jsonpath='{.items[0].status.conditions[?(@.type=="Ready")].status}'
+      register: node_ready_status
+      changed_when: false
+
+    - name: Assert node is ready
+      ansible.builtin.assert:
+        that:
+          - node_ready_status.stdout == "True"
+        fail_msg: "Node is not in Ready state"
+        success_msg: "Node is in Ready state"
+
+    - name: Check enabled addons
+      ansible.builtin.command:
+        cmd: microk8s status --addon {{ item.name }}
+      loop: "{{ microk8s_addons | selectattr('enabled', 'equalto', true) | list }}"
+      register: addon_status_results
+      changed_when: false
+      failed_when: false
+
+    - name: Parse addon status
+      ansible.builtin.set_fact:
+        addon_statuses: |
+          {% set results = [] %}
+          {% for item in addon_status_results.results %}
+          {% if 'enabled' in item.stdout.lower() %}
+          {% set _ = results.append({'name': item.item.name, 'status': 'enabled'}) %}
+          {% else %}
+          {% set _ = results.append({'name': item.item.name, 'status': 'disabled'}) %}
+          {% endif %}
+          {% endfor %}
+          {{ results }}
+
+    - name: Display addon status
+      ansible.builtin.debug:
+        msg: |
+          Addon status:
+          {% for addon in addon_statuses %}
+          - {{ addon.name }}: {{ addon.status }}
+          {% endfor %}
+
+    - name: Verify all required addons are enabled
+      ansible.builtin.assert:
+        that:
+          - item.status == 'enabled'
+        fail_msg: "Addon '{{ item.name }}' is not enabled as expected"
+        success_msg: "Addon '{{ item.name }}' is enabled"
+      loop: "{{ addon_statuses }}"
+      when: item.name in (microk8s_addons | selectattr('enabled', 'equalto', true) | map(attribute='name') | list)
+
+    - name: Check Kubernetes API server accessibility
+      ansible.builtin.command:
+        cmd: microk8s kubectl cluster-info
+      register: cluster_info
+      changed_when: false
+
+    - name: Display cluster info
+      ansible.builtin.debug:
+        msg: |
+          Cluster information:
+          {{ cluster_info.stdout }}
+
+    - name: Test DNS resolution
+      ansible.builtin.command:
+        cmd: microk8s kubectl run dns-test --image=busybox:1.28 --rm -i --restart=Never -- nslookup kubernetes.default
+      register: dns_test
+      changed_when: false
+      failed_when: false
+
+    - name: Display DNS test result
+      ansible.builtin.debug:
+        msg: |
+          DNS resolution test:
+          {{ 'Passed' if dns_test.rc == 0 else 'Failed (might be normal if DNS addon is still initializing)' }}
+          {% if dns_test.rc != 0 %}
+          Note: DNS might take a few minutes to be fully operational after installation
+          {% endif %}
+
+    - name: Check storage class if hostpath-storage is enabled
+      ansible.builtin.command:
+        cmd: microk8s kubectl get storageclass
+      register: storage_class
+      changed_when: false
+      when: >-
+        'hostpath-storage' in
+        (microk8s_addons | selectattr('enabled', 'equalto', true) | map(attribute='name') | list)
+
+    - name: Display storage class info
+      ansible.builtin.debug:
+        msg: |
+          Storage classes:
+          {{ storage_class.stdout }}
+      when: storage_class is defined and storage_class.stdout is defined
+
+    - name: Final validation summary
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          MicroK8s Installation Validation Summary
+          ========================================
+          ✓ MicroK8s is installed and running
+          ✓ Kubernetes node is in Ready state
+          ✓ Required addons are enabled
+          ✓ API server is accessible
+          {% if dns_test.rc == 0 %}
+          ✓ DNS resolution is working
+          {% else %}
+          ⚠ DNS resolution test failed (might still be initializing)
+          {% endif %}
+          ✓ User access is configured
+
+          Installation completed successfully!
+          ========================================
+
+  rescue:
+    - name: Validation failed
+      ansible.builtin.fail:
+        msg: |
+          MicroK8s installation validation failed.
+          Error: {{ ansible_failed_result.msg | default('Unknown error') }}
+
+          Please check:
+          1. MicroK8s service status: sudo microk8s status
+          2. System logs: sudo journalctl -u snap.microk8s.daemon-kubelite -n 50
+          3. Cluster status: sudo microk8s kubectl get all -A

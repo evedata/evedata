@@ -1,0 +1,103 @@
+---
+# Playbook to deploy ArgoCD for GitOps continuous delivery to Kubernetes clusters
+# This playbook installs and configures ArgoCD using the official Helm chart
+# with Tailscale ingress for secure, zero-trust network access
+#
+# ArgoCD provides declarative continuous deployment for Kubernetes applications
+# and is the foundation for GitOps workflows in the EVEData platform
+
+- name: Deploy ArgoCD to Kubernetes clusters
+  hosts: argocd
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Verify target hosts are Ubuntu 24.04
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Ubuntu"
+          - ansible_distribution_version == "24.04"
+        fail_msg: "This playbook requires Ubuntu 24.04 LTS"
+      tags:
+        - always
+
+    - name: Display deployment information
+      ansible.builtin.debug:
+        msg:
+          - "Deploying ArgoCD to: {{ inventory_hostname }}"
+          - "Environment: {{ inventory_hostname_short.split('-')[-2] | default('unknown') }}"
+          - "ArgoCD hostname will be: {{ argo_cd_hostname | default('not set') }}"
+          - "ArgoCD namespace: {{ argo_cd_namespace | default('argocd') }}"
+      tags:
+        - always
+
+  roles:
+    - role: argo_cd
+      tags:
+        - argo-cd
+
+  post_tasks:
+    - name: Display post-deployment instructions
+      ansible.builtin.debug:
+        msg:
+          - "========================================="
+          - "ArgoCD Deployment Complete"
+          - "========================================="
+          - "ArgoCD hostname: {{ argo_cd_hostname }}.{{ tailscale_dns_name | default('example') }}"
+          - "ArgoCD gRPC hostname: {{ argo_cd_grpc_hostname | default(argo_cd_hostname + '-grpc') }}.{{ tailscale_dns_name | default('example') }}"
+          - "Namespace: {{ argo_cd_namespace }}"
+          - ""
+          - "Next steps:"
+          - "1. Access the ArgoCD UI:"
+          - "   https://{{ argo_cd_hostname }}.{{ tailscale_dns_name | default('example') }}"
+          - ""
+          - "2. Get the initial admin password:"
+          - "   kubectl -n {{ argo_cd_namespace }} get secret argocd-initial-admin-secret \\"
+          - '     -o jsonpath="{.data.password}" | base64 -d'
+          - ""
+          - "3. Login with the ArgoCD CLI:"
+          - "   argocd login {{ argo_cd_hostname }}.{{ tailscale_dns_name | default('example') }} \\"
+          - "     --username admin \\"
+          - "     --password <initial-password> \\"
+          - "     --insecure"
+          - ""
+          - "4. Create your first application:"
+          - "   argocd app create <app-name> \\"
+          - "     --repo <git-repo-url> \\"
+          - "     --path <path> \\"
+          - "     --dest-server https://kubernetes.default.svc \\"
+          - "     --dest-namespace <namespace>"
+          - ""
+          - "5. For production, consider:"
+          - "   - Disabling the admin user and configuring SSO/OIDC"
+          - "   - Setting up RBAC policies"
+          - "   - Configuring external secret management"
+          - "   - Enabling metrics and monitoring"
+          - "========================================="
+      tags:
+        - argo-cd
+      when: not ansible_check_mode
+# Example usage:
+# Deploy to all hosts:
+#   ansible-playbook playbooks/argo_cd.yml -e @group_vars/vault.yml
+#
+# Deploy to specific group (recommended for ArgoCD):
+#   ansible-playbook playbooks/argo_cd.yml -e @group_vars/vault.yml -l hzl
+#
+# Deploy to specific host:
+#   ansible-playbook playbooks/argo_cd.yml -e @group_vars/vault.yml -l htz-eu-fsn-hzl-srv01
+#
+# Dry run:
+#   ansible-playbook playbooks/argo_cd.yml -e @group_vars/vault.yml --check
+#
+# Only validate existing deployment:
+#   ansible-playbook playbooks/argo_cd.yml -e @group_vars/vault.yml --tags argo-cd-validate
+#
+# Update Helm repository only:
+#   ansible-playbook playbooks/argo_cd.yml -e @group_vars/vault.yml --tags argo-cd-helm-repo
+#
+# Install/upgrade ArgoCD only:
+#   ansible-playbook playbooks/argo_cd.yml -e @group_vars/vault.yml --tags argo-cd-install
+#
+# Configure ingress only:
+#   ansible-playbook playbooks/argo_cd.yml -e @group_vars/vault.yml --tags argo-cd-ingress

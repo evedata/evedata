@@ -1,0 +1,11 @@
+---
+# defaults file for kubernetes role
+
+# Python package versions (leave empty for latest)
+# You can pin specific versions if needed for stability
+# Example: kubernetes_python_version: "30.1.0"
+kubernetes_python_version: ""
+
+# PyYAML version (leave empty for latest)
+# Example: kubernetes_pyyaml_version: "6.0.2"
+kubernetes_pyyaml_version: ""

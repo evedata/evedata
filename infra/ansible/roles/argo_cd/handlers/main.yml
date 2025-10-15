@@ -1,0 +1,123 @@
+---
+# handlers file for argo_cd role
+# Event-driven tasks that respond to notifications
+
+- name: Restart ArgoCD server
+  kubernetes.core.k8s:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ argo_cd_release_name }}-server"
+    namespace: "{{ argo_cd_namespace }}"
+    state: present
+    kubeconfig: "{{ helm_kubeconfig }}"
+    definition:
+      spec:
+        template:
+          metadata:
+            annotations:
+              kubectl.kubernetes.io/restartedAt: "{{ ansible_date_time.iso8601 }}"
+  become: true
+  listen: "restart argocd server"
+
+- name: Restart ArgoCD controller
+  ansible.builtin.command:
+    cmd: >
+      kubectl rollout restart statefulset/{{ argo_cd_release_name }}-application-controller
+      -n {{ argo_cd_namespace }}
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  changed_when: true
+  listen: "restart argocd controller"
+
+- name: Restart ArgoCD repo server
+  kubernetes.core.k8s:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ argo_cd_release_name }}-repo-server"
+    namespace: "{{ argo_cd_namespace }}"
+    state: present
+    kubeconfig: "{{ helm_kubeconfig }}"
+    definition:
+      spec:
+        template:
+          metadata:
+            annotations:
+              kubectl.kubernetes.io/restartedAt: "{{ ansible_date_time.iso8601 }}"
+  become: true
+  listen: "restart argocd repo server"
+
+- name: Wait for ArgoCD server to be ready after restart
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ argo_cd_release_name }}-server"
+    namespace: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_condition:
+      type: Progressing
+      status: "True"
+      reason: NewReplicaSetAvailable
+    wait_timeout: 300
+  become: true
+  listen: "restart argocd server"
+
+- name: Wait for ArgoCD controller to be ready after restart
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: StatefulSet
+    name: "{{ argo_cd_release_name }}-application-controller"
+    namespace: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_condition:
+      type: Ready
+      status: "True"
+    wait_timeout: 300
+  become: true
+  listen: "restart argocd controller"
+
+- name: Wait for ArgoCD repo server to be ready after restart
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ argo_cd_release_name }}-repo-server"
+    namespace: "{{ argo_cd_namespace }}"
+    kubeconfig: "{{ helm_kubeconfig }}"
+    wait: true
+    wait_condition:
+      type: Progressing
+      status: "True"
+      reason: NewReplicaSetAvailable
+    wait_timeout: 300
+  become: true
+  listen: "restart argocd repo server"
+
+- name: Reload ArgoCD configuration
+  ansible.builtin.uri:
+    url: "http://{{ argo_cd_release_name }}-server.{{ argo_cd_namespace }}.svc.cluster.local/api/v1/settings"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      reload: true
+    status_code: [200, 201, 204]
+  delegate_to: "{{ inventory_hostname }}"
+  become: true
+  failed_when: false  # Don't fail if API is not ready
+  listen: "reload argocd config"
+
+- name: Clear ArgoCD repo cache
+  ansible.builtin.command:
+    cmd: >
+      kubectl exec -n {{ argo_cd_namespace }}
+      deployment/{{ argo_cd_release_name }}-repo-server --
+      argocd-repo-server cache clear
+  become: true
+  environment:
+    KUBECONFIG: "{{ helm_kubeconfig }}"
+  failed_when: false  # Don't fail if command is not available
+  changed_when: true
+  listen: "clear argocd cache"

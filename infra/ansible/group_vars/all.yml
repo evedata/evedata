@@ -1,0 +1,8 @@
+---
+# Global variables for all hosts
+
+# Helm Configuration
+# Path to kubeconfig for Helm operations with MicroK8s
+# Uses localhost-friendly kubeconfig to bypass firewall restrictions on port 16443
+# This file is automatically created by the microk8s role
+helm_kubeconfig: /var/snap/microk8s/current/credentials/client.localhost.config
