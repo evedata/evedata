@@ -1,0 +1,83 @@
+---
+# Playbook to deploy Tailscale
+# Usage:
+#   ansible-playbook playbooks/tailscale.yml -e @group_vars/vault.yml
+#   ansible-playbook playbooks/tailscale.yml -e @group_vars/vault.yml -l prd
+#   ansible-playbook playbooks/tailscale.yml -e @group_vars/vault.yml -l htz-eu-fsn-hzl-srv01
+#
+# Required variables (store in vault):
+#   tailscale_auth_key: "tskey-auth-..."
+#
+# Optional variables:
+#   tailscale_up_options:
+#     - "--hostname=custom-name"
+#     - "--advertise-routes=10.0.0.0/24"
+#     - "--advertise-tags=tag:production"
+
+- name: Deploy Tailscale to target hosts
+  hosts: "{{ target_hosts | default('all') }}"
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Validate operating system
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Ubuntu"
+          - ansible_distribution_version == "24.04"
+        fail_msg: "This playbook requires Ubuntu 24.04 LTS. Current: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+        success_msg: "Operating system validated: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+    - name: Display deployment targets
+      ansible.builtin.debug:
+        msg: |
+          Deploying Tailscale to:
+          - Hostname: {{ ansible_hostname }}
+          - OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+          - IP: {{ ansible_default_ipv4.address | default('N/A') }}
+      tags:
+        - always
+
+  roles:
+    - tailscale
+
+  post_tasks:
+    - name: Get Tailscale status
+      ansible.builtin.command: tailscale status --json
+      register: tailscale_status_result
+      changed_when: false
+      failed_when: false
+
+    - name: Get Tailscale IP addresses
+      ansible.builtin.command: tailscale ip
+      register: tailscale_ips_result
+      changed_when: false
+      failed_when: false
+
+    - name: Display post-installation information
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          Tailscale Deployment Complete
+          ========================================
+
+          Host: {{ ansible_hostname }}
+
+          Tailscale Status:
+          {{ tailscale_ips_result.stdout_lines | default(['Status unavailable']) | join('\n          ') }}
+
+          To verify the connection:
+          1. SSH to the host: ssh {{ ansible_user }}@{{ ansible_host }}
+          2. Check status: tailscale status
+          3. View IP addresses: tailscale ip
+          4. Test SSH via Tailscale: ssh {{ ansible_user }}@<tailscale-ip>
+
+          To manage Tailscale:
+          - View status: sudo tailscale status
+          - View logs: sudo journalctl -u tailscaled -f
+          - Disconnect: sudo tailscale down
+          - Reconnect: sudo tailscale up
+
+          ========================================
+      tags:
+        - always

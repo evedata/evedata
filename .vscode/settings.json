@@ -117,6 +117,7 @@
     "stargates",
     "stationstandingsrestrictions",
     "streamlit",
+    "tailscaled",
     "templater",
     "tiangolo",
     "timestamptz",

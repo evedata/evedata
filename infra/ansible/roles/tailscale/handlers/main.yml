@@ -1,0 +1,18 @@
+---
+# handlers file for tailscale role
+
+- name: Verify tailscale connection
+  ansible.builtin.command: tailscale status
+  register: tailscale_verify_status
+  failed_when: tailscale_verify_status.rc != 0
+  changed_when: false
+
+- name: Restart tailscaled
+  ansible.builtin.systemd:
+    name: tailscaled
+    state: restarted
+    daemon_reload: true
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true

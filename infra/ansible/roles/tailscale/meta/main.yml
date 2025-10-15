@@ -1,0 +1,26 @@
+---
+# meta file for tailscale role
+
+galaxy_info:
+  role_name: tailscale
+  author: EVEData Platform Team
+  description: Install and configure Tailscale mesh VPN on Ubuntu 24.04 LTS systems
+  company: EVEData
+  license: MIT
+  min_ansible_version: "2.19"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - noble # 24.04 LTS
+
+  galaxy_tags:
+    - tailscale
+    - vpn
+    - mesh
+    - networking
+    - security
+    - ubuntu
+    - noble
+    - system
+
+dependencies: []

@@ -1,0 +1,35 @@
+---
+# defaults file for tailscale role
+
+# Authentication key for connecting to tailnet (REQUIRED - store in vault)
+# tailscale_auth_key: "tskey-auth-..."
+
+# Additional command-line options to pass to 'tailscale up'
+# Each option should be a complete flag with its value
+tailscale_up_options: []
+# Example:
+# tailscale_up_options:
+#   - "--hostname=my-server"
+#   - "--advertise-routes=10.0.0.0/24"
+#   - "--accept-routes"
+#   - "--advertise-tags=tag:production"
+#   - "--ephemeral"
+
+# Tailscale repository configuration
+tailscale_repository_key_url: "https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg"
+tailscale_repository_url: "https://pkgs.tailscale.com/stable/ubuntu/noble.tailscale-keyring.list"
+
+# Package state: present or latest
+tailscale_package_state: present
+
+# GPG key destination path
+tailscale_gpg_key_path: /usr/share/keyrings/tailscale-archive-keyring.gpg
+
+# APT repository list file path
+tailscale_apt_list_path: /etc/apt/sources.list.d/tailscale.list
+
+# Whether to force repository refresh
+tailscale_apt_update_cache: true
+
+# Cache validity time in seconds (3600 = 1 hour)
+tailscale_apt_cache_valid_time: 3600

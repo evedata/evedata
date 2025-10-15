@@ -1,0 +1,101 @@
+---
+# tasks file for tailscale role
+
+# Validate required variables
+- name: Ensure auth key is provided
+  ansible.builtin.assert:
+    that:
+      - tailscale_auth_key is defined
+      - tailscale_auth_key | length > 0
+    fail_msg: "tailscale_auth_key is required but not defined. Store it in an encrypted vault file."
+    success_msg: "tailscale_auth_key is properly configured"
+  no_log: true
+
+# Configure Tailscale repository
+- name: Create keyrings directory if it doesn't exist
+  ansible.builtin.file:
+    path: /usr/share/keyrings
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Download Tailscale GPG signing key
+  ansible.builtin.get_url:
+    url: "{{ tailscale_repository_key_url }}"
+    dest: "{{ tailscale_gpg_key_path }}"
+    mode: "0644"
+    owner: root
+    group: root
+  register: tailscale_gpg_key_result
+
+- name: Download Tailscale repository configuration
+  ansible.builtin.get_url:
+    url: "{{ tailscale_repository_url }}"
+    dest: "{{ tailscale_apt_list_path }}"
+    mode: "0644"
+    owner: root
+    group: root
+  register: tailscale_repo_config_result
+
+- name: Update APT cache if repository was changed
+  ansible.builtin.apt:
+    update_cache: true
+  when: tailscale_gpg_key_result.changed or tailscale_repo_config_result.changed
+
+# Install Tailscale
+- name: Install Tailscale package
+  ansible.builtin.apt:
+    name: tailscale
+    state: "{{ tailscale_package_state }}"
+    update_cache: "{{ tailscale_apt_update_cache }}"
+    cache_valid_time: "{{ tailscale_apt_cache_valid_time }}"
+  register: tailscale_install_result
+
+# Check Tailscale status
+- name: Check if Tailscale is already connected
+  ansible.builtin.command: tailscale status
+  register: tailscale_status
+  failed_when: false
+  changed_when: false
+
+# Build the tailscale up command
+- name: Build tailscale up command arguments
+  ansible.builtin.set_fact:
+    tailscale_up_args: >-
+      --auth-key={{ tailscale_auth_key }}
+      --accept-risk=all
+      --ssh
+      {{ tailscale_up_options | join(' ') }}
+  no_log: true
+
+# Connect to Tailscale network if not already connected
+- name: Connect to Tailscale network
+  ansible.builtin.command: >-
+    tailscale up {{ tailscale_up_args }}
+  when: tailscale_status.rc != 0 or 'Logged out.' in tailscale_status.stdout
+  register: tailscale_up_result
+  changed_when: tailscale_up_result.rc == 0
+  no_log: true
+  notify:
+    - Verify tailscale connection
+
+# Get Tailscale IP for confirmation
+- name: Get Tailscale IPv4 address
+  ansible.builtin.command: tailscale ip -4
+  register: tailscale_ip
+  changed_when: false
+  failed_when: false
+
+- name: Display Tailscale status
+  ansible.builtin.debug:
+    msg: "Tailscale is connected with IP: {{ tailscale_ip.stdout | default('Not available') }}"
+  when: tailscale_ip.rc == 0
+
+# Ensure Tailscale service is enabled and running
+- name: Ensure Tailscale service is enabled and running
+  ansible.builtin.systemd:
+    name: tailscaled
+    state: started
+    enabled: true
+    daemon_reload: true
