@@ -36,5 +36,6 @@ loki:
   namespace: loki
   chart:
     repoURL: https://github.com/evedata/evedata.git
+    path: deploy/argocd/services/core/loki
     targetRevision: "1.0.0"
   values: {}
