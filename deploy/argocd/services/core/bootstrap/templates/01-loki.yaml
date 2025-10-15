@@ -57,6 +57,7 @@ spec:
         global:
           extraArgs:
             - -config.expand-env=true
+            - -print-config-stderr=true
           extraEnvFrom:
             - secretRef:
                 name: loki-config-env
