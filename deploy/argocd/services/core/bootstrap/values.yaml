@@ -4,7 +4,7 @@
 # ArgoCD configuration
 argocd:
   namespace: argocd
-  project: default
+  project: hzl
 
 # Target cluster configuration
 destination:
@@ -31,9 +31,6 @@ syncPolicy:
       factor: 2
       maxDuration: 3m
 
-globals:
-  onePasswordVaultName: evedata-srv-hzl
-
 loki:
   enabled: true
   namespace: loki
@@ -42,7 +39,16 @@ loki:
     chart: loki
     targetRevision: "6.42.0"
   values:
+    global:
+      extraArgs:
+        - -config.expand-env=true
+        - -print-config-stderr=true
+      extraEnvFrom:
+        - secretRef:
+            name: loki-config-env
     loki:
+      commonConfig:
+        replication_factor: 1
       schemaConfig:
         configs:
           - from: "2024-04-01"
@@ -52,26 +58,24 @@ loki:
             index:
               prefix: loki_index_
               period: 24h
-      storage_config:
-        aws:
-          region: weur
-          bucketnames: hzl-loki-chunk-weur
-          s3forcepathstyle: true
       pattern_ingester:
         enabled: true
       limits_config:
         allow_structured_metadata: true
         volume_enabled: true
         retention_period: 672h # 28 days retention
-      querier:
-        max_concurrent: 4
-
+      ruler:
+        enable_api: true
+      storage_config:
+        aws:
+          region: weur
+          bucketnames: hzl-loki-chunk-weur
+          s3forcepathstyle: true
       storage:
         type: s3
         bucketNames:
           chunks: hzl-loki-chunk-weur
           ruler: hzl-loki-ruler-weur
-          admin: hzl-loki-admin-weur
         s3:
           endpoint: "${LOKI_STORAGE_S3_ENDPOINT}"
           region: weur
@@ -80,44 +84,33 @@ loki:
           signatureVersion: v4
           s3ForcePathStyle: true
           insecure: false
-
-    deploymentMode: SimpleScalable
-
+    deploymentMode: SingleBinary
+    singleBinary:
+      replicas: 1
     backend:
-      affinity: {}
-      replicas: 3
-    bloomGateway:
-      affinity: {}
-    bloomPlanner:
-      affinity: {}
-    bloomBuilder:
-      affinity: {}
-    compactor:
-      affinity: {}
-    distributor:
-      affinity: {}
-    indexGateway:
-      affinity: {}
-    ingester:
-      affinity: {}
-    overridesExporter:
-      affinity: {}
-    write:
-      affinity: {}
-      replicas: 3
-    patternIngester:
-      affinity: {}
-    querier:
-      affinity: {}
-    queryFrontend:
-      affinity: {}
-    queryScheduler:
-      affinity: {}
-    ruler:
-      affinity: {}
+      replicas: 0
     read:
-      affinity: {}
-      replicas: 3
+      replicas: 0
+    write:
+      replicas: 0
+    ingester:
+      replicas: 0
+    querier:
+      replicas: 0
+    queryFrontend:
+      replicas: 0
+    queryScheduler:
+      replicas: 0
+    distributor:
+      replicas: 0
+    compactor:
+      replicas: 0
+    indexGateway:
+      replicas: 0
+    bloomCompactor:
+      replicas: 0
+    bloomGateway:
+      replicas: 0
     minio:
       enabled: false
 lokiConfig:

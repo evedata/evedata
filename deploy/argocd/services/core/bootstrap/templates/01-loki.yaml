@@ -23,14 +23,6 @@ spec:
     helm:
       releaseName: loki
       values: |
-        global:
-          extraArgs:
-            - -config.expand-env=true
-            - -print-config-stderr=true
-          extraEnvFrom:
-            - secretRef:
-                name: loki-config-env
-
         {{- toYaml .Values.loki.values | nindent 8 }}
 
   destination:
