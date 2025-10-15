@@ -3,44 +3,13 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: loki-config
-  namespace: {{ .Values.argocd.namespace }}
-  labels:
-    {{- include "bootstrap.labels" . | nindent 4 }}
-    app.kubernetes.io/component: loki
-  annotations:
-    argocd.argoproj.io/manifest-generate-paths: .
-    argocd.argoproj.io/sync-wave: "1"
-  finalizers:
-    - argocd.argoproj.io/resources-finalizer
-spec:
-  project: {{ .Values.argocd.project }}
-
-  source:
-    repoURL: {{ .Values.lokiConfig.chart.repoURL }}
-    path: {{ .Values.lokiConfig.chart.path }}
-    targetRevision: {{ .Values.lokiConfig.chart.targetRevision }}
-    helm:
-      releaseName: loki-config
-      values: |
-        {{- toYaml .Values.lokiConfig.values | nindent 8 }}
-
-  destination:
-    server: {{ .Values.destination.server }}
-    namespace: {{ .Values.loki.namespace }}
-
-  {{- include "bootstrap.syncPolicy" .Values.syncPolicy | nindent 2 }}
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
   name: loki
   namespace: {{ .Values.argocd.namespace }}
   labels:
     {{- include "bootstrap.labels" . | nindent 4 }}
     app.kubernetes.io/component: loki
   annotations:
-    argocd.argoproj.io/manifest-generate-paths: .
+    argocd.argoproj.io/manifest-generate-paths: /deploy/argocd/services/core/bootstrap/**/*.{tpl,yaml}
     argocd.argoproj.io/sync-wave: "1"
   finalizers:
     - argocd.argoproj.io/resources-finalizer
@@ -61,39 +30,6 @@ spec:
           extraEnvFrom:
             - secretRef:
                 name: loki-config-env
-
-        write:
-          affinity: {}
-        read:
-          affinity: {}
-        backend:
-          affinity: {}
-        ingester:
-          affinity: {}
-        distributor:
-          affinity: {}
-        querier:
-          affinity: {}
-        queryFrontend:
-          affinity: {}
-        queryScheduler:
-          affinity: {}
-        indexGateway:
-          affinity: {}
-        compactor:
-          affinity: {}
-        bloomGateway:
-          affinity: {}
-        bloomPlanner:
-          affinity: {}
-        bloomBuilder:
-          affinity: {}
-        patternIngester:
-          affinity: {}
-        ruler:
-          affinity: {}
-        overridesExporter:
-          affinity: {}
 
         {{- toYaml .Values.loki.values | nindent 8 }}
 

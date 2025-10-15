@@ -35,7 +35,7 @@ globals:
   onePasswordVaultName: evedata-srv-hzl
 
 loki:
-  enabled: true
+  enabled: false
   namespace: loki
   chart:
     repoURL: https://grafana.github.io/helm-charts
@@ -122,7 +122,7 @@ loki:
       enabled: false
 lokiConfig:
   enabled: true
-  namespace: loki-config
+  namespace: loki
   chart:
     repoURL: https://github.com/evedata/evedata.git
     path: deploy/argocd/services/core/loki-config
