@@ -35,7 +35,7 @@ globals:
   onePasswordVaultName: evedata-srv-hzl
 
 loki:
-  enabled: false
+  enabled: true
   namespace: loki
   chart:
     repoURL: https://grafana.github.io/helm-charts
