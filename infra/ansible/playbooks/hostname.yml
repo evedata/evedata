@@ -1,0 +1,20 @@
+---
+# Playbook to configure system hostname
+# Usage: ansible-playbook playbooks/hostname.yml -e @group_vars/vault.yml
+#
+# By default, this playbook uses the inventory hostname for each host.
+# You can override by setting the hostname variable in host_vars, group_vars,
+# or by passing -e hostname=<value> on the command line.
+
+- name: Configure system hostnames
+  hosts: all
+  become: true
+  gather_facts: false
+
+  roles:
+    - hostname
+
+  post_tasks:
+    - name: Show hostname configuration result
+      ansible.builtin.debug:
+        msg: "Hostname '{{ hostname }}' has been successfully configured on {{ inventory_hostname }}"

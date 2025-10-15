@@ -1,0 +1,6 @@
+---
+# defaults file for hostname role
+# These values can be overridden in playbooks or group_vars/host_vars
+
+# Default hostname - uses the inventory hostname if not overridden
+hostname: "{{ inventory_hostname }}"

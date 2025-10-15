@@ -1,0 +1,23 @@
+---
+# meta file for hostname role
+
+galaxy_info:
+  role_name: hostname
+  author: EVEData Platform Team
+  description: Role to manage system hostname on Ubuntu 24.04 LTS
+  company: EVEData
+  license: MIT
+  min_ansible_version: "2.19"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - noble # 24.04 LTS
+
+  galaxy_tags:
+    - system
+    - hostname
+    - ubuntu
+    - configuration
+    - networking
+
+dependencies: []

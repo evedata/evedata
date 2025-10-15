@@ -1,0 +1,58 @@
+---
+# tasks file for hostname role
+# Sets the system hostname on Ubuntu 24.04 LTS
+
+- name: Validate hostname variable is defined
+  ansible.builtin.assert:
+    that:
+      - hostname is defined
+      - hostname | length > 0
+    fail_msg: "The 'hostname' variable must be defined and not empty"
+    success_msg: "Hostname validation passed: {{ hostname }}"
+
+- name: Validate hostname format
+  ansible.builtin.assert:
+    that:
+      - hostname is regex("^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$")
+    fail_msg: >-
+      Invalid hostname format. Hostname must start and end with
+      alphanumeric characters and can contain hyphens.
+    success_msg: "Hostname format is valid"
+
+- name: Set system hostname
+  ansible.builtin.hostname:
+    name: "{{ hostname }}"
+    use: systemd
+  become: true
+  register: hostname_result
+
+- name: Ensure hostname is set in /etc/hostname
+  ansible.builtin.copy:
+    content: "{{ hostname }}\n"
+    dest: /etc/hostname
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+  become: true
+
+- name: Update /etc/hosts with new hostname
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1\s+'
+    line: "127.0.1.1\t{{ hostname }}"
+    state: present
+    backup: true
+  become: true
+
+- name: Verify hostname was set correctly
+  ansible.builtin.command:
+    cmd: hostname
+  changed_when: false
+  register: hostname_current_hostname
+  become: true
+
+- name: Display hostname change result
+  ansible.builtin.debug:
+    msg: "Hostname successfully set to: {{ hostname_current_hostname.stdout }}"
+  when: hostname_current_hostname.stdout == hostname
