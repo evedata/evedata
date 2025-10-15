@@ -62,6 +62,39 @@ spec:
             - secretRef:
                 name: loki-config-env
 
+        write:
+          affinity: {}
+        read:
+          affinity: {}
+        backend:
+          affinity: {}
+        ingester:
+          affinity: {}
+        distributor:
+          affinity: {}
+        querier:
+          affinity: {}
+        queryFrontend:
+          affinity: {}
+        queryScheduler:
+          affinity: {}
+        indexGateway:
+          affinity: {}
+        compactor:
+          affinity: {}
+        bloomGateway:
+          affinity: {}
+        bloomPlanner:
+          affinity: {}
+        bloomBuilder:
+          affinity: {}
+        patternIngester:
+          affinity: {}
+        ruler:
+          affinity: {}
+        overridesExporter:
+          affinity: {}
+
         {{- toYaml .Values.loki.values | nindent 8 }}
 
   destination:
