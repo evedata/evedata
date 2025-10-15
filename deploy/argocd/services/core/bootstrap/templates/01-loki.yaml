@@ -55,6 +55,8 @@ spec:
       releaseName: loki
       values: |
         global:
+          extraArgs:
+            - -config.expand-env=true
           extraEnvFrom:
             - secretRef:
                 name: loki-config-env
