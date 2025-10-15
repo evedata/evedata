@@ -1,0 +1,98 @@
+---
+# Default values for bootstrap chart
+
+# ArgoCD configuration
+argocd:
+  namespace: argocd
+  project: default
+
+# Target cluster configuration
+destination:
+  server: https://kubernetes.default.svc
+
+# Global sync policy defaults
+# Individual applications can override these settings
+syncPolicy:
+  # Enable automated sync - applications will automatically sync when git changes are detected
+  automated:
+    # Enable self-healing - applications will be synced if they drift from desired state
+    selfHeal: true
+    # Enable auto-pruning - resources will be deleted if removed from git
+    prune: true
+  # Sync options applied to all applications
+  syncOptions:
+    - CreateNamespace=true # Automatically create namespaces if they don't exist
+    - PruneLast=true # Prune resources as a final step (safer for dependencies)
+  # Retry policy for failed syncs
+  retry:
+    limit: 5
+    backoff:
+      duration: 5s
+      factor: 2
+      maxDuration: 3m
+
+globals:
+  onePasswordVaultName: evedata-srv-hzl
+
+loki:
+  enabled: true
+  namespace: loki
+  chart:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: loki
+    targetRevision: "6.42.0"
+  values:
+    loki:
+      schemaConfig:
+        configs:
+          - from: "2024-04-01"
+            store: tsdb
+            object_store: s3
+            schema: v13
+            index:
+              prefix: loki_index_
+              period: 24h
+      storage_config:
+        aws:
+          region: weur
+          bucketnames: hzl-loki-chunk-weur
+          s3forcepathstyle: true
+      pattern_ingester:
+        enabled: true
+      limits_config:
+        allow_structured_metadata: true
+        volume_enabled: true
+        retention_period: 672h # 28 days retention
+      querier:
+        max_concurrent: 4
+
+      storage:
+        type: s3
+        bucketNames:
+          chunks: hzl-loki-chunk-weur
+          ruler: hzl-loki-ruler-weur
+          admin: hzl-loki-admin-weur
+        s3:
+          region: weur
+          signatureVersion: v4
+          s3ForcePathStyle: true
+          insecure: false
+
+    deploymentMode: SimpleScalable
+
+    backend:
+      replicas: 3
+    read:
+      replicas: 3
+    write:
+      replicas: 3
+
+    minio:
+      enabled: false
+lokiConfig:
+  enabled: true
+  namespace: loki-config
+  chart:
+    repoURL: https://github.com/evedata/evedata.git
+    path: deploy/argocd/services/core/loki-config
+    targetRevision: HEAD
