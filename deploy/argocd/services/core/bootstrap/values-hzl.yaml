@@ -6,3 +6,34 @@
 #   helm template common-bootstrap deploy/argocd/common/bootstrap \
 #     --values deploy/argocd/common/bootstrap/values.yaml \
 #     --values deploy/argocd/common/bootstrap/values-hzl.yaml
+loki:
+  values:
+    global:
+      extraEnvFrom:
+        - secretRef:
+            name: loki-storage-secret
+    storage:
+      onePasswordItem:
+        enabled: false
+        name: loki-storage-secret
+        vault: evedata-srv-hzl
+    loki:
+      loki:
+        storage_config:
+          aws:
+            region: weur
+            bucketnames: hzl-loki-chunk-weur
+            s3forcepathstyle: true
+        storage:
+          type: s3
+          bucketNames:
+            chunks: hzl-loki-chunk-weur
+            ruler: hzl-loki-ruler-weur
+          s3:
+            endpoint: "${storage_s3_endpoint}"
+            region: weur
+            accessKeyId: "${storage_s3_access_key_id}"
+            secretAccessKey: "${storage_s3_secret_access_key}"
+            signatureVersion: v4
+            s3ForcePathStyle: true
+            insecure: false

@@ -1,7 +1,0 @@
----
-fullnameOverride: null
-namespaceOverride: null
-
-onePassword:
-  vault: evedata-srv-hzl
-  itemName: loki-config-env

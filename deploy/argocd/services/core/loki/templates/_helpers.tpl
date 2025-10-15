@@ -1,14 +1,14 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "lokiConfig.name" -}}
+{{- define "loki.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Create a default fully qualified app name.
 */}}
-{{- define "lokiConfig.fullname" -}}
+{{- define "loki.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -24,7 +24,7 @@ Create a default fully qualified app name.
 {{/*
 Allow the release namespace to be overridden for multi-namespace deployments in combined charts
 */}}
-{{- define "lokiConfig.namespace" -}}
+{{- define "loki.namespace" -}}
   {{- if .Values.namespaceOverride -}}
     {{- .Values.namespaceOverride -}}
   {{- else -}}
@@ -35,7 +35,7 @@ Allow the release namespace to be overridden for multi-namespace deployments in 
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "lokiConfig.chart" -}}
+{{- define "loki.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -43,9 +43,9 @@ Create chart name and version as used by the chart label.
 Common labels - following Kubernetes recommended labels
 https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/
 */}}
-{{- define "lokiConfig.labels" -}}
-helm.sh/chart: {{ include "lokiConfig.chart" . }}
-{{ include "lokiConfig.selectorLabels" . }}
+{{- define "loki.labels" -}}
+helm.sh/chart: {{ include "loki.chart" . }}
+{{ include "loki.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -56,7 +56,33 @@ app.kubernetes.io/part-of: cluster-services
 {{/*
 Selector labels
 */}}
-{{- define "lokiConfig.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "lokiConfig.name" . }}
+{{- define "loki.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "loki.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Loki gateway fullname
+*/}}
+{{- define "loki.gatewayFullname" -}}
+{{ include "loki.fullname" . }}-gateway
+{{- end }}
+
+{{/*
+Loki gateway common labels
+*/}}
+{{- define "loki.gatewayLabels" -}}
+{{ include "loki.labels" . }}
+app.kubernetes.io/component: gateway
+{{- end }}
+
+{{/*
+Loki storage onepassworditem fullname
+*/}}
+{{- define "loki.storageOnePasswordItemFullname" -}}
+  {{- if .Values.storage.onePasswordItem.name -}}
+    {{- .Values.storage.onePasswordItem.name -}}
+  {{- else -}}
+    {{- include "loki.fullname" . }}-storage-secret
+  {{- end -}}
 {{- end }}

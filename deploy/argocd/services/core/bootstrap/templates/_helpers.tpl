@@ -1,14 +1,14 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "bootstrap.name" -}}
+{{- define "core.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Create a default fully qualified app name.
 */}}
-{{- define "bootstrap.fullname" -}}
+{{- define "core.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -24,36 +24,35 @@ Create a default fully qualified app name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "bootstrap.chart" -}}
+{{- define "core.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
-Common labels - following Kubernetes recommended labels
-https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/
+Common labels
 */}}
-{{- define "bootstrap.labels" -}}
-helm.sh/chart: {{ include "bootstrap.chart" . }}
-{{ include "bootstrap.selectorLabels" . }}
+{{- define "core.labels" -}}
+helm.sh/chart: {{ include "core.chart" . }}
+{{ include "core.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-app.kubernetes.io/part-of: cluster-services
+app.kubernetes.io/part-of: core
 {{- end }}
 
 {{/*
 Selector labels
 */}}
-{{- define "bootstrap.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "bootstrap.name" . }}
+{{- define "core.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "core.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Generate the sync policy for an application
 */}}
-{{- define "bootstrap.syncPolicy" -}}
+{{- define "core.syncPolicy" -}}
 syncPolicy:
   {{- if .automated }}
   automated:

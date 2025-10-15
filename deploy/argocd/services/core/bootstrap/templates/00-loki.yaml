@@ -6,34 +6,25 @@ metadata:
   name: loki
   namespace: {{ .Values.argocd.namespace }}
   labels:
-    {{- include "bootstrap.labels" . | nindent 4 }}
+    {{- include "core.labels" . | nindent 4 }}
     app.kubernetes.io/component: loki
   annotations:
-    argocd.argoproj.io/manifest-generate-paths: /deploy/argocd/
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/manifest-generate-paths: /deploy/argocd/services/core
+    argocd.argoproj.io/sync-wave: "0"
   finalizers:
     - argocd.argoproj.io/resources-finalizer
 spec:
   project: {{ .Values.argocd.project }}
-
   source:
     repoURL: {{ .Values.loki.chart.repoURL }}
-    chart: {{ .Values.loki.chart.chart }}
+    path: {{ .Values.loki.chart.path }}
     targetRevision: {{ .Values.loki.chart.targetRevision }}
     helm:
       releaseName: loki
       values: |
         {{- toYaml .Values.loki.values | nindent 8 }}
-
   destination:
     server: {{ .Values.destination.server }}
     namespace: {{ .Values.loki.namespace }}
-
-  {{- include "bootstrap.syncPolicy" .Values.syncPolicy | nindent 2 }}
-
-  info:
-    - name: Documentation
-      value: https://grafana.com/docs/loki
-    - name: Repository
-      value: https://github.com/grafana/loki
+  {{- include "core.syncPolicy" .Values.syncPolicy | nindent 2 }}
 {{- end }}

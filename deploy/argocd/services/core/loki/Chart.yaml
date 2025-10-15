@@ -1,0 +1,13 @@
+---
+apiVersion: v2
+name: loki
+description: Installs Loki.
+type: application
+version: 1.0.0
+appVersion: "1.0"
+maintainers:
+  - name: EVEData Team
+dependencies:
+  - name: loki
+    version: 6.42.0
+    repository: https://grafana.github.io/helm-charts
