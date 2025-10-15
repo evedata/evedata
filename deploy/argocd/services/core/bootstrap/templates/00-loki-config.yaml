@@ -9,7 +9,7 @@ metadata:
     {{- include "bootstrap.labels" . | nindent 4 }}
     app.kubernetes.io/component: loki
   annotations:
-    argocd.argoproj.io/manifest-generate-paths: /deploy/argocd/services/core/loki-config/**/*.{tpl,yaml};/deploy/argocd/services/core/bootstrap/**/*.{tpl,yaml}
+    argocd.argoproj.io/manifest-generate-paths: /deploy/argocd/
     argocd.argoproj.io/sync-wave: "1"
   finalizers:
     - argocd.argoproj.io/resources-finalizer
