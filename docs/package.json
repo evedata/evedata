@@ -12,7 +12,7 @@
   "dependencies": {},
   "devDependencies": {
     "markdownlint-cli2": "^0.18.1",
-    "wrangler": "^4.28.0"
+    "wrangler": "^4.43.0"
   },
   "packageManager": "pnpm@10.17.0",
   "engines": {

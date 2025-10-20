@@ -20,7 +20,7 @@
     "prettier-plugin-toml": "^2.0.6"
   },
   "devDependencies": {
-    "wrangler": "^4.28.1"
+    "wrangler": "^4.43.0"
   },
   "packageManager": "pnpm@10.17.0",
   "engines": {
